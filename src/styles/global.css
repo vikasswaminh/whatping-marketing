@@ -172,7 +172,10 @@ samp {
   color: var(--text-secondary);
   font-size: var(--size-body-lg);
   line-height: 1.55;
-  max-width: 58ch;
+  /* 50, not 58. `ch` measures the `0` advance, and Geist's zero is wide relative to its
+     average glyph — 58ch measured 684px, which rendered as 74 characters, past the top of
+     the comfortable 45–75 band. Measured from a screenshot, not assumed. */
+  max-width: 50ch;
 }
 
 /* --- buttons -------------------------------------------------------------- */
@@ -584,7 +587,8 @@ a.btn--secondary,
   padding: 0.4rem 0.7rem;
   background: var(--surface-raised);
   border: 1px solid var(--hairline-strong);
-  border-radius: var(--radius-sm);
+  /* Pill, like every other control. It was the one shape not in the system. */
+  border-radius: var(--radius-pill);
   color: var(--text-primary);
   font: inherit;
   font-size: var(--size-small);
