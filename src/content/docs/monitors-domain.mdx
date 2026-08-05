@@ -1,0 +1,101 @@
+---
+route: "/docs/monitors/domain"
+title: "Domain expiry monitors — WhatPing docs"
+description: "Check your domain registration expiry against the registry, with a warning threshold you set per monitor."
+h1: "Domain expiry monitors"
+---
+
+import Callout from "../../components/Callout.astro";
+
+## What it checks
+
+Once a day, queries the **domain registry** for a domain and records the registrar, the
+registration expiry date, the days remaining and the nameservers on file.
+
+The check fails when days remaining is **below** your warning threshold, or when the registry
+returns no usable expiry date.
+
+## Fields
+
+| Field | Range | Default |
+|---|---|---|
+| Domain | bare registrable domain | — |
+| Warn below | 1 – 365 days | 30 days |
+| Interval | 20 s – 24 h | 24 h |
+| Failures before down | 1 – 10 | 2 |
+| Re-alert every | 5 min – 24 h, or off | off |
+
+Use the **registrable** domain — `example.com`, not `www.example.com`. Registration exists at
+the registrable level; a subdomain has no registry record of its own.
+
+## It does not require the domain to resolve
+
+This is a registry lookup, not a DNS lookup, so a domain with no A record is monitorable.
+
+That matters more than it first appears. A domain used mainly for email often publishes only MX
+and TXT records at the apex and nothing else — and a monitoring tool that resolves the domain
+before checking it would refuse to watch exactly the domains most likely to lapse unnoticed.
+
+## Choosing a threshold
+
+| Situation | Suggested |
+|---|---|
+| Auto-renew on, card known good | 30 days |
+| Auto-renew on, card owned by someone who left | 60 days |
+| Manual renewal, or a registrar you rarely sign into | 90 days |
+
+For anything that matters, err high. The renewal itself takes two minutes; finding out who
+controls the registrar account can take a week.
+
+## Failure messages
+
+```
+🔴 DOWN — example-com-registration (example.com): domain registration expires in 21 days
+🔴 DOWN — example-com-registration (example.com): registry returned no expiry date
+🔴 DOWN — example-com-registration (example.com): could not parse registry expiry date
+```
+
+On the monitor:
+
+```
+BigRock Solutions Ltd. · expires 2027-05-29T18:41:10 · 297 days remaining
+```
+
+## Registry coverage
+
+Most gTLDs — `.com`, `.net`, `.org`, `.io`, `.dev`, `.app` — publish a machine-readable expiry
+date and work well.
+
+Some ccTLDs publish little or nothing; the registry may withhold the expiry date entirely. When
+that happens the monitor reports `registry returned no expiry date` rather than guessing.
+
+If your TLD is not supported, this monitor cannot help, and a calendar reminder is the honest
+alternative.
+
+## Nameservers
+
+The nameservers on file at the registry are recorded alongside the expiry. A registrar-level
+hijack — where nameservers change without your involvement — shows up here, which is a different
+signal from a [DNS monitor](/docs/monitors/dns) watching records inside the zone.
+
+## Worked example
+
+```
+Domain:               example.com
+Warn below:           60 days
+Interval:             24 hours
+Failures before down: 1
+Re-alert every:       24 hours
+```
+
+<Callout type="note">
+If you set up one monitor in this product, make it this one. Thirty seconds, once, against a
+failure that takes down every service on the domain simultaneously — including the email that
+would have warned you.
+</Callout>
+
+## Related
+
+- [DNS monitors](/docs/monitors/dns)
+- [Certificate monitors](/docs/monitors/ssl)
+- [Why this matters](/features/domain-expiry-monitoring)

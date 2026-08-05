@@ -1,0 +1,32 @@
+---
+import { DOCS_NAV } from "../lib/site";
+
+const path = Astro.url.pathname;
+---
+
+<nav class="docs-sidebar" aria-label="Documentation">
+  <details open>
+    <summary>Documentation</summary>
+    <div class="docs-sidebar__body">
+      {
+        DOCS_NAV.map((group) => (
+          <>
+            <h2>{group.group}</h2>
+            <ul>
+              {group.items.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    aria-current={path === item.href ? "page" : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))
+      }
+    </div>
+  </details>
+</nav>

@@ -1,0 +1,35 @@
+---
+import Heartbeat from "../components/Heartbeat.astro";
+import Base from "../layouts/Base.astro";
+---
+
+<Base
+  title="Not found — WhatPing"
+  description="That page does not exist."
+>
+  <div class="shell" style="padding: clamp(4rem, 12vw, 9rem) 0 6rem">
+    <p class="eyebrow" style="max-width:26rem">404 — no response</p>
+    <h1 style="max-width:18ch">This one is genuinely down.</h1>
+    <p style="color:var(--dim);max-width:46ch;margin-top:1.25rem">
+      The page you asked for does not exist. Everything else is fine — which, as
+      this product spends a lot of time pointing out, is not the same thing.
+    </p>
+    <Heartbeat
+      count={28}
+      down={[12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]}
+      height="2rem"
+      class="notfound-hb"
+    />
+    <p style="margin-top:2.5rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+      <a class="cta" href="/">Home</a>
+      <a class="cta cta--ghost" href="/docs/">Documentation</a>
+    </p>
+  </div>
+</Base>
+
+<style>
+  :global(.notfound-hb) {
+    max-width: 22rem;
+    margin-top: 2.5rem;
+  }
+</style>

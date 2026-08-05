@@ -1,0 +1,42 @@
+---
+import Heartbeat from "../components/Heartbeat.astro";
+import Base from "./Base.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  h1: string;
+  eyebrow?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, h1, eyebrow = "WhatPing", jsonLd } = Astro.props;
+---
+
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <div class="shell">
+    <div class="page-head">
+      <p class="eyebrow">{eyebrow}</p>
+      <h1>{h1}</h1>
+      <Heartbeat
+        count={40}
+        down={[27, 28]}
+        warn={[26]}
+        height="1.4rem"
+        class="page-head__hb"
+      />
+    </div>
+
+    <article class="prose">
+      <slot />
+    </article>
+  </div>
+</Base>
+
+<style>
+  .page-head :global(.page-head__hb) {
+    margin-top: 2rem;
+    max-width: 18rem;
+    opacity: 0.75;
+  }
+</style>

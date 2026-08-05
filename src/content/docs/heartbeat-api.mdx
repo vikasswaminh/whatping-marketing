@@ -1,0 +1,149 @@
+---
+route: "/docs/heartbeat-api"
+title: "Heartbeat ping endpoint — WhatPing docs"
+description: "URL format, methods and responses for the heartbeat ping endpoint, with snippets for cron, systemd, GitHub Actions and Docker."
+h1: "Heartbeat ping endpoint"
+---
+
+import Callout from "../../components/Callout.astro";
+
+## The endpoint
+
+```
+GET  https://<your-whatping-host>/monitor/ping/<token>
+POST https://<your-whatping-host>/monitor/ping/<token>
+```
+
+Both methods behave identically. No headers, no body, no authentication beyond the token in the
+path.
+
+The exact URL is shown once, when you create the heartbeat monitor.
+
+## Responses
+
+| Status | Body | Meaning |
+|---|---|---|
+| `200` | `{"ok":true}` | Ping recorded |
+| `404` | `{"ok":false}` | Unknown token |
+
+**The response is deliberately uniform and detail-free.** A 404 does not say whether the token
+is malformed, expired or simply wrong, so the endpoint cannot be used to enumerate or probe
+monitors.
+
+Tokens longer than 128 characters are rejected without a lookup.
+
+## The token
+
+Generated when the monitor is created and **shown once**. It is stored hashed, in the same way
+as an API key, so it cannot be recovered — only rotated, which invalidates the previous one
+immediately.
+
+<Callout type="warning">
+Anyone holding the URL can mark your job healthy. Treat it as a credential: a CI secret, an
+environment variable, a root-only file. Not in a repository, not in a Dockerfile, not in a
+committed cron entry.
+</Callout>
+
+## Where to call it
+
+**Only on success, at the end of the happy path.** Never in a `finally`, a `trap`, or an
+`always()` step — that reports "I ran", when what you meant was "I worked".
+
+### cron
+
+```bash
+0 3 * * * /usr/local/bin/backup.sh && curl -fsS "$WHATPING_PING_URL"
+```
+
+`&&` means a failing backup does not ping. `-f` makes curl fail on HTTP errors, `-sS` keeps it
+quiet unless something goes wrong — so cron emails you only on a genuine problem.
+
+### Bash script
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+pg_dump mydb | gzip > /backups/mydb-$(date +%F).sql.gz
+aws s3 cp /backups/mydb-$(date +%F).sql.gz s3://backups/
+
+curl -fsS --retry 3 --max-time 10 "$WHATPING_PING_URL"
+```
+
+With `set -e`, reaching the last line means everything before it succeeded. `--retry 3` covers a
+transient network failure on the ping itself — the endpoint is idempotent, so a retry is safe.
+
+### systemd
+
+```ini
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/whatping.env
+ExecStart=/usr/local/bin/backup.sh
+ExecStartPost=/usr/bin/curl -fsS --retry 3 ${WHATPING_PING_URL}
+```
+
+`ExecStartPost` runs only if `ExecStart` succeeded. Keep the URL in an `EnvironmentFile` with
+mode `0600`, not in the unit.
+
+### GitHub Actions
+
+```yaml
+- name: Run nightly sync
+  run: ./scripts/sync.sh
+
+- name: Report success
+  if: success()
+  run: curl -fsS --retry 3 "${{ secrets.WHATPING_PING_URL }}"
+```
+
+`if: success()`. Not `if: always()`.
+
+### Docker / Kubernetes CronJob
+
+```yaml
+command: ["/bin/sh", "-c"]
+args:
+  - |
+    set -e
+    /app/run-job
+    curl -fsS --retry 3 "$WHATPING_PING_URL"
+env:
+  - name: WHATPING_PING_URL
+    valueFrom:
+      secretKeyRef: { name: whatping, key: ping-url }
+```
+
+### Python
+
+```python
+import requests
+
+run_the_job()                                   # raises on failure
+requests.get(PING_URL, timeout=10)              # only reached on success
+```
+
+### Node
+
+```js
+await runTheJob();                              // throws on failure
+await fetch(process.env.WHATPING_PING_URL);
+```
+
+## Timing
+
+The deadline is **expected interval + grace**. A job that pings hourly with a 5-minute grace is
+overdue at 65 minutes past the last ping.
+
+A monitor that has never been pinged is measured from when it was created, so a heartbeat that
+was configured but never wired up will eventually alert rather than sitting quiet forever.
+
+## Idempotency
+
+Pinging more often than expected is harmless — extra pings simply reset the deadline. A job that
+retries internally and pings twice does not create a problem.
+
+## Related
+
+- [Heartbeat monitors](/docs/monitors/heartbeat)
+- [Troubleshooting](/docs/troubleshooting)

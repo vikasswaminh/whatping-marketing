@@ -1,0 +1,57 @@
+---
+import DocsSidebar from "../components/DocsSidebar.astro";
+import { DOCS_FLAT } from "../lib/site";
+import Base from "./Base.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  h1: string;
+}
+
+const { title, description, h1 } = Astro.props;
+
+const path = Astro.url.pathname;
+const index = DOCS_FLAT.findIndex((item) => item.href === path);
+const prev = index > 0 ? DOCS_FLAT[index - 1] : undefined;
+const next =
+  index >= 0 && index < DOCS_FLAT.length - 1 ? DOCS_FLAT[index + 1] : undefined;
+---
+
+<Base title={title} description={description}>
+  <div class="shell docs">
+    <DocsSidebar />
+
+    <div class="docs-main">
+      <div class="page-head">
+        <p class="eyebrow">Documentation</p>
+        <h1>{h1}</h1>
+      </div>
+
+      <article class="prose">
+        <slot />
+      </article>
+
+      {
+        (prev || next) && (
+          <nav class="docs-nextprev" aria-label="Pagination">
+            {prev ? (
+              <a href={prev.href}>
+                <span>Previous</span>
+                {prev.label}
+              </a>
+            ) : (
+              <span />
+            )}
+            {next && (
+              <a href={next.href} style="text-align:right">
+                <span>Next</span>
+                {next.label}
+              </a>
+            )}
+          </nav>
+        )
+      }
+    </div>
+  </div>
+</Base>

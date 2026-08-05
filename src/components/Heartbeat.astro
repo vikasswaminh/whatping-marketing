@@ -1,0 +1,51 @@
+---
+/**
+ * The check-history strip a monitoring dashboard draws, reused as this site's ornament.
+ *
+ * Deterministic rather than random: a build that reshuffles the bars on every deploy produces
+ * a pointless diff, and a decorative element should not depend on Math.random at build time.
+ */
+interface Props {
+  count?: number;
+  /** Zero-based indexes rendered as an outage. */
+  down?: number[];
+  warn?: number[];
+  height?: string;
+  class?: string;
+  /** Seconds before the first bar rises. */
+  delay?: number;
+}
+
+const {
+  count = 48,
+  down = [],
+  warn = [],
+  height = "2.5rem",
+  class: className = "",
+  delay = 0,
+} = Astro.props;
+
+const downSet = new Set(down);
+const warnSet = new Set(warn);
+
+// A fixed pseudo-random walk keeps the bars visually alive without a random source.
+const heights = Array.from({ length: count }, (_, i) => {
+  const wave = Math.sin(i * 0.7) * 0.18 + Math.sin(i * 2.3) * 0.09;
+  return Math.round((0.72 + wave) * 100);
+});
+---
+
+<div
+  class={`heartbeat ${className}`}
+  style={`--hb-height:${height}`}
+  aria-hidden="true"
+>
+  {
+    heights.map((h, i) => (
+      <span
+        data-state={downSet.has(i) ? "down" : warnSet.has(i) ? "warn" : "up"}
+        style={`height:${downSet.has(i) ? 100 : h}%;animation-delay:${(delay + i * 0.012).toFixed(3)}s`}
+      />
+    ))
+  }
+</div>

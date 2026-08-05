@@ -1,0 +1,6 @@
+# Cloudflare Pages redirects. A static build has no server-side redirect layer.
+# www -> apex is a zone redirect rule, not here: _redirects only sees requests that
+# already reached this project.
+/talk-to-us     /contact/            308
+/docs/monitors  /docs/               308
+/vs             /vs/uptime-kuma/     308

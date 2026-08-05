@@ -1,0 +1,465 @@
+---
+import Heartbeat from "../components/Heartbeat.astro";
+import Base from "../layouts/Base.astro";
+import { APP_URL, SITE_URL } from "../lib/site";
+
+const title =
+  "WhatPing — uptime monitoring that watches your certificate, domain and DNS";
+const description =
+  "Free uptime monitoring for HTTP, TCP and cron jobs — plus TLS expiry, domain registration, DNS records and SPF/DMARC. Alerts by email, webhook, ntfy or Telegram.";
+
+const gaps = [
+  {
+    tag: "Registration lapsed",
+    h: "Your domain expires on a Sunday",
+    p: "The registrar pulls the nameservers, the zone stops resolving, and every service on the domain disappears at once. Email included, so you may not even get told.",
+  },
+  {
+    tag: "Certificate expired",
+    h: "Not down. Worse than down.",
+    p: "Browsers show an interstitial, API clients throw TLS errors, mobile apps fail silently. The server is fine, and it will keep telling you so.",
+  },
+  {
+    tag: "SPF broken",
+    h: "Your mail starts landing in spam",
+    p: "Including the alert emails that were supposed to tell you something is wrong. The monitoring is up. The path from the monitoring to you is not.",
+  },
+];
+
+const types = [
+  ["HTTP", "Status ranges, redirects, and a keyword assertion for when 200 is a lie", "/features/uptime-monitoring/"],
+  ["TCP", "A port either accepts a connection or it doesn't", "/features/uptime-monitoring/"],
+  ["Heartbeat", "Your cron job pings on success; we alert when it stops", "/features/heartbeat-monitoring/"],
+  ["Certificate", "Days until your TLS certificate expires, checked daily", "/features/certificate-monitoring/"],
+  ["Domain", "Days until your registration expires, read from the registry", "/features/domain-expiry-monitoring/"],
+  ["DNS", "Assert an A, AAAA, MX, TXT, CNAME or NS record still says what it should", "/features/dns-monitoring/"],
+  ["Email auth", "SPF and DMARC present and valid, so your mail keeps arriving", "/features/email-auth-monitoring/"],
+] as const;
+
+const proof = [
+  {
+    h: "It monitors its own prober",
+    p: "A heartbeat monitor watches the probe worker, so if the worker dies the system tells you rather than going quiet. Not theoretical — it caught a parsing bug that froze the worker on a stale configuration, and it was the only signal anything was wrong.",
+    href: "/docs/monitors/heartbeat/",
+  },
+  {
+    h: "A broken alert channel cannot corrupt your monitoring",
+    p: "Delivery is attempted after state is already committed, and every attempt is recorded. A webhook returning 500 forever will never make a monitor look up or down.",
+    href: "/docs/alerting/channels/",
+  },
+  {
+    h: "A retry cannot double-page you",
+    p: "Every check result carries a producer-generated ID, so a replay after a network blip is discarded rather than opening a second incident.",
+    href: "/docs/concepts/",
+  },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "WhatPing",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Web",
+  url: SITE_URL,
+  description,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+};
+---
+
+<Base title={title} description={description} jsonLd={jsonLd}>
+  <!-- Hero ------------------------------------------------------------ -->
+  <section class="hero">
+    <div class="shell">
+      <p class="eyebrow">Uptime · certificates · domains · DNS · email auth</p>
+
+      <h1 class="hero__h1">
+        The outage that returns <span class="hero__code">HTTP 200</span> right up
+        until it doesn&rsquo;t
+      </h1>
+
+      <p class="hero__sub">
+        Your certificate expires. Your domain registration lapses. Someone edits
+        a DNS record. Your SPF breaks and your email stops arriving. A health
+        check sees none of it — and then everything is down at once. WhatPing
+        watches all four, alongside ordinary HTTP, TCP and cron monitoring.
+      </p>
+
+      <div class="hero__cta">
+        <a class="cta" href={APP_URL}>Start monitoring — free</a>
+        <a class="cta cta--ghost" href="/how-it-works/">See how it works</a>
+      </div>
+
+      <p class="hero__beta">
+        Free while in beta · no card · 20 monitors per workspace · one probe
+        location
+      </p>
+
+      <Heartbeat
+        count={64}
+        down={[41, 42, 43]}
+        warn={[40, 44]}
+        height="4.5rem"
+        class="hero__hb"
+        delay={0.15}
+      />
+      <p class="hero__hb-caption">
+        <span>check history</span>
+        <span>&larr; certificate expired here</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- The gap --------------------------------------------------------- -->
+  <section class="band">
+    <div class="shell">
+      <p class="eyebrow">01 — The gap</p>
+      <h2 class="band__h">
+        Four outages your health check will never predict
+      </h2>
+
+      <div class="card-grid">
+        {
+          gaps.map((g) => (
+            <div class="card">
+              <span class="card__tag">{g.tag}</span>
+              <h3>{g.h}</h3>
+              <p>{g.p}</p>
+              <p class="card__foot">
+                A health check would have returned 200 the whole time.
+              </p>
+            </div>
+          ))
+        }
+      </div>
+
+      <p class="band__close">
+        Every one of these is a total outage with no warning signal in the place
+        everyone looks. So WhatPing looks somewhere else as well.
+      </p>
+    </div>
+  </section>
+
+  <!-- Monitor types --------------------------------------------------- -->
+  <section class="band">
+    <div class="shell">
+      <p class="eyebrow">02 — Monitor types</p>
+      <h2 class="band__h">Seven things worth watching</h2>
+
+      <div class="card-grid">
+        {
+          types.map(([name, line, href]) => (
+            <a class="card" href={href}>
+              <span class="card__tag">{name}</span>
+              <p>{line}</p>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Alerting -------------------------------------------------------- -->
+  <section class="band">
+    <div class="shell">
+      <p class="eyebrow">03 — Alerting</p>
+      <h2 class="band__h">Alerts that keep working when the first one doesn&rsquo;t</h2>
+
+      <div class="split">
+        <div class="measure">
+          <p>
+            Email, webhook, ntfy and Telegram. The webhook payload carries
+            <code>text</code> and <code>content</code> aliases, so one endpoint works
+            for Slack, Discord, Mattermost and plain automation receivers without
+            per-provider setup.
+          </p>
+          <p>
+            <strong>Reminders while you are still down.</strong> Most tools alert
+            once, on the transition. If that message fails to deliver, a six-hour
+            outage is indistinguishable from everything being fine. Off unless you
+            turn it on — a repeating alert on a flapping monitor is how people learn
+            to filter your notifications.
+          </p>
+          <p>
+            <strong>A second opinion.</strong> When a check fails, WhatPing asks a
+            network that isn&rsquo;t ours whether it agrees, and says so in the alert.
+            &ldquo;The site is down&rdquo; and &ldquo;<em>we</em> can&rsquo;t reach the
+            site&rdquo; are different problems.
+          </p>
+          <p><a href="/features/alerting/">How alerting works &rarr;</a></p>
+        </div>
+
+        <figure class="terminal">
+          <figcaption>alert stream</figcaption>
+          <pre><code><span class="t-down">🔴 DOWN</span> — api (https://api.example.com):
+connect failed: Connection refused (os error 111)
+
+<span class="t-down">🔴 STILL DOWN (1h 35m)</span> — api (https://api.example.com):
+connect failed: Connection refused (os error 111)
+<span class="t-dim">· confirmed unreachable from a second network</span>
+
+<span class="t-up">🟢 RECOVERED</span> — api (https://api.example.com) after 5820s</code></pre>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works ---------------------------------------------------- -->
+  <section class="band">
+    <div class="shell">
+      <p class="eyebrow">04 — How it works</p>
+      <h2 class="band__h">Three moving parts</h2>
+
+      <ol class="steps">
+        <li>
+          <span>01</span>
+          <strong>A stateless Rust prober</strong> runs the checks. It holds no
+          state of its own, so it can be restarted mid-outage without losing or
+          duplicating anything.
+        </li>
+        <li>
+          <span>02</span>
+          <strong>A backend that owns every decision.</strong> The prober reports
+          raw observations; whether that means &ldquo;down&rdquo; is decided in one
+          place, against your threshold.
+        </li>
+        <li>
+          <span>03</span>
+          <strong>Certificate, domain, DNS and email checks run daily</strong>,
+          because a certificate does not stop being valid between one minute and
+          the next.
+        </li>
+      </ol>
+
+      <p><a href="/how-it-works/">The architecture in detail &rarr;</a></p>
+    </div>
+  </section>
+
+  <!-- Proof ----------------------------------------------------------- -->
+  <section class="band">
+    <div class="shell">
+      <p class="eyebrow">05 — Proof</p>
+      <h2 class="band__h">No testimonials. Here is what you can check instead.</h2>
+
+      <div class="proof">
+        {
+          proof.map((item) => (
+            <div>
+              <h3>{item.h}</h3>
+              <p>{item.p}</p>
+              <p>
+                <a href={item.href}>Read the docs &rarr;</a>
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA ------------------------------------------------------- -->
+  <section class="band band--last">
+    <div class="shell">
+      <h2 class="band__h" style="max-width:20ch">
+        Start with the one you keep forgetting
+      </h2>
+      <p class="measure">
+        Add a domain expiry monitor. It takes about thirty seconds, it costs
+        nothing, and it covers the failure that no amount of health checking will
+        ever warn you about.
+      </p>
+      <p class="hero__cta">
+        <a class="cta" href={APP_URL}>Start monitoring — free</a>
+        <a class="cta cta--ghost" href="/docs/">Read the docs</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding: clamp(3.5rem, 10vw, 8rem) 0 clamp(3rem, 7vw, 5rem);
+    border-bottom: 1px solid var(--rule);
+  }
+  .hero__h1 {
+    font-size: var(--step-4);
+    max-width: 17ch;
+    line-height: 1.02;
+  }
+  .hero__code {
+    font-family: var(--mono);
+    font-size: 0.72em;
+    letter-spacing: -0.02em;
+    color: var(--up);
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    padding: 0.05em 0.3em;
+    white-space: nowrap;
+    vertical-align: 0.12em;
+  }
+  .hero__sub {
+    margin: 1.75rem 0 0;
+    max-width: 56ch;
+    font-family: var(--serif);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--dim);
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 2.25rem 0 0;
+  }
+  .hero__beta {
+    margin: 1.15rem 0 0;
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    color: var(--faint);
+  }
+  .hero :global(.hero__hb) {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+  }
+  .hero__hb-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.6rem 0 0;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .hero__hb-caption span:last-child {
+    color: var(--down);
+  }
+
+  .band {
+    padding: clamp(3rem, 8vw, 5.5rem) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .band--last {
+    border-bottom: 0;
+  }
+  .band__h {
+    max-width: 24ch;
+    margin-bottom: 2.25rem;
+  }
+  .band__close {
+    margin: 2rem 0 0;
+    max-width: var(--measure);
+    color: var(--dim);
+  }
+  .band p {
+    text-wrap: pretty;
+  }
+
+  .card__foot {
+    margin-top: 0.9rem !important;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 0.72rem !important;
+    letter-spacing: 0.04em;
+    color: var(--faint) !important;
+  }
+
+  .split {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: start;
+  }
+  .split p {
+    color: var(--dim);
+  }
+  .split p + p {
+    margin-top: 1.1rem;
+  }
+  @media (max-width: 58rem) {
+    .split {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .terminal {
+    margin: 0;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--ink-sunken);
+    overflow: hidden;
+  }
+  .terminal figcaption {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .terminal pre {
+    margin: 0;
+    padding: 1.1rem 1rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.75;
+    color: var(--dim);
+  }
+  .t-down {
+    color: var(--down);
+  }
+  .t-up {
+    color: var(--up);
+  }
+  .t-dim {
+    color: var(--faint);
+  }
+
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--rule);
+    border-block: 1px solid var(--rule);
+  }
+  .steps li {
+    background: var(--ink);
+    padding: 1.35rem 0;
+    display: grid;
+    grid-template-columns: 4rem minmax(0, var(--measure));
+    gap: 1rem;
+    color: var(--dim);
+  }
+  .steps span {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    color: var(--faint);
+  }
+  @media (max-width: 40rem) {
+    .steps li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.4rem;
+    }
+  }
+
+  .proof {
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  }
+  .proof h3 {
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+  }
+  .proof p {
+    color: var(--dim);
+    font-size: var(--step--1);
+    margin: 0 0 0.75rem;
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import Callout from "../components/Callout.astro";
+import Marketing from "../layouts/Marketing.astro";
+import { SITE_URL, normalize } from "../lib/site";
+
+export async function getStaticPaths() {
+  const pages = await getCollection("pages");
+  return pages.map((entry) => ({
+    // `route` frontmatter is authoritative, so docs/site/02-SITEMAP.md stays the source of
+    // truth for URLs even though the content files are flat.
+    params: { slug: normalize(entry.data.route).replace(/^\/|\/$/g, "") },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props as { entry: CollectionEntry<"pages"> };
+const { Content } = await render(entry);
+
+// Comparison pages are the ones people find through search; give them article markup.
+const isComparison = entry.data.route.startsWith("/vs/");
+const jsonLd = isComparison
+  ? {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      headline: entry.data.h1,
+      description: entry.data.description,
+      url: new URL(normalize(entry.data.route), SITE_URL).href,
+    }
+  : undefined;
+---
+
+<Marketing
+  title={entry.data.title}
+  description={entry.data.description}
+  h1={entry.data.h1}
+  jsonLd={jsonLd}
+>
+  <Content components={{ Callout }} />
+</Marketing>

@@ -1,0 +1,5 @@
+# Cloudflare prepends a managed block with its own `User-agent: *` group.
+# Declaring a second one would be a duplicate group that crawlers may ignore, so this
+# contributes only the sitemap, which is group-independent.
+
+Sitemap: https://whatping.com/sitemap-index.xml

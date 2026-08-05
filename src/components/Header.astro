@@ -1,0 +1,45 @@
+---
+import { APP_URL } from "../lib/site";
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="shell site-header__inner">
+    <a class="wordmark" href="/">
+      <span class="dot" aria-hidden="true"></span>WhatPing
+    </a>
+
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      data-nav-toggle
+    >
+      Menu
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary">
+      <a href="/features/" aria-current={isActive("/features") ? "page" : undefined}>Features</a>
+      <a href="/how-it-works/" aria-current={isActive("/how-it-works") ? "page" : undefined}>How it works</a>
+      <a href="/pricing/" aria-current={isActive("/pricing") ? "page" : undefined}>Pricing</a>
+      <a href="/docs/" aria-current={isActive("/docs") ? "page" : undefined}>Docs</a>
+      <a href="/vs/uptime-kuma/" aria-current={isActive("/vs") ? "page" : undefined}>Compare</a>
+      <a class="cta" href={APP_URL}>Start free</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+  const nav = document.getElementById("site-nav");
+  toggle?.addEventListener("click", () => {
+    const open = nav?.dataset.open === "true";
+    if (nav) nav.dataset.open = String(!open);
+    toggle.setAttribute("aria-expanded", String(!open));
+    toggle.textContent = open ? "Menu" : "Close";
+  });
+</script>

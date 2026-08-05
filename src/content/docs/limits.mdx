@@ -1,0 +1,103 @@
+---
+route: "/docs/limits"
+title: "Limits and defaults — WhatPing docs"
+description: "Every bound and default in one table — intervals, timeouts, thresholds, retention and the monitor cap."
+h1: "Limits and defaults"
+---
+
+## Workspace
+
+| Limit | Value |
+|---|---|
+| Monitors per workspace | 20 |
+| Members per workspace | no limit |
+| Alert channels per workspace | no limit |
+| Channels per monitor | no limit |
+
+## Timing
+
+| Setting | Range | Default |
+|---|---|---|
+| Check interval | 20 seconds – 24 hours | 60 seconds (probed types) |
+| Check interval | 20 seconds – 24 hours | 24 hours (certificate, domain, DNS, email auth) |
+| Timeout | 1 – 60 seconds | 10 seconds |
+| Failures before down | 1 – 10 | 2 |
+| Re-alert interval | 5 minutes – 24 hours, or off | off |
+
+## HTTP monitors
+
+| Setting | Range | Default |
+|---|---|---|
+| URL length | up to 2048 characters | — |
+| Accepted status | codes and inclusive ranges, e.g. `200-299,301` | `200` |
+| Max redirects | 0 – 10 | 0 |
+| Keyword length | up to 200 characters | none |
+| Response body read for keyword match | up to 256 KB | — |
+| Second opinion | on / off | on |
+
+## TCP monitors
+
+| Setting | Range |
+|---|---|
+| Port | 1 – 65535 |
+
+## Heartbeat monitors
+
+| Setting | Range | Default |
+|---|---|---|
+| Expected ping interval | 1 minute – 7 days | 1 hour |
+| Grace period | 0 seconds and up | 5 minutes |
+| Ping token length | up to 128 characters | — |
+
+## Certificate and domain monitors
+
+| Setting | Range | Default |
+|---|---|---|
+| Warning threshold | 1 – 365 days | 30 days |
+
+## DNS monitors
+
+| Setting | Values | Default |
+|---|---|---|
+| Record type | A, AAAA, MX, TXT, CNAME, NS | A |
+| Expected value | any substring, optional | none |
+
+## Data
+
+| Item | Value |
+|---|---|
+| Raw check result retention | 7 days |
+| Uptime windows available | last 24 hours, last 7 days |
+| Long-term aggregation | none |
+| Incident retention | until the monitor is deleted |
+| Monitor name length | up to 80 characters |
+| Stored error message length | up to 200 characters |
+
+## Targets
+
+| Rule | Applies to |
+|---|---|
+| `http` and `https` schemes only | HTTP monitors |
+| URLs with embedded credentials rejected | HTTP monitors |
+| Private-network targets refused by default | HTTP and TCP monitors |
+| Bare domain required — no scheme, port, path or IP literal | certificate, domain, DNS, email auth |
+
+"Private-network" covers loopback, RFC1918, link-local (including the cloud metadata address),
+CGNAT, IETF protocol assignments, benchmarking and multicast ranges, plus the IPv6 equivalents
+and internal-only hostname suffixes. Detail: [security model](/docs/security).
+
+## Not limits — things that do not exist
+
+So you do not go looking for the setting:
+
+- No probe location selection. Checks run from one location.
+- No status pages, maintenance windows, incident acknowledgement, tags or on-call scheduling.
+  See the [roadmap](/roadmap).
+- No SMS or phone alerts.
+- No public API for creating or managing monitors. The only public endpoint is the
+  [heartbeat ping](/docs/heartbeat-api).
+
+## Related
+
+- [Concepts](/docs/concepts)
+- [Pricing](/pricing)

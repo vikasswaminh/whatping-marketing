@@ -1,0 +1,74 @@
+---
+import { APP_URL } from "../lib/site";
+
+const cols = [
+  {
+    title: "Product",
+    links: [
+      ["Features", "/features/"],
+      ["How it works", "/how-it-works/"],
+      ["Pricing", "/pricing/"],
+      ["Roadmap", "/roadmap/"],
+      ["Changelog", "/changelog/"],
+    ],
+  },
+  {
+    title: "Monitor types",
+    links: [
+      ["Uptime — HTTP & TCP", "/features/uptime-monitoring/"],
+      ["Cron heartbeat", "/features/heartbeat-monitoring/"],
+      ["Certificate expiry", "/features/certificate-monitoring/"],
+      ["Domain expiry", "/features/domain-expiry-monitoring/"],
+      ["DNS records", "/features/dns-monitoring/"],
+      ["SPF & DMARC", "/features/email-auth-monitoring/"],
+    ],
+  },
+  {
+    title: "Docs",
+    links: [
+      ["Quickstart", "/docs/quickstart/"],
+      ["Concepts", "/docs/concepts/"],
+      ["Alerting", "/docs/alerting/channels/"],
+      ["Webhook payload", "/docs/webhook-payload/"],
+      ["Limits", "/docs/limits/"],
+      ["Troubleshooting", "/docs/troubleshooting/"],
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      ["About", "/about/"],
+      ["Security", "/security/"],
+      ["Contact", "/contact/"],
+      ["Privacy", "/legal/privacy/"],
+      ["Terms", "/legal/terms/"],
+    ],
+  },
+] as const;
+---
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="site-footer__cols">
+      {
+        cols.map((col) => (
+          <div>
+            <h2>{col.title}</h2>
+            <ul>
+              {col.links.map(([label, href]) => (
+                <li>
+                  <a href={href}>{label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="site-footer__base">
+      <span>WhatPing — free while in beta, no SLA</span>
+      <span><a href={APP_URL}>monitor.whatping.com</a></span>
+    </div>
+  </div>
+</footer>
