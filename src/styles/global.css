@@ -741,7 +741,7 @@ a.btn--secondary,
 /* The heartbeat motif, one bar of it: the active page is the live bar. */
 .docs-sidebar a[aria-current="page"] {
   color: var(--text-primary);
-  border-left-color: var(--accent);
+  border-left-color: var(--accent-indicator);
 }
 
 .docs-toc h2 {

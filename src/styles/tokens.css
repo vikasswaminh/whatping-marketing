@@ -78,6 +78,10 @@
   --accent-active: color-mix(in oklch, var(--accent), black 18%);
   --accent-soft: var(--brand-beige-medium);
   --accent-line: color-mix(in oklch, var(--accent) 45%, var(--hairline));
+  /* Indicators are non-text UI, which WCAG 1.4.11 holds to 3:1. #ff8205 on cream is
+     2.38:1 — found by the render check reading the docs sidebar bar, not by the token
+     audit, which was never looking at it. */
+  --accent-indicator: var(--accent-text);
   --accent-glow: color-mix(in oklch, var(--brand-yellow) 22%, transparent);
 
   --focus-ring: color-mix(in oklch, var(--brand-orange-dark) 65%, transparent);
@@ -177,6 +181,7 @@
   /* On black, orange is legible as text — so the text form goes back to the
      brighter brand value rather than the darkened one. */
   --accent-text: var(--brand-orange-light);
+  --accent-indicator: var(--brand-orange);
   --accent-soft: #2a1a05;
   --accent-glow: color-mix(in oklch, var(--brand-orange) 16%, transparent);
 
