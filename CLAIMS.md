@@ -107,12 +107,44 @@ drifted from the code is worse than no claim, because it will be believed.
 | Password: 8+ chars, upper, lower, digit; email verification required | `packages/backend/convex/auth.ts` |
 | Google sign-in is **not** enabled | `convex env list` on the deployment — no `AUTH_GOOGLE_ID` |
 
+## Public API
+
+| Claim | Source |
+|---|---|
+| Base URL `/v1` on the Convex site host | `packages/backend/convex/http.ts` — `pathPrefix: "/v1/"` |
+| Bearer `sk_…` key auth, workspace-scoped | `convex/api/auth.ts` — `resolve` |
+| Read and write scopes; write implies read | `schema.ts` — `apiScope`; `api/router.ts` scope check |
+| Unknown, revoked and expired keys are indistinguishable | `api/auth.ts` — one `null` return; asserted in `api.test.ts` |
+| 600 reads and 60 writes per minute, per key, continuous refill | `api/auth.ts` — `LIMITS`, `consume` |
+| `RateLimit-*` headers on every response; 429 carries `Retry-After` | `api/router.ts` |
+| `Idempotency-Key` on POST; replay returns the original; different body is 409 | `api/router.ts`; `apiIdempotency` table |
+| Cursor pagination, limit 1–100 default 25 | `api/routes.ts` — `pageSize`; `api/queries.ts` `paginate` |
+| Cross-workspace access returns 404, not 403 | `api/queries.ts` — `getMonitor` |
+| Channel destinations returned redacted | `api/queries.ts` — `listChannels` via `redactChannelConfig` |
+| Writes use the same validation as the dashboard | `monitors.ts` — `updateImpl`/`setEnabledImpl`/`removeImpl`, shared by both entry points |
+| The endpoint list matches the spec in both directions | `apps/marketing/scripts/build-openapi.py --check` |
+
+## Probe protocols
+
+| Claim | Source |
+|---|---|
+| Eleven monitor types | `schema.ts` — `monitorType` |
+| ICMP: 1–10 echoes, 0–99% loss threshold, median RTT | `utils/monitorTarget.ts`; `services/monitor-worker/src/protocols.rs` — `probe_icmp` |
+| ICMP runs unprivileged via `ping_group_range`, no `CAP_NET_RAW` | `deploy/60-monitor-worker.sh`; `protocols.rs` module comment |
+| UDP has no generic port-open mode | `protocols.rs` — `probe_udp` and its tests |
+| UDP payload presets: dns, ntp, stun, raw | `protocols.rs` — `dns_query`, `ntp_query`, `stun_query`, `hex_decode` |
+| ICMP port-unreachable is reported distinctly from silence | `protocols.rs` — `ConnectionRefused` arm; test `udp_distinguishes_a_refused_port_from_silence` |
+| gRPC asserts `SERVING` via `grpc.health.v1.Health/Check` | `protocols.rs` — `probe_grpc` |
+| SMTP expects `220`, IMAP expects `* OK`, then optional STARTTLS | `protocols.rs` — `probe_mail` |
+| Mail banners are never forwarded into the stored error | `probe_mail`; test `mail_probe_rejects_a_wrong_greeting_without_echoing_the_banner` |
+| Every probe type reaches the worker's config | `monitorWorker.ts` — `PROBE_TYPES`; test in `api.test.ts` |
+
 ## Proof claims used in marketing copy
 
 | Claim | Source |
 |---|---|
-| 187 backend tests | `bun x vitest run` in `packages/backend` |
-| 22 prober tests | `cargo test` in `services/monitor-worker` |
+| 228 backend tests | `bun x vitest run` in `packages/backend` |
+| 36 prober tests | `cargo test` in `services/monitor-worker` |
 | The heartbeat caught a prober regression within ~10 minutes | Commit `9d58d51` and the session that produced it |
 | A DNS error envelope once made a dead domain read as up | Commit `ca8dad4` |
 | DNS monitors ignored the configured record type | Commit `5cd993b` |
@@ -138,6 +170,7 @@ in the sweep below.
 | `/security`, `/docs/security` | no SOC 2, ISO 27001, penetration test |
 | `/docs/security` | no SSO, no SAML, Google sign-in not enabled |
 | `/vs/uptime-kuma` | "unlimited monitors" — describing Uptime Kuma, not WhatPing |
+| `/docs/monitors/udp`, `/docs/faq`, `/features` | "no generic UDP port check" — a capability deliberately not built, because the question is unanswerable |
 | `/docs/faq`, `/pricing`, `/docs/limits` | 7-day retention, 20-monitor cap |
 | `/`, `/features/certificate-monitoring` | "mobile apps fail silently" — the reader's apps breaking, not a WhatPing app |
 | `/features/domain-expiry-monitoring` | "your SSO" — the reader's SSO going down with the domain |

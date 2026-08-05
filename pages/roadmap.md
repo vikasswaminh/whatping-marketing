@@ -65,9 +65,6 @@ than keeping every raw result.
 policy strength. Today WhatPing checks that SPF and DMARC are present, not that they are
 optimal.
 
-**A public API** — for creating and managing monitors programmatically. The only public
-endpoint today is the heartbeat ping.
-
 **More monitors per workspace** — the cap of 20 is conservative and will move.
 
 ---
@@ -99,5 +96,7 @@ The things below were on this page and are now in the product. Full detail in th
 - Accepted status ranges and configurable redirect depth
 - Reminders while an incident is still open
 - External second opinion on HTTP incidents
+- A public REST API for monitors, incidents, results and channels
+- ICMP ping, UDP, gRPC health and SMTP/IMAP monitor types
 
 **CTA:** See what exists today → `/features`

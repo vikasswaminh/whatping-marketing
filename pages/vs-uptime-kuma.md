@@ -27,7 +27,8 @@ for that.
   webhooks and more. WhatPing has four.
 - **Community and longevity.** Thousands of contributors and users. WhatPing is one developer
   and a few months old.
-- **More protocol types** — ping/ICMP, DNS, Docker containers, Steam game servers, gRPC.
+- **More protocol types still** — Docker containers, Steam game servers, Radius, and a
+  longer list of one-off integrations.
 
 ## Where WhatPing wins
 
@@ -60,9 +61,12 @@ for that.
 | **SPF / DMARC monitoring** | ✓ | ✗ |
 | **External second opinion** | ✓ | ✗ |
 | Reminders while down | ✓ | ✓ |
-| ICMP / ping | ✗ | ✓ |
+| ICMP / ping | ✓ | ✓ |
 | Status pages | ✗ ([roadmap](/roadmap)) | ✓ |
 | Maintenance windows | ✗ ([roadmap](/roadmap)) | ✓ |
+| gRPC health check | ✓ | ✓ |
+| SMTP / IMAP banner + STARTTLS | ✓ | ✗ |
+| Public REST API | ✓ | ✗ |
 | Notification integrations | 4 | ~20 |
 | Monitor limit | 20 per workspace | unlimited |
 | Check history | 7 days | as long as your disk allows |

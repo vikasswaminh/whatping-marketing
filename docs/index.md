@@ -26,6 +26,10 @@ later.
 | **Domain** | How long until my registration expires? | [docs](/docs/monitors/domain) |
 | **DNS** | Does this record still say what it should? | [docs](/docs/monitors/dns) |
 | **Email auth** | Are SPF and DMARC still published? | [docs](/docs/monitors/email-auth) |
+| **ICMP** | Is this host reachable, and how lossy is the path? | [docs](/docs/monitors/icmp) |
+| **UDP** | Does this DNS, NTP or STUN service answer? | [docs](/docs/monitors/udp) |
+| **gRPC** | Does the health service report SERVING? | [docs](/docs/monitors/grpc) |
+| **SMTP / IMAP** | Does the mail server greet, and does STARTTLS work? | [docs](/docs/monitors/mail) |
 
 HTTP, TCP and heartbeat run at your chosen interval, from 20 seconds. The other four default to
 once a day, because certificates and registrations change on a scale of months.
@@ -46,6 +50,9 @@ stays open. Off by default.
 ---
 
 ## Reference
+
+**[API reference](/docs/api)** — provision monitors and read state from Terraform, CI or your
+own dashboard. Bearer key auth, cursor pagination, idempotent creates.
 
 **[Webhook payload](/docs/webhook-payload)** — the full JSON schema, with a real example.
 

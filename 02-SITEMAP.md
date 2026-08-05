@@ -8,7 +8,7 @@ to be prettier; they are targeting the query, not the reader who already arrived
 | Route | Content file | Title | Description | Priority |
 |---|---|---|---|---|
 | `/` | `pages/home.md` | WhatPing — uptime monitoring that watches your certificate, domain and DNS | Free uptime monitoring for HTTP, TCP and cron jobs — plus TLS expiry, domain registration, DNS records and SPF/DMARC. Alerts by email, webhook, ntfy or Telegram. | 1.0 |
-| `/features` | `pages/features.md` | Features — WhatPing | Seven monitor types, four alert channels, reminders while you are still down, and a second opinion from a network that is not ours. | 0.9 |
+| `/features` | `pages/features.md` | Features — WhatPing | Eleven monitor types, four alert channels, reminders while you are still down, and a second opinion from a network that is not ours. | 0.9 |
 | `/features/uptime-monitoring` | `pages/features-uptime.md` | HTTP and TCP uptime monitoring — WhatPing | Monitor HTTP and TCP endpoints from 20 seconds up. Accepted status ranges, redirect following, and keyword assertions that catch a 200 serving a broken page. | 0.8 |
 | `/features/heartbeat-monitoring` | `pages/features-heartbeat.md` | Cron and backup monitoring (heartbeat) — WhatPing | Get told when a cron job, backup or CI pipeline silently stops running. Your job pings a URL on success; WhatPing alerts when the ping does not arrive. | 0.8 |
 | `/features/certificate-monitoring` | `pages/features-certificate.md` | TLS certificate expiry monitoring — WhatPing | Know weeks before a certificate expires, not minutes after. Daily checks, issuer and days remaining, with a warning threshold you set per monitor. | 0.8 |
@@ -51,6 +51,10 @@ Sidebar groups in this order. `/docs` is the group-less index.
 | `/docs/monitors/domain` | `docs/monitors-domain.md` | Domain expiry monitors — WhatPing docs |
 | `/docs/monitors/dns` | `docs/monitors-dns.md` | DNS monitors — WhatPing docs |
 | `/docs/monitors/email-auth` | `docs/monitors-email-auth.md` | Email authentication monitors — WhatPing docs |
+| `/docs/monitors/icmp` | `docs/monitors-icmp.md` | ICMP monitors — WhatPing docs |
+| `/docs/monitors/udp` | `docs/monitors-udp.md` | UDP monitors — WhatPing docs |
+| `/docs/monitors/grpc` | `docs/monitors-grpc.md` | gRPC monitors — WhatPing docs |
+| `/docs/monitors/mail` | `docs/monitors-mail.md` | SMTP and IMAP monitors — WhatPing docs |
 
 **Alerting**
 
@@ -64,6 +68,7 @@ Sidebar groups in this order. `/docs` is the group-less index.
 
 | Route | Content file | Title |
 |---|---|---|
+| `/docs/api` | `docs/api.md` | API reference — WhatPing docs |
 | `/docs/webhook-payload` | `docs/webhook-payload.md` | Webhook payload — WhatPing docs |
 | `/docs/heartbeat-api` | `docs/heartbeat-api.md` | Heartbeat ping endpoint — WhatPing docs |
 | `/docs/limits` | `docs/limits.md` | Limits and defaults — WhatPing docs |

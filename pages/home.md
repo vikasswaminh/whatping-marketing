@@ -48,9 +48,9 @@ everyone looks. So WhatPing looks somewhere else as well.
 
 ---
 
-## Section 3 — Seven monitor types
+## Section 3 — Monitor types
 
-**Heading:** Seven things worth watching
+**Heading:** Everything worth watching
 
 `MonitorTypeGrid`, each card links to its feature page.
 
@@ -63,6 +63,7 @@ everyone looks. So WhatPing looks somewhere else as well.
 | **Domain** | Days until your registration expires, read from the registry | `/features/domain-expiry-monitoring` |
 | **DNS** | Assert an A, AAAA, MX, TXT, CNAME or NS record still says what it should | `/features/dns-monitoring` |
 | **Email auth** | SPF and DMARC present and valid, so your mail keeps arriving | `/features/email-auth-monitoring` |
+| **ICMP · UDP · gRPC · Mail** | The protocols a health check cannot reach | `/docs` |
 
 ---
 

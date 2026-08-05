@@ -1,7 +1,7 @@
 ---
 route: "/features"
 title: "Features — WhatPing"
-description: "Seven monitor types, four alert channels, reminders while you are still down, and a second opinion from a network that is not ours."
+description: "Eleven monitor types, four alert channels, reminders while you are still down, and a second opinion from a network that is not ours."
 h1: "Everything WhatPing watches"
 ---
 
@@ -28,8 +28,16 @@ monitorable. Redirect depth you control. Keyword assertions, including inverted 
 the case where the server returns 200 and serves a broken page.
 
 **[TCP monitoring](/features/uptime-monitoring)**
-For everything that isn't HTTP: a database port, an SMTP listener, a game server. Either the
+For everything that isn't HTTP: a database port, a message broker, a game server. Either the
 port accepts a connection or it doesn't.
+
+**ICMP, UDP, gRPC and SMTP/IMAP**
+Ping a host and track packet loss. Ask a DNS, NTP or STUN service a real question and require
+a real answer — there is no generic "UDP port open" check, because that question cannot be
+answered. Call a gRPC health service and require `SERVING`. Read a mail server's greeting and
+complete a STARTTLS handshake, which is where an expired certificate on port 587 surfaces.
+[ICMP](/docs/monitors/icmp) · [UDP](/docs/monitors/udp) · [gRPC](/docs/monitors/grpc) ·
+[SMTP / IMAP](/docs/monitors/mail)
 
 **[Heartbeat monitoring](/features/heartbeat-monitoring)**
 Inverted monitoring for things that have no address to poll. Your cron job, backup script or
@@ -75,6 +83,13 @@ protects the path your alerts travel down.
 - **A delivery ledger** — every send is recorded, so a channel that has been quietly failing
   is visible rather than assumed to be working.
 
+## Automation
+
+**[REST API](/docs/api)** — provision monitors from Terraform or CI and read incidents,
+results and uptime back into your own dashboard. Bearer key auth, read/write scopes, cursor
+pagination, and `Idempotency-Key` so a rerun does not create duplicates. Writes go through the
+same validation the dashboard uses, so the API accepts exactly what the interface accepts.
+
 ---
 
 ## What WhatPing does not do
@@ -88,6 +103,7 @@ Stated plainly, because finding out later is worse.
   roadmap.
 - **No SMS or phone calls.** Email, webhook, ntfy and Telegram only.
 - **20 monitors per workspace**, and 7 days of raw check history.
+- **No implicit-TLS mail ports** (465, 993) — use a TCP monitor there for now.
 
 If you need multi-region probing and on-call rotation today, [Better
 Stack](/vs/better-stack) does that and WhatPing does not.

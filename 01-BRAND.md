@@ -145,14 +145,14 @@ page.
 - SMS, phone calls, PagerDuty, Opsgenie, Slack app (the webhook works with Slack; there is no
   Slack app), Discord app (same), Microsoft Teams.
 - A mobile app.
-- A public REST API for creating or managing monitors. The only public HTTP surface is the
-  heartbeat ping endpoint; webhooks are outbound.
 - SSO, SAML, or Google sign-in. **`AUTH_GOOGLE_ID` is not configured on the deployment** —
   sign-in is email + password, or a magic email code.
 - Any uptime SLA, guarantee, or "99.9%" figure about WhatPing itself.
 - Uptime history beyond **7 days** — raw results are purged at 7 days and there is no
   long-term rollup.
 - Log collection, metrics, APM, tracing, synthetic browser tests, screenshots on error.
+- Generic "is this UDP port open" checking. UDP monitors send a real request and require a
+  real reply; silence is not evidence and must never be presented as if it were.
 - Any customer count, company logo, testimonial, star rating, or "trusted by".
 - Compliance claims: SOC 2, ISO 27001, GDPR-compliant, HIPAA.
 
