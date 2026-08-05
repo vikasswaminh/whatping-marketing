@@ -77,6 +77,12 @@ word on an orange-accented page stops carrying information. `DOWN` does the work
 reinforces it. This is the mitigation for a collision that was accepted deliberately — on a
 monitoring product, orange chrome and amber warnings occupy the same visual register.
 
+*Exception, deliberate:* a **value or an error string that sits beside its own pill** may take
+the status colour — `21 days` next to `WARN`, `connection refused` next to `DOWN`. The pill has
+already named the state, so the colour is reinforcing a label the reader has, not standing in
+for one they do not. The rule is about colour carrying meaning *alone*; it never does here.
+Bare status-coloured text with no pill in the same row is still out.
+
 **Accessibility is asserted, not eyeballed.** `apps/marketing/scripts/verify-contrast.py`
 resolves every pair in **both** surface sets and fails below WCAG AA. It caught eight failures
 in the first pass of this palette, including every status pill.
