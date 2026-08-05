@@ -40,43 +40,46 @@ the problem is their own vantage point.
 
 ## Visual system
 
-Implemented in `apps/marketing/src/styles/tokens.css`. Three tiers — generator, primitives,
-semantic — and nothing outside that file states a colour.
+Implemented in `apps/marketing/src/styles/tokens.css`. Three tiers — brand, surfaces, semantic
+— and nothing outside that file states a colour. The one exception is the `theme-color` meta
+tag and the favicon data-URI in `Base.astro`, which cannot read CSS variables.
 
-**The architecture is borrowed from Linear; the identity is not.** Linear derives a whole
-theme from base, accent and contrast in LCH, and gets its depth from a surface ladder plus 1px
-hairlines with no drop shadows at all. That generator is worth copying. The palette is not:
-the documented failure mode of Linear-inspired sites is "a dark app with a purple button".
-
-So the accent is the product's own semantics. Up/down/warn *are* the brand colours, which is
-the one palette choice that could only belong to a monitoring tool.
+**The design language is capacity.so's**, extracted from their compiled CSS rather than
+eyeballed. A cream page with full-bleed black bands, orange brand, soft shadows, 10px radii.
 
 ```
---accent  oklch(0.78 0.155 155)   green — CTAs, links, active states, `up`
---down    oklch(0.68 0.19   25)   incidents only
---warn    oklch(0.82 0.15   78)   thresholds only
+--brand-orange        #ff8205     --brand-beige-light   #fffaeb
+--brand-orange-light  #ffaf00     --brand-beige-medium  #fff0c3
+--brand-orange-dark   #fa500f     --brand-beige-dark    #e9e2cb
+--brand-yellow        #ffd800     --brand-red           #e10500
+
+light   canvas #fffaeb · card #fcfbf8 · text #252525 · hairline #ebebeb
+dark    canvas #0a0a0a · card #1c1c1c · text #fafafa · hairline #27272a
+radius  0.625rem base, ±2/4px derived, pill for buttons
+shadow  0 1px 3px #0000001a, 0 2px 4px -1px #0000001a  (md)
 ```
 
-Surfaces are a lightness ramp — canvas, sunken, raised, overlay, hover — each about +0.025 L.
-Text is a four-step ladder. Interaction states are derived with `color-mix(in oklch, …)` rather
-than hand-picked, so changing the accent moves every state with it.
+**Dark is a section treatment, not a colour scheme.** `.band--dark` remaps the same semantic
+names, so the hero and the closing CTA are black bands inside a cream page and every component
+inside them works unchanged. `.surface--terminal` does the same for the alert-stream block.
 
-**Type: Geist Sans and Geist Mono**, self-hosted. Tracking tightens as size grows — −0.038em at
-the display size down to 0 at 14px. That single rule is most of what makes headlines read as
-engineered rather than merely large.
+**Type: Instrument Serif for h1/h2, Geist for body, Geist Mono for data.** Display tracking is
+flat at −0.05em with 1.08 leading, matching the reference rather than the size-scaled ramp the
+previous system used.
 
-**Weight band is 400–600.** No 300, no 700+.
+**Accent has two forms, and this is load-bearing.** `#ff8205` on cream is 2.2:1 — it fails AA
+as text, and even `#fa500f` only reaches 3.2:1. So `--accent` fills buttons (with a near-black
+label at 7.7:1) and `--accent-text` `#cd3c04` is the only orange that words are ever set in.
+Same reasoning for the status colours: brand hue kept, lightness solved to 4.75:1.
 
-**Exclusions carry as much of the look as the colours.** No drop shadows. No second accent. No
-gradients except one restrained radial wash behind the hero and the final CTA — read as light
-on a panel, not decoration. Radii cap at 16px.
-
-**Motion is scroll-driven CSS**, no JavaScript: `animation-timeline: view()` for reveals and
-`scroll()` for the header hairline. All of it inside `prefers-reduced-motion`.
+**Status is always a labelled pill, never bare coloured text.** With orange as the brand, a red
+word on an orange-accented page stops carrying information. `DOWN` does the work; the colour
+reinforces it. This is the mitigation for a collision that was accepted deliberately — on a
+monitoring product, orange chrome and amber warnings occupy the same visual register.
 
 **Accessibility is asserted, not eyeballed.** `apps/marketing/scripts/verify-contrast.py`
-resolves every token pair to sRGB and fails the build below WCAG AA. It has already caught one
-real failure: the eyebrow tier at 3.58:1 against a card.
+resolves every pair in **both** surface sets and fails below WCAG AA. It caught eight failures
+in the first pass of this palette, including every status pill.
 
 ---
 
