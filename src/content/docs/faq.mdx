@@ -83,10 +83,30 @@ Yes. Monitor anything you own or are authorised to monitor.
 
 ## Is there an API?
 
-Not for creating or managing monitors. The only public endpoint is the
-[heartbeat ping](/docs/heartbeat-api). Outbound webhooks are the integration surface.
+Yes. A REST API at `https://monitor-site.whatping.com/v1` covers monitors, incidents, check
+results and alert channels — enough to provision from Terraform or CI and read state back
+into your own dashboard.
 
-A management API is on the [roadmap](/roadmap).
+Authenticate with `Authorization: Bearer sk_…` using a key from your workspace settings.
+Keys are scoped read or write, and rate limits are 600 reads and 60 writes a minute.
+
+See the [API reference](/docs/api). Outbound webhooks remain the push side.
+
+## Do you support ping (ICMP)?
+
+Yes. An ICMP monitor sends echo requests, reports the median round-trip time, and fails
+above a packet-loss threshold you set.
+
+## Do you support UDP?
+
+Yes, with a constraint worth understanding before you rely on it: a generic "is this UDP
+port open" check is **not possible**. UDP has no handshake, so a port that never replies is
+indistinguishable from a firewall dropping your packets — a monitor built that way reports
+healthy for a dead service.
+
+So a UDP monitor sends something a real server answers — a DNS query, an NTP request, a STUN
+binding request, or raw bytes you supply — and requires a reply. See
+[UDP monitors](/docs/monitors/udp).
 
 ## Why 20 monitors?
 

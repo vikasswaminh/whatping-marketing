@@ -62,6 +62,36 @@ h1: "Limits and defaults"
 | Record type | A, AAAA, MX, TXT, CNAME, NS | A |
 | Expected value | any substring, optional | none |
 
+## ICMP monitors
+
+| Setting | Range | Default |
+|---|---|---|
+| Echo requests per check | 1 – 10 | 4 |
+| Packet-loss threshold | 0 – 99 % | 0 % |
+
+## UDP monitors
+
+| Setting | Values | Default |
+|---|---|---|
+| Payload | dns, ntp, stun, raw | dns |
+| Raw payload / expected reply | hex, up to 256 bytes | — |
+
+## gRPC monitors
+
+| Setting | Values | Default |
+|---|---|---|
+| Service name | blank asks about the server as a whole | blank |
+| TLS | on / off | off |
+
+## API
+
+| Limit | Value |
+|---|---|
+| Read requests | 600 per minute, per key |
+| Write requests | 60 per minute, per key |
+| Page size | 1 – 100, default 25 |
+| Idempotency-Key replay window | 24 hours |
+
 ## Data
 
 | Item | Value |
@@ -94,8 +124,8 @@ So you do not go looking for the setting:
 - No status pages, maintenance windows, incident acknowledgement, tags or on-call scheduling.
   See the [roadmap](/roadmap).
 - No SMS or phone alerts.
-- No public API for creating or managing monitors. The only public endpoint is the
-  [heartbeat ping](/docs/heartbeat-api).
+- No generic "UDP port open" check — see [UDP monitors](/docs/monitors/udp) for why that
+  question cannot be answered.
 
 ## Related
 

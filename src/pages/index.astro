@@ -74,6 +74,12 @@ const monitorCells = [
     title: "A, AAAA, MX, TXT, CNAME, NS",
     body: "Assert a record still says what it should.",
     href: "/features/dns-monitoring/",
+  },
+  {
+    tag: "ICMP · UDP · gRPC · Mail",
+    title: "The protocols a health check cannot reach",
+    body: "Ping with packet loss. DNS, NTP and STUN over UDP. gRPC health. SMTP and IMAP greetings with STARTTLS — where an expired certificate on port 587 shows up.",
+    href: "/docs/",
     wide: true,
   },
 ];
@@ -172,7 +178,7 @@ const jsonLd = {
   <section class="band">
     <div class="shell">
       <p class="eyebrow reveal">02 — Monitor types</p>
-      <h2 class="band__h reveal">Seven things worth watching</h2>
+      <h2 class="band__h reveal">Everything worth watching</h2>
       <Bento cells={monitorCells} />
     </div>
   </section>

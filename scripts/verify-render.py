@@ -19,6 +19,7 @@ Python packages for a job this small.
 import json
 import os
 import pathlib
+import re
 import struct
 import sys
 import time
@@ -203,6 +204,38 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     failures: list[str] = []
     print(f"base: {BASE}\nout:  {OUT}\n")
+
+    # Prove we are looking at the build in dist/, not whatever the edge is still serving.
+    # Without this the whole suite passes against the *previous* deployment — which is
+    # exactly what happened once: wrangler was missing from PATH, the deploy failed inside a
+    # pipeline that swallowed its exit code, and every check below reported green against
+    # the old site. A green run that proves nothing is worse than a red one.
+    dist_index = pathlib.Path(__file__).resolve().parents[1] / "dist/index.html"
+    if dist_index.exists():
+        want = set(re.findall(r'/_astro/[^"]+\.css', dist_index.read_text(encoding="utf-8")))
+        got: set[str] = set()
+        try:
+            req = urllib.request.Request(
+                f"{BASE}/?build={int(time.time())}",
+                headers={"user-agent": "whatping-render-check/1.0 (+https://whatping.com)"},
+            )
+            with urllib.request.urlopen(req, timeout=TIMEOUT) as res:
+                got = set(re.findall(r'/_astro/[^"]+\.css', res.read().decode("utf-8", "replace")))
+        except Exception as e:  # noqa: BLE001 — any failure here is a failed check
+            failures.append(f"could not fetch {BASE} to compare builds: {e}")
+            print(f"  BAD could not fetch {BASE}: {e}")
+
+        if want and got:
+            if want & got:
+                print(f"  ok  build matches dist/ ({sorted(want & got)[0]})")
+            else:
+                failures.append(
+                    f"live site is serving a different build — dist {sorted(want)}, live {sorted(got)}"
+                )
+                print(f"  BAD build mismatch: dist {sorted(want)}, live {sorted(got)}")
+    else:
+        print("  --  no dist/ here; skipping the build-match check")
+    print()
 
     print("full-page captures")
     for name, path, sizes in PAGES:

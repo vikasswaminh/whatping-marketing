@@ -134,6 +134,19 @@ the monitor or a zone that has genuinely gone.
 The cap is 20 per workspace. Delete one you no longer need, or create a second workspace. The
 cap will rise; see the [roadmap](/roadmap).
 
+## My ICMP monitor says "icmp socket unavailable"
+
+The worker could not open an ICMP socket. It does not run as root by design, and instead
+relies on `net.ipv4.ping_group_range` covering its group. On a self-managed deployment, check
+that sysctl. See [ICMP monitors](/docs/monitors/icmp).
+
+## My UDP monitor times out but the service is fine
+
+Quite possibly both are true. UDP has no handshake, so a timeout means "no reply arrived",
+which a firewall drop produces just as readily as a dead service. Check that the payload you
+chose is one the service actually answers — an NTP request to a DNS resolver gets nothing —
+and that the port is right. See [UDP monitors](/docs/monitors/udp).
+
 ## Still stuck
 
 [Contact](/contact) — with the monitor name and what you expected to happen.
