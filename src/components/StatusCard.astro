@@ -1,0 +1,194 @@
+---
+import Heartbeat from "./Heartbeat.astro";
+
+/**
+ * The hero visual: a real monitor list, not an abstract shape.
+ *
+ * Built from the same tokens as the rest of the page, so it is the product's actual interface
+ * vocabulary rather than a picture of it. Every row here is a monitor type that exists, and
+ * the failure text is the literal string the product sends.
+ */
+
+const rows = [
+  { name: "api", target: "api.example.com", state: "up", meta: "182 ms" },
+  { name: "checkout", target: "shop.example.com", state: "up", meta: "240 ms" },
+  { name: "example.com registration", target: "registry", state: "warn", meta: "21 days" },
+  { name: "postgres", target: "db.example.com:5432", state: "down", meta: "connection refused" },
+  { name: "nightly-backup", target: "heartbeat", state: "up", meta: "3h ago" },
+  { name: "example.com SPF + DMARC", target: "email auth", state: "up", meta: "ok" },
+] as const;
+
+const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
+---
+
+<figure class="status">
+  <figcaption class="status__head">
+    <span class="status__dot" aria-hidden="true"></span>
+    <span>Monitors</span>
+    <span class="status__count">6</span>
+  </figcaption>
+
+  <ul class="status__list">
+    {
+      rows.map((row, i) => (
+        <li class="status__row" style={`--i:${i}`}>
+          <span class={`status__pill status__pill--${row.state}`}>{label[row.state]}</span>
+          <span class="status__name">{row.name}</span>
+          <span class="status__target">{row.target}</span>
+          <span class={`status__meta status__meta--${row.state}`}>{row.meta}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="status__foot">
+    <Heartbeat count={40} down={[30, 31]} warn={[29, 32]} height="1.5rem" delay={0.35} />
+    <p>
+      <span class="status__foot-label">postgres</span>
+      <span>down 4m · confirmed unreachable from a second network</span>
+    </p>
+  </div>
+</figure>
+
+<style>
+  .status {
+    margin: 0;
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    font-size: var(--size-small);
+  }
+
+  .status__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 1px solid var(--hairline);
+    background: var(--surface-overlay);
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .status__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--status-up);
+  }
+  .status__count {
+    margin-left: auto;
+    color: var(--text-quaternary);
+  }
+
+  .status__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .status__row {
+    display: grid;
+    grid-template-columns: 3.6rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-xs);
+    padding: 0.6rem var(--space-sm);
+    border-bottom: 1px solid var(--hairline);
+    animation: row-in 0.5s var(--ease) both;
+    animation-delay: calc(0.06s * var(--i) + 0.1s);
+  }
+  .status__row:last-child {
+    border-bottom: 0;
+  }
+  @keyframes row-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .status__pill {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: var(--weight-medium);
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 0.15rem 0;
+    border-radius: var(--radius-xs);
+    border: 1px solid;
+  }
+  .status__pill--up {
+    color: var(--status-up);
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+  }
+  .status__pill--down {
+    color: var(--status-down);
+    border-color: var(--down-line);
+    background: var(--down-soft);
+  }
+  .status__pill--warn {
+    color: var(--status-warn);
+    border-color: var(--warn-line);
+    background: transparent;
+  }
+
+  .status__name {
+    color: var(--text-primary);
+    font-weight: var(--weight-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .status__target {
+    grid-column: 2;
+    grid-row: 2;
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    color: var(--text-quaternary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .status__meta {
+    grid-row: 1 / span 2;
+    grid-column: 3;
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    color: var(--text-tertiary);
+    text-align: right;
+  }
+  .status__meta--down {
+    color: var(--status-down);
+  }
+  .status__meta--warn {
+    color: var(--status-warn);
+  }
+
+  .status__foot {
+    padding: var(--space-sm);
+    border-top: 1px solid var(--hairline);
+    background: var(--surface-sunken);
+  }
+  .status__foot p {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    color: var(--text-quaternary);
+  }
+  .status__foot-label {
+    color: var(--status-down);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status__row {
+      animation: none;
+    }
+  }
+</style>

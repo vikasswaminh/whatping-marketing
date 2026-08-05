@@ -4,6 +4,14 @@ import { APP_URL } from "../lib/site";
 const path = Astro.url.pathname;
 const isActive = (href: string) =>
   href === "/" ? path === "/" : path.startsWith(href);
+
+const links = [
+  ["Features", "/features/"],
+  ["How it works", "/how-it-works/"],
+  ["Pricing", "/pricing/"],
+  ["Docs", "/docs/"],
+  ["Compare", "/vs/uptime-kuma/"],
+] as const;
 ---
 
 <header class="site-header">
@@ -23,12 +31,21 @@ const isActive = (href: string) =>
     </button>
 
     <nav class="site-nav" id="site-nav" aria-label="Primary">
-      <a href="/features/" aria-current={isActive("/features") ? "page" : undefined}>Features</a>
-      <a href="/how-it-works/" aria-current={isActive("/how-it-works") ? "page" : undefined}>How it works</a>
-      <a href="/pricing/" aria-current={isActive("/pricing") ? "page" : undefined}>Pricing</a>
-      <a href="/docs/" aria-current={isActive("/docs") ? "page" : undefined}>Docs</a>
-      <a href="/vs/uptime-kuma/" aria-current={isActive("/vs") ? "page" : undefined}>Compare</a>
-      <a class="cta" href={APP_URL}>Start free</a>
+      {
+        links.map(([label, href]) => (
+          <a
+            href={href}
+            aria-current={
+              isActive(href === "/vs/uptime-kuma/" ? "/vs" : href.replace(/\/$/, ""))
+                ? "page"
+                : undefined
+            }
+          >
+            {label}
+          </a>
+        ))
+      }
+      <a class="btn btn--primary" href={APP_URL}>Start free</a>
     </nav>
   </div>
 </header>

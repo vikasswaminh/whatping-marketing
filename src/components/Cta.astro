@@ -10,10 +10,10 @@ const { label, href, secondaryLabel, secondaryHref } = Astro.props;
 ---
 
 <p class="cta-row">
-  <a class="cta" href={href}>{label}</a>
+  <a class="btn btn--primary" href={href}>{label}</a>
   {
     secondaryLabel && secondaryHref && (
-      <a class="cta cta--ghost" href={secondaryHref}>
+      <a class="btn btn--secondary" href={secondaryHref}>
         {secondaryLabel}
       </a>
     )
@@ -24,9 +24,9 @@ const { label, href, secondaryLabel, secondaryHref } = Astro.props;
   .cta-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 2.5rem !important;
-    padding-top: 2rem;
-    border-top: 1px solid var(--rule);
+    gap: var(--space-2xs);
+    margin-top: var(--space-xl) !important;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--hairline);
   }
 </style>

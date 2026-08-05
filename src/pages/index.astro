@@ -1,5 +1,6 @@
 ---
-import Heartbeat from "../components/Heartbeat.astro";
+import Bento from "../components/Bento.astro";
+import StatusCard from "../components/StatusCard.astro";
 import Base from "../layouts/Base.astro";
 import { APP_URL, SITE_URL } from "../lib/site";
 
@@ -26,15 +27,56 @@ const gaps = [
   },
 ];
 
-const types = [
-  ["HTTP", "Status ranges, redirects, and a keyword assertion for when 200 is a lie", "/features/uptime-monitoring/"],
-  ["TCP", "A port either accepts a connection or it doesn't", "/features/uptime-monitoring/"],
-  ["Heartbeat", "Your cron job pings on success; we alert when it stops", "/features/heartbeat-monitoring/"],
-  ["Certificate", "Days until your TLS certificate expires, checked daily", "/features/certificate-monitoring/"],
-  ["Domain", "Days until your registration expires, read from the registry", "/features/domain-expiry-monitoring/"],
-  ["DNS", "Assert an A, AAAA, MX, TXT, CNAME or NS record still says what it should", "/features/dns-monitoring/"],
-  ["Email auth", "SPF and DMARC present and valid, so your mail keeps arriving", "/features/email-auth-monitoring/"],
-] as const;
+// Wide cells are the two things nothing else in this category does.
+const monitorCells = [
+  {
+    tag: "Domain",
+    title: "Registration expiry, read from the registry",
+    body: "An expired domain takes down every service on it at once — including the email that would have warned you. Uptime Kuma has no equivalent.",
+    href: "/features/domain-expiry-monitoring/",
+    wide: true,
+    accent: true,
+  },
+  {
+    tag: "Email auth",
+    title: "SPF and DMARC, checked daily",
+    body: "Break SPF and your mail lands in spam — including your own alerts. Nothing else in this category watches the path your alerts travel down.",
+    href: "/features/email-auth-monitoring/",
+    wide: true,
+    accent: true,
+  },
+  {
+    tag: "HTTP",
+    title: "Status ranges and keyword assertions",
+    body: "For when 200 is a lie.",
+    href: "/features/uptime-monitoring/",
+  },
+  {
+    tag: "TCP",
+    title: "Port accepts a connection",
+    body: "Databases, SMTP, anything without HTTP.",
+    href: "/features/uptime-monitoring/",
+  },
+  {
+    tag: "Heartbeat",
+    title: "Your cron job pings on success",
+    body: "We alert when it stops arriving.",
+    href: "/features/heartbeat-monitoring/",
+  },
+  {
+    tag: "Certificate",
+    title: "Days until TLS expiry",
+    body: "Checked daily, threshold you set.",
+    href: "/features/certificate-monitoring/",
+  },
+  {
+    tag: "DNS",
+    title: "A, AAAA, MX, TXT, CNAME, NS",
+    body: "Assert a record still says what it should.",
+    href: "/features/dns-monitoring/",
+    wide: true,
+  },
+];
 
 const proof = [
   {
@@ -43,7 +85,7 @@ const proof = [
     href: "/docs/monitors/heartbeat/",
   },
   {
-    h: "A broken alert channel cannot corrupt your monitoring",
+    h: "A broken channel cannot corrupt monitoring",
     p: "Delivery is attempted after state is already committed, and every attempt is recorded. A webhook returning 500 forever will never make a monitor look up or down.",
     href: "/docs/alerting/channels/",
   },
@@ -67,105 +109,84 @@ const jsonLd = {
 ---
 
 <Base title={title} description={description} jsonLd={jsonLd}>
-  <!-- Hero ------------------------------------------------------------ -->
+  <!-- Hero -->
   <section class="hero">
-    <div class="shell">
-      <p class="eyebrow">Uptime · certificates · domains · DNS · email auth</p>
+    <div class="shell hero__grid">
+      <div class="hero__copy">
+        <p class="hero__badge">
+          <span class="hero__badge-dot" aria-hidden="true"></span>
+          Free while in beta · no card
+        </p>
 
-      <h1 class="hero__h1">
-        The outage that returns <span class="hero__code">HTTP 200</span> right up
-        until it doesn&rsquo;t
-      </h1>
+        <h1 class="hero__h1">
+          The outage that returns <span class="hero__200">200</span> right up until
+          it doesn&rsquo;t
+        </h1>
 
-      <p class="hero__sub">
-        Your certificate expires. Your domain registration lapses. Someone edits
-        a DNS record. Your SPF breaks and your email stops arriving. A health
-        check sees none of it — and then everything is down at once. WhatPing
-        watches all four, alongside ordinary HTTP, TCP and cron monitoring.
-      </p>
+        <p class="lede hero__lede">
+          Your certificate expires. Your domain registration lapses. Someone edits
+          a DNS record. Your SPF breaks and your email stops arriving. A health
+          check sees none of it — and then everything is down at once.
+        </p>
 
-      <div class="hero__cta">
-        <a class="cta" href={APP_URL}>Start monitoring — free</a>
-        <a class="cta cta--ghost" href="/how-it-works/">See how it works</a>
+        <div class="hero__cta">
+          <a class="btn btn--primary" href={APP_URL}>Start monitoring — free</a>
+          <a class="btn btn--secondary" href="/how-it-works/">See how it works</a>
+        </div>
+
+        <p class="hero__meta">
+          20 monitors per workspace · checks from 20 seconds · one probe location
+        </p>
       </div>
 
-      <p class="hero__beta">
-        Free while in beta · no card · 20 monitors per workspace · one probe
-        location
-      </p>
-
-      <Heartbeat
-        count={64}
-        down={[41, 42, 43]}
-        warn={[40, 44]}
-        height="4.5rem"
-        class="hero__hb"
-        delay={0.15}
-      />
-      <p class="hero__hb-caption">
-        <span>check history</span>
-        <span>&larr; certificate expired here</span>
-      </p>
+      <div class="hero__visual">
+        <StatusCard />
+      </div>
     </div>
   </section>
 
-  <!-- The gap --------------------------------------------------------- -->
+  <!-- The gap -->
   <section class="band">
     <div class="shell">
-      <p class="eyebrow">01 — The gap</p>
-      <h2 class="band__h">
+      <p class="eyebrow reveal">01 — The gap</p>
+      <h2 class="band__h reveal">
         Four outages your health check will never predict
       </h2>
 
-      <div class="card-grid">
+      <div class="gaps">
         {
-          gaps.map((g) => (
-            <div class="card">
-              <span class="card__tag">{g.tag}</span>
-              <h3>{g.h}</h3>
-              <p>{g.p}</p>
-              <p class="card__foot">
-                A health check would have returned 200 the whole time.
-              </p>
-            </div>
-          ))
-        }
-      </div>
-
-      <p class="band__close">
-        Every one of these is a total outage with no warning signal in the place
-        everyone looks. So WhatPing looks somewhere else as well.
-      </p>
-    </div>
-  </section>
-
-  <!-- Monitor types --------------------------------------------------- -->
-  <section class="band">
-    <div class="shell">
-      <p class="eyebrow">02 — Monitor types</p>
-      <h2 class="band__h">Seven things worth watching</h2>
-
-      <div class="card-grid">
-        {
-          types.map(([name, line, href]) => (
-            <a class="card" href={href}>
-              <span class="card__tag">{name}</span>
-              <p>{line}</p>
-            </a>
+          gaps.map((g, i) => (
+            <article class="gap reveal" style={`--i:${i}`}>
+              <span class="gap__tag">{g.tag}</span>
+              <h3 class="gap__h">{g.h}</h3>
+              <p class="gap__p">{g.p}</p>
+              <p class="gap__foot">A health check would have returned 200 the whole time.</p>
+            </article>
           ))
         }
       </div>
     </div>
   </section>
 
-  <!-- Alerting -------------------------------------------------------- -->
+  <!-- Monitor types, bento -->
   <section class="band">
     <div class="shell">
-      <p class="eyebrow">03 — Alerting</p>
-      <h2 class="band__h">Alerts that keep working when the first one doesn&rsquo;t</h2>
+      <p class="eyebrow reveal">02 — Monitor types</p>
+      <h2 class="band__h reveal">Seven things worth watching</h2>
+      <Bento cells={monitorCells} />
+    </div>
+  </section>
+
+  <!-- Alerting -->
+  <section class="band">
+    <div class="shell">
+      <p class="eyebrow reveal">03 — Alerting</p>
+      <h2 class="band__h reveal">
+        Alerts that keep working when the first one doesn&rsquo;t
+      </h2>
 
       <div class="split">
-        <div class="measure">
+        <div class="reveal">
           <p>
             Email, webhook, ntfy and Telegram. The webhook payload carries
             <code>text</code> and <code>content</code> aliases, so one endpoint works
@@ -175,79 +196,83 @@ const jsonLd = {
           <p>
             <strong>Reminders while you are still down.</strong> Most tools alert
             once, on the transition. If that message fails to deliver, a six-hour
-            outage is indistinguishable from everything being fine. Off unless you
-            turn it on — a repeating alert on a flapping monitor is how people learn
-            to filter your notifications.
+            outage is indistinguishable from everything being fine.
           </p>
           <p>
             <strong>A second opinion.</strong> When a check fails, WhatPing asks a
             network that isn&rsquo;t ours whether it agrees, and says so in the alert.
-            &ldquo;The site is down&rdquo; and &ldquo;<em>we</em> can&rsquo;t reach the
-            site&rdquo; are different problems.
+            &ldquo;The site is down&rdquo; and &ldquo;<em>we</em> can&rsquo;t reach
+            the site&rdquo; are different problems.
           </p>
-          <p><a href="/features/alerting/">How alerting works &rarr;</a></p>
+          <p><a href="/features/alerting/">How alerting works →</a></p>
         </div>
 
-        <figure class="terminal">
+        <figure class="terminal reveal">
           <figcaption>alert stream</figcaption>
           <pre><code><span class="t-down">🔴 DOWN</span> — api (https://api.example.com):
 connect failed: Connection refused (os error 111)
 
-<span class="t-down">🔴 STILL DOWN (1h 35m)</span> — api (https://api.example.com):
+<span class="t-down">🔴 STILL DOWN (1h 35m)</span> — api:
 connect failed: Connection refused (os error 111)
 <span class="t-dim">· confirmed unreachable from a second network</span>
 
-<span class="t-up">🟢 RECOVERED</span> — api (https://api.example.com) after 5820s</code></pre>
+<span class="t-up">🟢 RECOVERED</span> — api after 5820s</code></pre>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- How it works ---------------------------------------------------- -->
+  <!-- How it works -->
   <section class="band">
     <div class="shell">
-      <p class="eyebrow">04 — How it works</p>
-      <h2 class="band__h">Three moving parts</h2>
+      <p class="eyebrow reveal">04 — How it works</p>
+      <h2 class="band__h reveal">Three moving parts</h2>
 
       <ol class="steps">
-        <li>
+        <li class="reveal" style="--i:0">
           <span>01</span>
-          <strong>A stateless Rust prober</strong> runs the checks. It holds no
-          state of its own, so it can be restarted mid-outage without losing or
-          duplicating anything.
+          <div>
+            <strong>A stateless Rust prober</strong> runs the checks. It holds no
+            state of its own, so it can be restarted mid-outage without losing or
+            duplicating anything.
+          </div>
         </li>
-        <li>
+        <li class="reveal" style="--i:1">
           <span>02</span>
-          <strong>A backend that owns every decision.</strong> The prober reports
-          raw observations; whether that means &ldquo;down&rdquo; is decided in one
-          place, against your threshold.
+          <div>
+            <strong>A backend that owns every decision.</strong> The prober reports
+            raw observations; whether that means &ldquo;down&rdquo; is decided in one
+            place, against your threshold.
+          </div>
         </li>
-        <li>
+        <li class="reveal" style="--i:2">
           <span>03</span>
-          <strong>Certificate, domain, DNS and email checks run daily</strong>,
-          because a certificate does not stop being valid between one minute and
-          the next.
+          <div>
+            <strong>Certificate, domain, DNS and email checks run daily</strong>,
+            because a certificate does not stop being valid between one minute and
+            the next.
+          </div>
         </li>
       </ol>
 
-      <p><a href="/how-it-works/">The architecture in detail &rarr;</a></p>
+      <p class="band__link"><a href="/how-it-works/">The architecture in detail →</a></p>
     </div>
   </section>
 
-  <!-- Proof ----------------------------------------------------------- -->
+  <!-- Proof -->
   <section class="band">
     <div class="shell">
-      <p class="eyebrow">05 — Proof</p>
-      <h2 class="band__h">No testimonials. Here is what you can check instead.</h2>
+      <p class="eyebrow reveal">05 — Proof</p>
+      <h2 class="band__h reveal">No testimonials. Here is what you can check instead.</h2>
 
       <div class="proof">
         {
-          proof.map((item) => (
-            <div>
-              <h3>{item.h}</h3>
-              <p>{item.p}</p>
+          proof.map((item, i) => (
+            <div class="reveal" style={`--i:${i}`}>
+              <h3 class="proof__h">{item.h}</h3>
+              <p class="proof__p">{item.p}</p>
               <p>
-                <a href={item.href}>Read the docs &rarr;</a>
+                <a href={item.href}>Read the docs →</a>
               </p>
             </div>
           ))
@@ -256,125 +281,176 @@ connect failed: Connection refused (os error 111)
     </div>
   </section>
 
-  <!-- Final CTA ------------------------------------------------------- -->
+  <!-- Final CTA -->
   <section class="band band--last">
     <div class="shell">
-      <h2 class="band__h" style="max-width:20ch">
-        Start with the one you keep forgetting
-      </h2>
-      <p class="measure">
-        Add a domain expiry monitor. It takes about thirty seconds, it costs
-        nothing, and it covers the failure that no amount of health checking will
-        ever warn you about.
-      </p>
-      <p class="hero__cta">
-        <a class="cta" href={APP_URL}>Start monitoring — free</a>
-        <a class="cta cta--ghost" href="/docs/">Read the docs</a>
-      </p>
+      <div class="final panel reveal">
+        <h2 class="final__h">Start with the one you keep forgetting</h2>
+        <p class="final__p">
+          Add a domain expiry monitor. Thirty seconds, no cost, and it covers the
+          failure that no amount of health checking will ever warn you about.
+        </p>
+        <p class="hero__cta">
+          <a class="btn btn--primary" href={APP_URL}>Start monitoring — free</a>
+          <a class="btn btn--secondary" href="/docs/">Read the docs</a>
+        </p>
+      </div>
     </div>
   </section>
 </Base>
 
 <style>
+  /* --- hero --- */
   .hero {
-    padding: clamp(3.5rem, 10vw, 8rem) 0 clamp(3rem, 7vw, 5rem);
-    border-bottom: 1px solid var(--rule);
+    padding: clamp(3rem, 8vw, 6rem) 0 var(--space-section);
+    border-bottom: 1px solid var(--hairline);
+    /* A single restrained wash behind the hero. The one place this system permits
+       a gradient — it reads as light falling on the panel, not decoration. */
+    background:
+      radial-gradient(
+        60rem 32rem at 18% -10%,
+        var(--accent-glow),
+        transparent 62%
+      ),
+      var(--surface-canvas);
   }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0 0 var(--space-md);
+    padding: 0.28rem 0.7rem;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-pill);
+    background: var(--surface-raised);
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    color: var(--text-tertiary);
+  }
+  .hero__badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--status-up);
+  }
+
   .hero__h1 {
-    font-size: var(--step-4);
-    max-width: 17ch;
+    font-size: var(--size-display-xl);
+    letter-spacing: var(--track-display-xl);
     line-height: 1.02;
+    max-width: 15ch;
   }
-  .hero__code {
-    font-family: var(--mono);
-    font-size: 0.72em;
-    letter-spacing: -0.02em;
-    color: var(--up);
-    border: 1px solid var(--rule-strong);
-    border-radius: 2px;
-    padding: 0.05em 0.3em;
-    white-space: nowrap;
-    vertical-align: 0.12em;
+  .hero__200 {
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    letter-spacing: -0.01em;
+    color: var(--accent);
   }
-  .hero__sub {
-    margin: 1.75rem 0 0;
-    max-width: 56ch;
-    font-family: var(--serif);
-    font-size: var(--step-1);
-    line-height: 1.5;
-    color: var(--dim);
+
+  .hero__lede {
+    margin: var(--space-md) 0 0;
   }
+
   .hero__cta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin: 2.25rem 0 0;
-  }
-  .hero__beta {
-    margin: 1.15rem 0 0;
-    font-family: var(--mono);
-    font-size: var(--step--1);
-    color: var(--faint);
-  }
-  .hero :global(.hero__hb) {
-    margin-top: clamp(2.5rem, 6vw, 4rem);
-  }
-  .hero__hb-caption {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin: 0.6rem 0 0;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
-  .hero__hb-caption span:last-child {
-    color: var(--down);
+    gap: var(--space-2xs);
+    margin: var(--space-lg) 0 0;
   }
 
+  .hero__meta {
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    color: var(--text-quaternary);
+  }
+
+  @media (max-width: 62rem) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hero__h1 {
+      max-width: 18ch;
+    }
+  }
+
+  /* --- bands --- */
   .band {
-    padding: clamp(3rem, 8vw, 5.5rem) 0;
-    border-bottom: 1px solid var(--rule);
+    padding: var(--space-section) 0;
+    border-bottom: 1px solid var(--hairline);
   }
   .band--last {
     border-bottom: 0;
   }
   .band__h {
-    max-width: 24ch;
-    margin-bottom: 2.25rem;
+    max-width: 22ch;
+    margin-bottom: var(--space-lg);
   }
-  .band__close {
-    margin: 2rem 0 0;
-    max-width: var(--measure);
-    color: var(--dim);
+  .band__link {
+    margin-top: var(--space-md);
+    font-size: var(--size-small);
   }
   .band p {
-    text-wrap: pretty;
+    color: var(--text-tertiary);
   }
 
-  .card__foot {
-    margin-top: 0.9rem !important;
-    padding-top: 0.9rem;
-    border-top: 1px solid var(--rule);
-    font-family: var(--mono);
-    font-size: 0.72rem !important;
-    letter-spacing: 0.04em;
-    color: var(--faint) !important;
+  /* --- the gap --- */
+  .gaps {
+    display: grid;
+    gap: var(--space-2xs);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+  .gap {
+    padding: var(--space-md);
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+  }
+  .gap__tag {
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--status-down);
+  }
+  .gap__h {
+    margin: var(--space-xs) 0 var(--space-2xs);
+    font-size: var(--size-body-lg);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--track-title);
+    color: var(--text-primary);
+  }
+  .gap__p {
+    margin: 0;
+    font-size: var(--size-small);
+    color: var(--text-tertiary);
+  }
+  .gap__foot {
+    margin: var(--space-sm) 0 0;
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    color: var(--text-quaternary) !important;
   }
 
+  /* --- alerting --- */
   .split {
     display: grid;
     gap: clamp(1.5rem, 4vw, 3rem);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
     align-items: start;
   }
-  .split p {
-    color: var(--dim);
-  }
   .split p + p {
-    margin-top: 1.1rem;
+    margin-top: var(--space-sm);
   }
   @media (max-width: 58rem) {
     .split {
@@ -384,82 +460,111 @@ connect failed: Connection refused (os error 111)
 
   .terminal {
     margin: 0;
-    border: 1px solid var(--rule);
-    border-radius: 2px;
-    background: var(--ink-sunken);
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
     overflow: hidden;
   }
   .terminal figcaption {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
+    padding: var(--space-2xs) var(--space-sm);
+    border-bottom: 1px solid var(--hairline);
+    background: var(--surface-raised);
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--faint);
-    padding: 0.7rem 1rem;
-    border-bottom: 1px solid var(--rule);
+    color: var(--text-quaternary);
   }
   .terminal pre {
     margin: 0;
-    padding: 1.1rem 1rem;
+    padding: var(--space-sm);
     overflow-x: auto;
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    line-height: 1.75;
-    color: var(--dim);
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    line-height: 1.8;
+    color: var(--text-tertiary);
   }
   .t-down {
-    color: var(--down);
+    color: var(--status-down);
   }
   .t-up {
-    color: var(--up);
+    color: var(--status-up);
   }
   .t-dim {
-    color: var(--faint);
+    color: var(--text-quaternary);
   }
 
+  /* --- steps --- */
   .steps {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: 1px;
-    background: var(--rule);
-    border-block: 1px solid var(--rule);
+    border-top: 1px solid var(--hairline);
   }
   .steps li {
-    background: var(--ink);
-    padding: 1.35rem 0;
     display: grid;
-    grid-template-columns: 4rem minmax(0, var(--measure));
-    gap: 1rem;
-    color: var(--dim);
+    grid-template-columns: 3.5rem minmax(0, var(--measure));
+    gap: var(--space-sm);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--hairline);
+    color: var(--text-tertiary);
   }
   .steps span {
-    font-family: var(--mono);
-    font-size: var(--step--1);
-    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: var(--size-small);
+    color: var(--text-quaternary);
   }
   @media (max-width: 40rem) {
     .steps li {
       grid-template-columns: minmax(0, 1fr);
-      gap: 0.4rem;
+      gap: var(--space-3xs);
     }
   }
 
+  /* --- proof --- */
   .proof {
     display: grid;
-    gap: 2.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: var(--space-lg);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
-  .proof h3 {
-    font-family: var(--sans);
-    font-size: var(--step-0);
-    font-weight: 500;
-    margin-bottom: 0.6rem;
+  .proof__h {
+    margin-bottom: var(--space-2xs);
+    font-size: var(--size-body);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--track-body);
+    color: var(--text-primary);
   }
-  .proof p {
-    color: var(--dim);
-    font-size: var(--step--1);
-    margin: 0 0 0.75rem;
+  .proof__p {
+    margin: 0 0 var(--space-2xs);
+    font-size: var(--size-small);
+  }
+  .proof a {
+    font-size: var(--size-small);
+  }
+
+  /* --- final --- */
+  .final {
+    padding: clamp(2rem, 5vw, 3.5rem);
+    text-align: center;
+    background:
+      radial-gradient(40rem 20rem at 50% 120%, var(--accent-glow), transparent 70%),
+      var(--surface-raised);
+  }
+  .final__h {
+    margin-inline: auto;
+    max-width: 20ch;
+  }
+  .final__p {
+    margin: var(--space-sm) auto 0;
+    max-width: 46ch;
+    color: var(--text-tertiary);
+  }
+  .final .hero__cta {
+    justify-content: center;
+  }
+
+  /* Stagger reveals within a group. */
+  .reveal {
+    animation-delay: calc(var(--i, 0) * 60ms);
   }
 </style>

@@ -1,0 +1,165 @@
+/* ==========================================================================
+   WhatPing design tokens
+
+   Three tiers. Nothing outside this file states a colour.
+
+     1. Generator  — base hue/chroma, accent, contrast. Four inputs.
+     2. Primitives — surfaces, text, borders, derived from the generator.
+     3. Semantic   — what components actually reference.
+
+   OKLCH throughout. Perceptually uniform lightness is the whole point: a ramp
+   built by stepping L reads evenly to the eye, which an HSL ramp does not —
+   raising HSL lightness drops saturation and shifts hue, worst of all on dark.
+
+   Depth is a surface ladder plus 1px hairlines. There are no drop shadows in
+   this system, deliberately; shadows do not survive a dark canvas, and the
+   ladder carries elevation on its own.
+   ========================================================================== */
+
+:root {
+  /* --- 1. generator ----------------------------------------------------- */
+
+  /* A cool near-black. Chroma stays tiny so surfaces read neutral while still
+     being tinted — a true grey next to a tinted accent looks broken. */
+  --h: 220;
+  --c-surface: 0.006;
+  --c-text: 0.008;
+
+  /* One accent, used sparingly. Green because this product's own semantics are
+     up/down/warn — the only palette that could belong to a monitoring tool. */
+  --accent: oklch(0.78 0.155 155);
+  --accent-ink: oklch(0.16 0.02 155); /* text on top of the accent */
+
+  /* Scales the whole ladder. 1 is the tuned default; raising it pushes text
+     brighter and surfaces darker for a high-contrast theme. */
+  --contrast: 1;
+
+  /* --- 2. primitives ---------------------------------------------------- */
+
+  /* Surface ladder. Five levels, each ~+0.025 L. More levels than this stop
+     being distinguishable and start being a contrast problem. */
+  --surface-canvas: oklch(calc(0.145 / var(--contrast)) var(--c-surface) var(--h));
+  --surface-sunken: oklch(calc(0.125 / var(--contrast)) var(--c-surface) var(--h));
+  --surface-raised: oklch(calc(0.178 / var(--contrast)) var(--c-surface) var(--h));
+  --surface-overlay: oklch(calc(0.205 / var(--contrast)) var(--c-surface) var(--h));
+  --surface-hover: oklch(calc(0.232 / var(--contrast)) var(--c-surface) var(--h));
+
+  /* Text ladder. Four steps is enough to express every level of emphasis on
+     this site; a fifth would be indistinguishable from the fourth.
+     The floor is set by contrast, not by taste: quaternary is used for 12px
+     uppercase mono eyebrows, which is small text, so it has to clear 4.5:1
+     against the raised surface — not the 3:1 that large text could excuse.
+     `scripts/verify-contrast.py` asserts this; an earlier 0.53 failed at 3.58. */
+  --text-primary: oklch(calc(0.97 * var(--contrast)) 0.002 var(--h));
+  --text-secondary: oklch(calc(0.79 * var(--contrast)) var(--c-text) var(--h));
+  --text-tertiary: oklch(calc(0.67 * var(--contrast)) var(--c-text) var(--h));
+  --text-quaternary: oklch(calc(0.605 * var(--contrast)) var(--c-text) var(--h));
+
+  /* Hairlines. The entire depth system, alongside the surface ladder. */
+  --hairline: oklch(0.27 0.005 var(--h));
+  --hairline-strong: oklch(0.35 0.007 var(--h));
+  --hairline-loud: oklch(0.45 0.009 var(--h));
+
+  /* Status. `up` is the accent itself — the product's semantics and its brand
+     colour are the same thing, which is the point. */
+  --status-up: var(--accent);
+  --status-down: oklch(0.68 0.19 25);
+  --status-warn: oklch(0.82 0.15 78);
+  --status-idle: var(--text-quaternary);
+
+  /* --- 3. semantic ------------------------------------------------------ */
+
+  /* Interaction states are mixed, not hand-picked. One accent definition
+     supports every variant, and they all stay in step if the accent changes. */
+  --accent-hover: color-mix(in oklch, var(--accent), white 14%);
+  --accent-active: color-mix(in oklch, var(--accent), black 8%);
+  --accent-soft: color-mix(in oklch, var(--accent) 14%, var(--surface-canvas));
+  --accent-line: color-mix(in oklch, var(--accent) 40%, var(--hairline));
+  --accent-glow: color-mix(in oklch, var(--accent) 9%, transparent);
+
+  --down-soft: color-mix(in oklch, var(--status-down) 14%, var(--surface-canvas));
+  --down-line: color-mix(in oklch, var(--status-down) 45%, var(--hairline));
+  --warn-line: color-mix(in oklch, var(--status-warn) 45%, var(--hairline));
+
+  --focus-ring: color-mix(in oklch, var(--accent) 55%, transparent);
+  --selection: color-mix(in oklch, var(--accent) 30%, transparent);
+
+  /* --- typography ------------------------------------------------------- */
+
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
+
+  /* Tracking tightens as size grows. This is the single largest contributor to
+     headlines reading as engineered rather than merely large. */
+  --size-display-xl: clamp(2.75rem, 1.6rem + 5.1vw, 4.75rem);
+  --size-display-lg: clamp(2.1rem, 1.45rem + 2.9vw, 3.375rem);
+  --size-display-md: clamp(1.7rem, 1.35rem + 1.6vw, 2.375rem);
+  --size-headline: clamp(1.4rem, 1.22rem + 0.8vw, 1.6875rem);
+  --size-title: 1.3125rem;
+  --size-body-lg: 1.125rem;
+  --size-body: 1rem;
+  --size-small: 0.875rem;
+  --size-eyebrow: 0.75rem;
+  --size-mono: 0.8125rem;
+
+  --track-display-xl: -0.038em;
+  --track-display-lg: -0.032em;
+  --track-display-md: -0.026em;
+  --track-headline: -0.021em;
+  --track-title: -0.017em;
+  --track-body-lg: -0.006em;
+  --track-body: -0.003em;
+  --track-eyebrow: 0.14em;
+
+  /* Weight band is 400–600. No 300, no 700+ — an exclusion that carries as
+     much of the look as any colour does. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-strong: 550;
+  --weight-display: 600;
+
+  /* --- space and shape -------------------------------------------------- */
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-section: clamp(4rem, 8vw, 7rem);
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  --measure: 68ch;
+  --shell: 78rem;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 120ms;
+  --duration: 200ms;
+}
+
+/* Registered so hovers interpolate in oklch instead of snapping. Unregistered
+   custom properties are strings to the animation engine and cannot tween. */
+@property --surface-tint {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
+/* A high-contrast variant falls out of the generator for free — the reason the
+   ladder is expressed as arithmetic on `--contrast` rather than as literals. */
+@media (prefers-contrast: more) {
+  :root {
+    --contrast: 1.06;
+    --hairline: oklch(0.38 0.006 var(--h));
+    --hairline-strong: oklch(0.48 0.008 var(--h));
+  }
+}

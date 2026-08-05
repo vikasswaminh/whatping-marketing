@@ -3,13 +3,23 @@ import DocsSidebar from "../components/DocsSidebar.astro";
 import { DOCS_FLAT } from "../lib/site";
 import Base from "./Base.astro";
 
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
 interface Props {
   title: string;
   description: string;
   h1: string;
+  headings?: Heading[];
 }
 
-const { title, description, h1 } = Astro.props;
+const { title, description, h1, headings = [] } = Astro.props;
+
+// Only h2s. An "on this page" rail that mirrors every heading level stops being a map.
+const toc = headings.filter((h) => h.depth === 2);
 
 const path = Astro.url.pathname;
 const index = DOCS_FLAT.findIndex((item) => item.href === path);
@@ -53,5 +63,20 @@ const next =
         )
       }
     </div>
+
+    {
+      toc.length > 1 && (
+        <nav class="docs-toc" aria-label="On this page">
+          <h2>On this page</h2>
+          <ul>
+            {toc.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
   </div>
 </Base>
