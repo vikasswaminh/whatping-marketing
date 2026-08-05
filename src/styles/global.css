@@ -1,5 +1,6 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
+@import "@fontsource/instrument-serif";
 @import "./tokens.css";
 
 /* ==========================================================================
@@ -81,34 +82,39 @@ svg {
 /* --- typography ----------------------------------------------------------- */
 
 h1,
-h2,
+h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-display);
+  text-wrap: balance;
+}
 h3,
 h4 {
   margin: 0;
   color: var(--text-primary);
-  font-weight: var(--weight-display);
-  line-height: 1.1;
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  line-height: 1.25;
   text-wrap: balance;
 }
 
 h1 {
   font-size: var(--size-display-lg);
-  letter-spacing: var(--track-display-lg);
+  letter-spacing: var(--track-display);
 }
 h2 {
   font-size: var(--size-display-md);
-  letter-spacing: var(--track-display-md);
+  letter-spacing: var(--track-heading);
 }
 h3 {
   font-size: var(--size-headline);
-  letter-spacing: var(--track-headline);
-  font-weight: var(--weight-strong);
+  letter-spacing: var(--track-heading);
 }
 h4 {
   font-size: var(--size-title);
-  letter-spacing: var(--track-title);
-  font-weight: var(--weight-medium);
-  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 p,
@@ -126,8 +132,8 @@ a {
     text-decoration-color var(--duration-fast) var(--ease);
 }
 a:hover {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
+  color: var(--accent-text);
+  text-decoration-color: var(--accent-text);
 }
 
 strong {
@@ -165,7 +171,6 @@ samp {
 .lede {
   color: var(--text-secondary);
   font-size: var(--size-body-lg);
-  letter-spacing: var(--track-body-lg);
   line-height: 1.55;
   max-width: 58ch;
 }
@@ -178,7 +183,7 @@ samp {
   gap: var(--space-2xs);
   padding: 0.6rem 1rem;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
   font-size: var(--size-small);
   font-weight: var(--weight-medium);
   letter-spacing: 0;
@@ -197,6 +202,7 @@ samp {
 .btn--primary {
   background: var(--accent);
   color: var(--accent-ink);
+  box-shadow: var(--shadow-sm);
 }
 .btn--primary:hover {
   background: var(--accent-hover);
@@ -210,6 +216,7 @@ samp {
   background: var(--surface-raised);
   border-color: var(--hairline-strong);
   color: var(--text-primary);
+  box-shadow: var(--shadow-2xs);
 }
 .btn--secondary:hover {
   background: var(--surface-overlay);
@@ -231,7 +238,37 @@ samp {
 .panel {
   background: var(--surface-raised);
   border: 1px solid var(--hairline);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Status is always a labelled pill, never bare coloured text. With orange as the
+   brand, a red word on an orange-accented page stops carrying information — the
+   word DOWN does the work and the colour reinforces it. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pill--up {
+  color: var(--status-up);
+  background: var(--status-up-bg);
+}
+.pill--down {
+  color: var(--status-down);
+  background: var(--status-down-bg);
+}
+.pill--warn {
+  color: var(--status-warn);
+  background: var(--status-warn-bg);
 }
 
 /* --- prose ---------------------------------------------------------------- */
@@ -250,13 +287,13 @@ samp {
   padding-top: var(--space-md);
   border-top: 1px solid var(--hairline);
   font-size: var(--size-headline);
-  letter-spacing: var(--track-headline);
+  letter-spacing: var(--track-heading);
 }
 
 .prose h3 {
   margin-top: var(--space-lg);
   font-size: var(--size-title);
-  letter-spacing: var(--track-title);
+  letter-spacing: -0.01em;
   font-weight: var(--weight-medium);
   color: var(--text-primary);
 }
@@ -304,7 +341,7 @@ samp {
 }
 
 .prose pre {
-  background: var(--surface-sunken) !important;
+  background: var(--surface-overlay) !important;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
@@ -363,8 +400,9 @@ samp {
 .callout {
   background: var(--surface-raised);
   border: 1px solid var(--hairline);
-  border-left-width: 2px;
-  border-radius: var(--radius-md);
+  border-left-width: 3px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2xs);
   padding: var(--space-xs) var(--space-sm);
   font-size: var(--size-small);
   color: var(--text-tertiary);
@@ -439,7 +477,7 @@ samp {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in oklch, var(--surface-canvas) 82%, transparent);
+  background: color-mix(in oklch, var(--surface-canvas) 86%, transparent);
   backdrop-filter: saturate(140%) blur(12px);
   border-bottom: 1px solid transparent;
   transition: border-color var(--duration) var(--ease);
@@ -478,7 +516,7 @@ samp {
   flex-shrink: 0;
   font-size: var(--size-body);
   font-weight: var(--weight-strong);
-  letter-spacing: var(--track-title);
+  letter-spacing: -0.01em;
   color: var(--text-primary);
   text-decoration: none;
 }
@@ -486,7 +524,7 @@ samp {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--status-up);
+  background: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
   animation: pulse 2.8s var(--ease) infinite;
 }
@@ -751,6 +789,7 @@ samp {
   background: var(--surface-raised);
   border-color: var(--hairline-strong);
   color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
 }
 .docs-nextprev span {
   display: block;
@@ -800,6 +839,20 @@ samp {
   .docs-sidebar summary {
     display: none;
   }
+}
+
+/* --- full-bleed dark bands ------------------------------------------------ */
+
+/* The reference is a cream page with black sections. Bands remap the semantic
+   tokens (see .band--dark in tokens.css), so components inside need no changes. */
+.band--dark {
+  border-block: 0 !important;
+}
+.band--dark a {
+  color: var(--text-primary);
+}
+.band--dark a:hover {
+  color: var(--accent-text);
 }
 
 /* --- scroll-driven reveals ------------------------------------------------ */

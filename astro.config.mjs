@@ -13,9 +13,9 @@ export default defineConfig({
   integrations: [mdx(), sitemap()],
   markdown: {
     shikiConfig: {
-      // Muted and cool, so code blocks do not ship a second colour system. The block's
-      // background is overridden to --surface-sunken in CSS; only token colours come from here.
-      theme: "vitesse-dark",
+      // Code sits on a near-white surface now, so the highlighter has to be light too.
+      // The block background is overridden in CSS; only token colours come from here.
+      theme: "github-light",
       wrap: true,
     },
   },

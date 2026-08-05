@@ -32,7 +32,7 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
     {
       rows.map((row, i) => (
         <li class="status__row" style={`--i:${i}`}>
-          <span class={`status__pill status__pill--${row.state}`}>{label[row.state]}</span>
+          <span class={`pill pill--${row.state} status__pill`}>{label[row.state]}</span>
           <span class="status__name">{row.name}</span>
           <span class="status__target">{row.target}</span>
           <span class={`status__meta status__meta--${row.state}`}>{row.meta}</span>
@@ -55,7 +55,8 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
     margin: 0;
     background: var(--surface-raised);
     border: 1px solid var(--hairline);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
     font-size: var(--size-small);
   }
@@ -110,30 +111,10 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
     }
   }
 
+  /* Sizing only — colour and shape come from the shared .pill rule. */
   .status__pill {
-    font-family: var(--font-mono);
+    justify-content: center;
     font-size: 0.625rem;
-    font-weight: var(--weight-medium);
-    letter-spacing: 0.1em;
-    text-align: center;
-    padding: 0.15rem 0;
-    border-radius: var(--radius-xs);
-    border: 1px solid;
-  }
-  .status__pill--up {
-    color: var(--status-up);
-    border-color: var(--accent-line);
-    background: var(--accent-soft);
-  }
-  .status__pill--down {
-    color: var(--status-down);
-    border-color: var(--down-line);
-    background: var(--down-soft);
-  }
-  .status__pill--warn {
-    color: var(--status-warn);
-    border-color: var(--warn-line);
-    background: transparent;
   }
 
   .status__name {

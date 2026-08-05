@@ -110,7 +110,7 @@ const jsonLd = {
 
 <Base title={title} description={description} jsonLd={jsonLd}>
   <!-- Hero -->
-  <section class="hero">
+  <section class="hero band--dark">
     <div class="shell hero__grid">
       <div class="hero__copy">
         <p class="hero__badge">
@@ -157,7 +157,7 @@ const jsonLd = {
         {
           gaps.map((g, i) => (
             <article class="gap reveal" style={`--i:${i}`}>
-              <span class="gap__tag">{g.tag}</span>
+              <span class="pill pill--down gap__tag">{g.tag}</span>
               <h3 class="gap__h">{g.h}</h3>
               <p class="gap__p">{g.p}</p>
               <p class="gap__foot">A health check would have returned 200 the whole time.</p>
@@ -207,7 +207,7 @@ const jsonLd = {
           <p><a href="/features/alerting/">How alerting works →</a></p>
         </div>
 
-        <figure class="terminal reveal">
+        <figure class="terminal surface--terminal reveal">
           <figcaption>alert stream</figcaption>
           <pre><code><span class="t-down">🔴 DOWN</span> — api (https://api.example.com):
 connect failed: Connection refused (os error 111)
@@ -282,7 +282,7 @@ connect failed: Connection refused (os error 111)
   </section>
 
   <!-- Final CTA -->
-  <section class="band band--last">
+  <section class="band band--last band--dark">
     <div class="shell">
       <div class="final panel reveal">
         <h2 class="final__h">Start with the one you keep forgetting</h2>
@@ -301,16 +301,14 @@ connect failed: Connection refused (os error 111)
 
 <style>
   /* --- hero --- */
+  /* Full-bleed black band inside a cream page — the reference's core move. */
   .hero {
-    padding: clamp(3rem, 8vw, 6rem) 0 var(--space-section);
-    border-bottom: 1px solid var(--hairline);
-    /* A single restrained wash behind the hero. The one place this system permits
-       a gradient — it reads as light falling on the panel, not decoration. */
+    padding: clamp(3.5rem, 9vw, 7rem) 0 var(--space-section);
     background:
       radial-gradient(
-        60rem 32rem at 18% -10%,
+        70rem 38rem at 22% -18%,
         var(--accent-glow),
-        transparent 62%
+        transparent 60%
       ),
       var(--surface-canvas);
   }
@@ -327,8 +325,8 @@ connect failed: Connection refused (os error 111)
     align-items: center;
     gap: 0.45rem;
     margin: 0 0 var(--space-md);
-    padding: 0.28rem 0.7rem;
-    border: 1px solid var(--hairline-strong);
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--hairline);
     border-radius: var(--radius-pill);
     background: var(--surface-raised);
     font-family: var(--font-mono);
@@ -339,12 +337,12 @@ connect failed: Connection refused (os error 111)
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: var(--status-up);
+    background: var(--accent);
   }
 
   .hero__h1 {
     font-size: var(--size-display-xl);
-    letter-spacing: var(--track-display-xl);
+    letter-spacing: var(--track-display);
     line-height: 1.02;
     max-width: 15ch;
   }
@@ -389,6 +387,7 @@ connect failed: Connection refused (os error 111)
   }
   .band--last {
     border-bottom: 0;
+    padding-bottom: var(--space-2xl);
   }
   .band__h {
     max-width: 22ch;
@@ -412,20 +411,17 @@ connect failed: Connection refused (os error 111)
     padding: var(--space-md);
     background: var(--surface-raised);
     border: 1px solid var(--hairline);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
   }
   .gap__tag {
-    font-family: var(--font-mono);
-    font-size: var(--size-eyebrow);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--status-down);
+    align-self: flex-start;
   }
   .gap__h {
     margin: var(--space-xs) 0 var(--space-2xs);
     font-size: var(--size-body-lg);
     font-weight: var(--weight-medium);
-    letter-spacing: var(--track-title);
+    letter-spacing: -0.01em;
     color: var(--text-primary);
   }
   .gap__p {
@@ -458,11 +454,12 @@ connect failed: Connection refused (os error 111)
     }
   }
 
+  /* Colours come from .surface--terminal in tokens.css; this is shape only. */
   .terminal {
     margin: 0;
-    background: var(--surface-sunken);
     border: 1px solid var(--hairline);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
   }
   .terminal figcaption {
@@ -544,11 +541,14 @@ connect failed: Connection refused (os error 111)
 
   /* --- final --- */
   .final {
-    padding: clamp(2rem, 5vw, 3.5rem);
+    padding: clamp(2.5rem, 6vw, 4rem);
     text-align: center;
+    border: 0;
+    box-shadow: none;
     background:
-      radial-gradient(40rem 20rem at 50% 120%, var(--accent-glow), transparent 70%),
+      radial-gradient(44rem 22rem at 50% 130%, var(--accent-glow), transparent 68%),
       var(--surface-raised);
+    border-radius: var(--radius-2xl);
   }
   .final__h {
     margin-inline: auto;

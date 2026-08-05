@@ -1,97 +1,95 @@
 /* ==========================================================================
-   WhatPing design tokens
+   WhatPing design tokens — capacity.so design language
 
    Three tiers. Nothing outside this file states a colour.
 
-     1. Generator  — base hue/chroma, accent, contrast. Four inputs.
-     2. Primitives — surfaces, text, borders, derived from the generator.
-     3. Semantic   — what components actually reference.
+     1. Brand      — the eight exact brand values, as hex.
+     2. Surfaces   — light-first, with a dark set scoped to .band--dark.
+     3. Semantic   — what components reference. Derived with color-mix.
 
-   OKLCH throughout. Perceptually uniform lightness is the whole point: a ramp
-   built by stepping L reads evenly to the eye, which an HSL ramp does not —
-   raising HSL lightness drops saturation and shifts hue, worst of all on dark.
+   Brand values stay hex on purpose: they are exact, and round-tripping them
+   through OKLCH would land somewhere fractionally different for no benefit.
+   Derived states use `color-mix(in oklch, …)`, which is where perceptual
+   uniformity actually earns its place.
 
-   Depth is a surface ladder plus 1px hairlines. There are no drop shadows in
-   this system, deliberately; shadows do not survive a dark canvas, and the
-   ladder carries elevation on its own.
+   Light page, dark full-bleed bands. The dark set is a *section* treatment,
+   not a colour scheme, so it is a class rather than a media query.
    ========================================================================== */
 
 :root {
-  /* --- 1. generator ----------------------------------------------------- */
+  /* --- 1. brand -------------------------------------------------------- */
 
-  /* A cool near-black. Chroma stays tiny so surfaces read neutral while still
-     being tinted — a true grey next to a tinted accent looks broken. */
-  --h: 220;
-  --c-surface: 0.006;
-  --c-text: 0.008;
+  --brand-orange: #ff8205;
+  --brand-orange-light: #ffaf00;
+  --brand-orange-dark: #fa500f;
+  --brand-yellow: #ffd800;
+  --brand-red: #e10500;
+  --brand-beige-light: #fffaeb;
+  --brand-beige-medium: #fff0c3;
+  --brand-beige-dark: #e9e2cb;
 
-  /* One accent, used sparingly. Green because this product's own semantics are
-     up/down/warn — the only palette that could belong to a monitoring tool. */
-  --accent: oklch(0.78 0.155 155);
-  --accent-ink: oklch(0.16 0.02 155); /* text on top of the accent */
+  /* --- 2. surfaces, light ---------------------------------------------- */
 
-  /* Scales the whole ladder. 1 is the tuned default; raising it pushes text
-     brighter and surfaces darker for a high-contrast theme. */
-  --contrast: 1;
+  --surface-canvas: var(--brand-beige-light);
+  --surface-raised: #fcfbf8;
+  --surface-sunken: var(--brand-beige-medium);
+  --surface-overlay: #ffffff;
+  --surface-hover: #fffdf5;
 
-  /* --- 2. primitives ---------------------------------------------------- */
+  --text-primary: #252525;
+  --text-secondary: #4a4a4a;
+  /* Tertiary is #8e8e8e in the reference. On cream that is 3.2:1 — fine for
+     large text, short of AA for the 12px eyebrows this site uses it for, so
+     the eyebrow tier is darkened separately below. verify-contrast.py holds
+     the line. */
+  --text-tertiary: #6b6b6b;
+  --text-quaternary: #747063;
 
-  /* Surface ladder. Five levels, each ~+0.025 L. More levels than this stop
-     being distinguishable and start being a contrast problem. */
-  --surface-canvas: oklch(calc(0.145 / var(--contrast)) var(--c-surface) var(--h));
-  --surface-sunken: oklch(calc(0.125 / var(--contrast)) var(--c-surface) var(--h));
-  --surface-raised: oklch(calc(0.178 / var(--contrast)) var(--c-surface) var(--h));
-  --surface-overlay: oklch(calc(0.205 / var(--contrast)) var(--c-surface) var(--h));
-  --surface-hover: oklch(calc(0.232 / var(--contrast)) var(--c-surface) var(--h));
+  --hairline: #ebebeb;
+  /* beige-dark #e9e2cb is the reference value, but on cream it is 1.24:1 —
+     effectively invisible. Darkened until a border is actually a border. */
+  --hairline-strong: #dfd5b4;
+  --hairline-loud: #c9bd97;
 
-  /* Text ladder. Four steps is enough to express every level of emphasis on
-     this site; a fifth would be indistinguishable from the fourth.
-     The floor is set by contrast, not by taste: quaternary is used for 12px
-     uppercase mono eyebrows, which is small text, so it has to clear 4.5:1
-     against the raised surface — not the 3:1 that large text could excuse.
-     `scripts/verify-contrast.py` asserts this; an earlier 0.53 failed at 3.58. */
-  --text-primary: oklch(calc(0.97 * var(--contrast)) 0.002 var(--h));
-  --text-secondary: oklch(calc(0.79 * var(--contrast)) var(--c-text) var(--h));
-  --text-tertiary: oklch(calc(0.67 * var(--contrast)) var(--c-text) var(--h));
-  --text-quaternary: oklch(calc(0.605 * var(--contrast)) var(--c-text) var(--h));
-
-  /* Hairlines. The entire depth system, alongside the surface ladder. */
-  --hairline: oklch(0.27 0.005 var(--h));
-  --hairline-strong: oklch(0.35 0.007 var(--h));
-  --hairline-loud: oklch(0.45 0.009 var(--h));
-
-  /* Status. `up` is the accent itself — the product's semantics and its brand
-     colour are the same thing, which is the point. */
-  --status-up: var(--accent);
-  --status-down: oklch(0.68 0.19 25);
-  --status-warn: oklch(0.82 0.15 78);
+  /* Status. Orange is the brand here, so these have to work alongside it
+     rather than instead of it — see the pill rule in global.css: status is
+     always a labelled pill, never bare coloured text. */
+  --status-up: #197948;
+  --status-down: #d50500;
+  --status-warn: #c33904;
   --status-idle: var(--text-quaternary);
+
+  --status-up-bg: #e6f4ec;
+  --status-down-bg: #fdeceb;
+  --status-warn-bg: var(--brand-beige-medium);
 
   /* --- 3. semantic ------------------------------------------------------ */
 
-  /* Interaction states are mixed, not hand-picked. One accent definition
-     supports every variant, and they all stay in step if the accent changes. */
-  --accent-hover: color-mix(in oklch, var(--accent), white 14%);
-  --accent-active: color-mix(in oklch, var(--accent), black 8%);
-  --accent-soft: color-mix(in oklch, var(--accent) 14%, var(--surface-canvas));
-  --accent-line: color-mix(in oklch, var(--accent) 40%, var(--hairline));
-  --accent-glow: color-mix(in oklch, var(--accent) 9%, transparent);
+  --accent: var(--brand-orange);
+  /* Orange-on-cream is 2.2:1 as text, and even brand-orange-dark #fa500f only
+     reaches 3.2:1. So the fill and the text forms of the accent are different
+     tokens: #ff8205 fills buttons (with near-black labels at 7.7:1), and words
+     use a darkened orange solved to 4.75:1 for headroom over the AA floor.
+     Same reasoning for the status colours below — the brand hues are kept, the
+     lightness is solved. verify-contrast.py holds all of it. */
+  --accent-text: #cd3c04;
+  --accent-ink: #1a0d00;
+  --accent-hover: color-mix(in oklch, var(--accent), black 10%);
+  --accent-active: color-mix(in oklch, var(--accent), black 18%);
+  --accent-soft: var(--brand-beige-medium);
+  --accent-line: color-mix(in oklch, var(--accent) 45%, var(--hairline));
+  --accent-glow: color-mix(in oklch, var(--brand-yellow) 22%, transparent);
 
-  --down-soft: color-mix(in oklch, var(--status-down) 14%, var(--surface-canvas));
-  --down-line: color-mix(in oklch, var(--status-down) 45%, var(--hairline));
-  --warn-line: color-mix(in oklch, var(--status-warn) 45%, var(--hairline));
-
-  --focus-ring: color-mix(in oklch, var(--accent) 55%, transparent);
-  --selection: color-mix(in oklch, var(--accent) 30%, transparent);
+  --focus-ring: color-mix(in oklch, var(--brand-orange-dark) 65%, transparent);
+  --selection: color-mix(in oklch, var(--brand-yellow) 45%, transparent);
 
   /* --- typography ------------------------------------------------------- */
 
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
 
-  /* Tracking tightens as size grows. This is the single largest contributor to
-     headlines reading as engineered rather than merely large. */
-  --size-display-xl: clamp(2.75rem, 1.6rem + 5.1vw, 4.75rem);
+  --size-display-xl: clamp(2.75rem, 1.5rem + 5.6vw, 5rem);
   --size-display-lg: clamp(2.1rem, 1.45rem + 2.9vw, 3.375rem);
   --size-display-md: clamp(1.7rem, 1.35rem + 1.6vw, 2.375rem);
   --size-headline: clamp(1.4rem, 1.22rem + 0.8vw, 1.6875rem);
@@ -102,21 +100,18 @@
   --size-eyebrow: 0.75rem;
   --size-mono: 0.8125rem;
 
-  --track-display-xl: -0.038em;
-  --track-display-lg: -0.032em;
-  --track-display-md: -0.026em;
-  --track-headline: -0.021em;
-  --track-title: -0.017em;
-  --track-body-lg: -0.006em;
-  --track-body: -0.003em;
-  --track-eyebrow: 0.14em;
+  /* capacity.so uses a flat display tracking rather than a size-scaled ramp:
+     -0.05em on the hero, -0.03em on section heads, leading 1.08. */
+  --track-display: -0.05em;
+  --track-heading: -0.03em;
+  --track-body: 0;
+  --track-eyebrow: 0.12em;
+  --leading-display: 1.08;
 
-  /* Weight band is 400–600. No 300, no 700+ — an exclusion that carries as
-     much of the look as any colour does. */
   --weight-regular: 400;
   --weight-medium: 500;
-  --weight-strong: 550;
-  --weight-display: 600;
+  --weight-strong: 600;
+  --weight-display: 500;
 
   /* --- space and shape -------------------------------------------------- */
 
@@ -130,12 +125,23 @@
   --space-2xl: 4rem;
   --space-section: clamp(4rem, 8vw, 7rem);
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* Their base is .625rem, with the scale derived by ±2 and ±4px. */
+  --radius: 0.625rem;
+  --radius-xs: 0.125rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 12px);
   --radius-pill: 999px;
+
+  /* Shadows are back. Their absence was Linear's discipline, not a universal
+     rule, and this reference leans on soft black elevation. Values verbatim. */
+  --shadow-2xs: 0 1px 3px 0 #0000000d;
+  --shadow-xs: 0 1px 2px 0 #00000014;
+  --shadow-sm: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+  --shadow-md: 0 1px 3px 0 #0000001a, 0 2px 4px -1px #0000001a;
+  --shadow-lg: 0 1px 3px 0 #0000001a, 0 4px 6px -1px #0000001a;
 
   --measure: 68ch;
   --shell: 78rem;
@@ -146,20 +152,88 @@
   --duration: 200ms;
 }
 
-/* Registered so hovers interpolate in oklch instead of snapping. Unregistered
-   custom properties are strings to the animation engine and cannot tween. */
+/* --------------------------------------------------------------------------
+   Dark bands. Full-bleed sections inside a light page — the hero and the
+   closing CTA — so this remaps the same semantic names rather than defining
+   new ones. Every component inside works unchanged.
+   -------------------------------------------------------------------------- */
+
+.band--dark {
+  --surface-canvas: #0a0a0a;
+  --surface-raised: #1c1c1c;
+  --surface-sunken: #141414;
+  --surface-overlay: #232323;
+  --surface-hover: #272727;
+
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d4;
+  --text-tertiary: #a1a1aa;
+  --text-quaternary: #8e8e8e;
+
+  --hairline: #27272a;
+  --hairline-strong: #3f3f46;
+  --hairline-loud: #52525b;
+
+  /* On black, orange is legible as text — so the text form goes back to the
+     brighter brand value rather than the darkened one. */
+  --accent-text: var(--brand-orange-light);
+  --accent-soft: #2a1a05;
+  --accent-glow: color-mix(in oklch, var(--brand-orange) 16%, transparent);
+
+  --status-up: #4ade80;
+  --status-down: #ff6b66;
+  --status-warn: var(--brand-orange-light);
+  --status-up-bg: #0f2a1b;
+  --status-down-bg: #2c1210;
+  --status-warn-bg: #2a1a05;
+
+  --focus-ring: color-mix(in oklch, var(--brand-orange-light) 70%, transparent);
+  --selection: color-mix(in oklch, var(--brand-orange) 40%, transparent);
+
+  /* Shadows do not read on black; the hairline carries elevation there. */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  background: var(--surface-canvas);
+  color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Terminal surface. The alert stream is literally terminal output, so it stays
+   dark on the cream page rather than being inverted into something it is not.
+   Same mechanism as .band--dark: remap the semantic names, change no component.
+   -------------------------------------------------------------------------- */
+
+.surface--terminal {
+  --surface-canvas: #0a0a0a;
+  --surface-raised: #1c1c1c;
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d4;
+  --text-tertiary: #a1a1aa;
+  --text-quaternary: #8e8e8e;
+  --hairline: #27272a;
+  --hairline-strong: #3f3f46;
+  --status-up: #4ade80;
+  --status-down: #ff6b66;
+  --status-warn: var(--brand-orange-light);
+
+  background: var(--surface-canvas);
+  color: var(--text-tertiary);
+}
+
 @property --surface-tint {
   syntax: "<color>";
   inherits: false;
   initial-value: transparent;
 }
 
-/* A high-contrast variant falls out of the generator for free — the reason the
-   ladder is expressed as arithmetic on `--contrast` rather than as literals. */
 @media (prefers-contrast: more) {
   :root {
-    --contrast: 1.06;
-    --hairline: oklch(0.38 0.006 var(--h));
-    --hairline-strong: oklch(0.48 0.008 var(--h));
+    --text-tertiary: #4a4a4a;
+    --text-quaternary: #5a5648;
+    --hairline: #d8d8d8;
+    --hairline-strong: #c9c0a6;
   }
 }
