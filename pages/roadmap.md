@@ -1,0 +1,103 @@
+---
+route: "/roadmap"
+title: "Roadmap — WhatPing"
+description: "What is designed but not built: status pages, maintenance windows, incident acknowledgement, tags. Marked as planned, not shipped."
+h1: "What isn't built yet"
+---
+
+## Intro
+
+Everything on this page is **not in the product**. Some of it is designed in detail; none of it
+is something you can use today. Nothing here should factor into a decision to start using
+WhatPing — decide on [what exists](/features).
+
+This page exists because "coming soon" scattered across feature pages reads as vaporware, and
+because knowing what a young product intends to do is genuinely useful when you're deciding
+whether to depend on it.
+
+No dates. A solo developer giving delivery dates for unpaid work is making something up.
+
+---
+
+## Designed, not built
+
+These have a clear shape and a known cost. They are the next things.
+
+**Public status pages** — `planned`
+A read-only page per workspace showing current state and recent incidents, on a shareable URL.
+The technical blocker was the uptime query, which has been fixed, so this is now mostly
+interface work.
+
+**Maintenance windows** — `planned`
+Suppress alerts during a scheduled window, without pausing the monitor or losing the history.
+Pausing a monitor to deploy is the current workaround and it is a bad one, because a monitor
+you forgot to unpause is worse than no monitor.
+
+**Incident acknowledgement** — `planned`
+Mark an incident as seen so reminders stop, without resolving it. The reminder mechanism this
+builds on already exists.
+
+**Tags and grouping** — `planned`
+Group monitors by service or environment, and filter the list. Matters at 20 monitors; will
+matter more when that cap rises.
+
+**Uptime badges** — `planned`
+An embeddable SVG badge for a README.
+
+---
+
+## Under consideration
+
+Wanted, but the design is not settled.
+
+**More alert channels** — Slack app, Discord app, Gotify, Pushover, Matrix. The generic webhook
+already covers Slack, Discord and Mattermost; native integrations would be nicer, not
+different.
+
+**A second probe location** — the honest version of multi-region. One more genuine vantage
+point is a large improvement over one; twelve is a different product with a different cost
+structure.
+
+**Longer retention** — check history beyond 7 days, which needs rolled-up aggregates rather
+than keeping every raw result.
+
+**Deeper email authentication checks** — SPF lookup counts, DKIM selector validation, DMARC
+policy strength. Today WhatPing checks that SPF and DMARC are present, not that they are
+optimal.
+
+**A public API** — for creating and managing monitors programmatically. The only public
+endpoint today is the heartbeat ping.
+
+**More monitors per workspace** — the cap of 20 is conservative and will move.
+
+---
+
+## Deliberately not planned
+
+Saying no is more useful than a list of everything imaginable.
+
+**Log management, metrics, APM, tracing.** A different product. Better Stack and Grafana do
+this well and WhatPing is not going to do it badly alongside monitoring.
+
+**On-call scheduling and escalation policies.** A real need, and a large product in its own
+right. If you need rotations, use a tool built for them.
+
+**Synthetic browser tests.** Recording and replaying user journeys is a different discipline
+with a different cost model.
+
+**A mobile app.** ntfy and Telegram both deliver push notifications to your phone today,
+without an app store.
+
+---
+
+## Recently shipped
+
+The things below were on this page and are now in the product. Full detail in the
+[changelog](/changelog).
+
+- Certificate, domain, DNS and email authentication monitor types
+- Accepted status ranges and configurable redirect depth
+- Reminders while an incident is still open
+- External second opinion on HTTP incidents
+
+**CTA:** See what exists today → `/features`

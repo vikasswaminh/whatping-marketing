@@ -1,0 +1,81 @@
+---
+route: "/legal/privacy"
+title: "Privacy — WhatPing"
+description: "What WhatPing stores, for how long, and who it is shared with."
+h1: "Privacy"
+---
+
+> **Build note:** this is plain-language, accurate-to-the-code content, not legal advice and
+> not a reviewed policy. Have it checked before launch if you are taking users in regulated
+> jurisdictions. Replace `[EMAIL]` and `[LAST UPDATED]`.
+
+**Last updated:** [LAST UPDATED]
+
+## What is stored
+
+**Your account** — email address, hashed password, and the time your email was verified.
+
+**Your workspace** — its name, its members, and their roles.
+
+**Your monitors** — everything you configured: names, URLs, hostnames, ports, intervals,
+thresholds, keyword assertions, warning thresholds.
+
+**Check results** — for each check: the time, whether it succeeded, latency, HTTP status, and
+the failure reason when it failed. **Deleted after 7 days.**
+
+**Incidents** — when they opened and resolved, the reason, and the external verdict where one
+was recorded.
+
+**Alert channels** — the destination you configured. Webhook URLs, ntfy topic URLs, Telegram
+bot tokens and email addresses are stored in full because they are needed to deliver the alert,
+and are displayed back to you redacted. See [security](/security).
+
+**A delivery ledger** — which channel was sent what, when, and whether it worked.
+
+**Audit records** — significant actions in your workspace, with the user and timestamp.
+
+## What is not stored
+
+- Response bodies from your monitored endpoints. Keyword matching happens in memory; only the
+  pass/fail result is kept.
+- Payment details. There is no billing.
+- Analytics profiles, advertising identifiers, or cross-site tracking.
+
+## Third parties
+
+**Email delivery** — alert and account emails are sent through an SMTP provider, which
+necessarily receives the recipient address and message content.
+
+**Intelligence checks** — certificate, domain, DNS and email-authentication monitors are
+performed via an external API, which receives the domain name being checked.
+
+**Second opinion** — when an HTTP incident opens, the monitored URL is sent to an external
+service to be fetched from an independent network.
+
+**Hosting and network** — the service runs behind Cloudflare, which handles TLS termination and
+sees request metadata.
+
+Your data is not sold, and is not shared with anyone beyond what is needed to deliver the
+service.
+
+## Retention
+
+| Data | Kept |
+|---|---|
+| Check results | 7 days |
+| Incidents | Until you delete the monitor |
+| Monitor configuration | Until you delete it |
+| Account | Until you delete it |
+| Delivery ledger | Until the incident is deleted |
+
+Deleting a monitor deletes its check results, incidents and channel attachments.
+
+## Your choices
+
+**Export or delete** — email [EMAIL] and it will be actioned.
+
+**Cookies** — a session cookie for sign-in. Nothing else is required for the service to work.
+
+## Contact
+
+[EMAIL]

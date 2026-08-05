@@ -1,0 +1,108 @@
+---
+route: "/features/alerting"
+title: "Alerting — WhatPing"
+description: "Email, webhook, ntfy and Telegram. Reminders while an incident is still open, and a second opinion on whether the target is really unreachable."
+h1: "One alert is a single point of failure"
+---
+
+## Channels
+
+Four, all of them attachable to any monitor.
+
+**Webhook.** A JSON POST. The body carries the structured payload plus `text` and `content`
+aliases, which is what makes a single endpoint work with Slack, Discord, Mattermost and plain
+automation receivers without per-provider configuration. Full schema:
+[webhook payload](/docs/webhook-payload).
+
+**Email.** Sent over SMTP with the failure reason, the target and the time the incident opened.
+
+**ntfy.** Push notification to your phone with no account, no app store login and no token —
+subscribe to an unguessable topic and the URL is the credential. Title, priority and tags are
+set from the incident, so a down alert arrives as high priority with an alarm icon.
+
+**Telegram.** A message to a chat or group via a bot you create. Two minutes with BotFather,
+and the [setup guide](/docs/alerting/channels) includes the trap that makes a fresh bot look
+broken.
+
+A channel that fails is recorded and retried on the next reminder — it never changes what a
+monitor believes about its target. Delivery is attempted after state is already committed, so
+a webhook returning 500 forever cannot make a monitor look up or down.
+
+---
+
+## Reminders while still down
+
+Most monitoring alerts once, at the transition. That single message is a single point of
+failure: if SMTP hiccups, if the webhook endpoint is briefly 500ing, if your phone was face
+down — a six-hour outage is now indistinguishable from everything being fine.
+
+Set a reminder interval and WhatPing repeats the alert while the incident stays open, with the
+elapsed time in the message:
+
+```
+🔴 STILL DOWN (1h 35m) — api (https://api.example.com): connect failed: Connection refused
+(os error 111) · confirmed unreachable from a second network
+```
+
+**Off unless you turn it on**, and the minimum is 5 minutes. A repeating alert on a flapping
+monitor is how people learn to filter your notifications into a folder they never open, and
+then the alert that mattered is in there too.
+
+Reminders are recorded separately from the original alert, so "we sent it" and "it was
+delivered" stay distinguishable. Detail: [reminders](/docs/alerting/re-alert).
+
+---
+
+## A second opinion
+
+Every failure verdict comes from one vantage point. So "the site is down" and "*we* cannot
+reach the site" look identical, and until you can tell them apart you are guessing at 3am.
+
+When an incident opens on an HTTP monitor, WhatPing asks an independent network to fetch the
+same URL, and labels the incident with what it found:
+
+| Verdict | Meaning |
+|---|---|
+| **agreed** | The other network could not reach it either. This is a real outage. |
+| **disagreed** | The other network reached it fine. The problem may be on the path between our probe and your service. |
+| **unavailable** | The check could not be performed — a private address, a rate limit, or the confirmation service itself failing. |
+
+**It never delays the alert.** Confirming an unreachable target can take 30 seconds, and that
+slow case is exactly the one worth confirming — so the alert goes out immediately and the
+verdict is attached when it arrives, appearing on the incident and in any reminder.
+
+**It annotates, it does not suppress.** If our probe cannot reach your service and another
+network can, that is still a real reachability failure on one network path, and your users on
+that path are seeing it too. Silencing the alert would turn a partial outage into silence.
+
+**Say what this is.** One independent network path, not a global probe fleet. It is genuinely
+useful and it is not multi-region probing. If you need checks from twelve locations,
+[Better Stack](/vs/better-stack) sells that.
+
+Detail: [second opinion](/docs/alerting/second-opinion).
+
+---
+
+## The delivery ledger
+
+Every send attempt is recorded — which channel, which incident, which reminder, whether it
+succeeded, and the error if it didn't.
+
+This exists because the worst state for an alerting system is one where a channel has been
+quietly failing for weeks and everyone believes it works. A ledger turns that from a discovery
+during an outage into something visible beforehand.
+
+---
+
+## Limits
+
+| Setting | Range | Default |
+|---|---|---|
+| Reminder interval | 5 minutes – 24 hours, or off | off |
+| Second opinion | on / off per HTTP monitor | on |
+| Channels per monitor | any number | — |
+
+No SMS, no phone calls, no PagerDuty or Opsgenie, and no on-call scheduling. If your process
+needs a rotation and an escalation policy, WhatPing is not the tool for it yet.
+
+**CTA:** Start monitoring — free → `https://monitor.whatping.com`

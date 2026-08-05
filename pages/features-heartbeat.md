@@ -1,0 +1,95 @@
+---
+route: "/features/heartbeat-monitoring"
+title: "Cron and backup monitoring (heartbeat) — WhatPing"
+description: "Get told when a cron job, backup or CI pipeline silently stops running. Your job pings a URL on success; WhatPing alerts when the ping does not arrive."
+h1: "The backup that stopped running three weeks ago"
+---
+
+## The problem
+
+Everything with an address can be polled. The jobs that matter most usually don't have one.
+
+A nightly backup. A billing reconciliation job. A certificate renewal hook. A queue drain. If
+one of those quietly stops running, nothing fails, nothing 500s, and no health check anywhere
+changes colour. You find out when you need the backup.
+
+The failure mode is silence, so the monitoring has to be inverted: instead of asking whether
+something responds, wait to be told it ran, and raise an alarm when the telling stops.
+
+## How it works
+
+WhatPing gives you a URL. Your job requests it — `GET` or `POST`, whichever is easier — after
+it finishes successfully. That's the whole integration:
+
+```bash
+# at the end of your backup script
+pg_dump mydb | gzip > /backups/mydb.sql.gz && curl -fsS https://.../monitor/ping/<token>
+```
+
+The `&&` matters: the ping only fires if the backup actually succeeded. A job that runs and
+fails should not check in.
+
+You tell WhatPing how often the job is expected to ping, plus a grace period for normal
+variance. When the deadline passes without a ping, the monitor fails. Cross the failure
+threshold and an incident opens, exactly like any other monitor.
+
+Expected intervals run from 1 minute to 7 days, so this covers a per-minute queue worker and a
+weekly report equally well.
+
+## The detail that makes it trustworthy
+
+**The deadline is evaluated by the backend, not by the prober.**
+
+That sounds like an implementation detail and it is the entire point. If the component that
+runs your checks is also the component that decides whether a heartbeat is overdue, then when
+that component dies it stops noticing everything — including its own death. The failure is
+invisible precisely when it matters.
+
+So heartbeat deadlines are evaluated on a schedule inside the backend, which is a different
+process on different infrastructure. WhatPing uses this on itself: the probe worker sends its
+own heartbeat, and if the worker stops, the backend reports it. That has already caught a real
+regression, where a parsing bug froze the worker on a stale configuration and everything
+otherwise looked normal.
+
+## What you'll see when it fires
+
+```
+🔴 DOWN — nightly-backup (push every 86400s): no ping received for 25h 12m
+```
+
+## Where to put the ping
+
+**cron**
+```bash
+0 3 * * * /usr/local/bin/backup.sh && curl -fsS https://.../monitor/ping/<token>
+```
+
+**GitHub Actions**
+```yaml
+- name: Report success
+  if: success()
+  run: curl -fsS "${{ secrets.WHATPING_URL }}"
+```
+
+**systemd timer** — add an `ExecStartPost=` to the service unit.
+
+**Python / Node** — request the URL at the end of the happy path, not in a `finally`.
+
+## Limits
+
+| Setting | Range | Default |
+|---|---|---|
+| Expected ping interval | 1 minute – 7 days | 1 hour |
+| Grace period | 0 seconds and up | 5 minutes |
+| Failures before down | 1 – 10 | 2 |
+
+The ping URL contains a token that is shown **once**, at creation. It is stored hashed, so it
+cannot be recovered — only rotated.
+
+## Related
+
+- [Heartbeat monitor reference](/docs/monitors/heartbeat)
+- [Ping endpoint reference](/docs/heartbeat-api)
+- [How WhatPing works](/how-it-works)
+
+**CTA:** Start monitoring — free → `https://monitor.whatping.com`

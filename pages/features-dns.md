@@ -1,0 +1,85 @@
+---
+route: "/features/dns-monitoring"
+title: "DNS record monitoring — WhatPing"
+description: "Assert that your A, AAAA, MX, TXT, CNAME or NS records still say what they should. Catch a wrong record or a hijacked zone before your users do."
+h1: "DNS is edited by hand, at 6pm, by someone in a hurry"
+---
+
+## The problem
+
+DNS is the least defended configuration most teams have. There is usually no review, no
+staging, no rollback and no audit trail — just a web console where one person changes a record
+and hopes.
+
+The failure modes are mundane and expensive:
+
+- A migration switches an A record to the new host, and the old one is left on a second record
+  that half the world still resolves.
+- An MX record is edited during a mail provider change and mail silently starts bouncing.
+- A CNAME for a subdomain points at a deprovisioned service, and the subdomain is now available
+  for anyone to claim — a subdomain takeover.
+- A nameserver change at the registrar drops half the zone, and only some resolvers notice.
+- A TXT record for a verification is deleted during a cleanup, and an integration stops
+  authenticating a week later.
+
+Some of these break things immediately. The dangerous ones don't: they break things for some
+users, in some regions, on some resolvers, days later.
+
+## How it works
+
+Pick a domain, a record type, and — optionally — a value you expect to see.
+
+**Record types:** `A`, `AAAA`, `MX`, `TXT`, `CNAME`, `NS`.
+
+**With an expected value**, the monitor asserts that at least one record of that type contains
+the string you gave. Substring matching is deliberate: it lets you assert `cloudflare.com`
+against nameservers, or `route2.mx.` against an MX set, without pinning the exact record and
+being paged every time a provider adds capacity.
+
+**Without an expected value**, the monitor asserts that records of that type exist at all. That
+catches deletion, and it catches the whole zone disappearing.
+
+Checks run daily by default. DNS changes are events, not gradual drift — a daily check catches
+the change within a day of it happening, which is the window that matters for the failures
+above.
+
+## A failure that used to look like success
+
+Worth stating, because it is the kind of thing that separates a monitor you can trust from one
+you can't: a name that does not exist is reported by DNS APIs as a perfectly successful lookup
+with an error nested inside it.
+
+WhatPing treats that as a failed check. A monitor for a domain that no longer exists reports
+down, which is what you asked it to tell you. Getting this wrong — as an earlier build of
+WhatPing did, for about a day — means a deleted zone reads as healthy, which is the exact
+opposite of monitoring.
+
+## What you'll see when it fires
+
+```
+🔴 DOWN — apex-a (example.com): no A record contains "203.0.113.10"
+
+🔴 DOWN — mail-mx (example.com): no MX records found
+
+🔴 DOWN — old-host (legacy.example.com): A lookup failed: Domain does not exist
+```
+
+## Limits
+
+| Setting | Range | Default |
+|---|---|---|
+| Record type | A, AAAA, MX, TXT, CNAME, NS | A |
+| Expected value | any substring, optional | none |
+| Check interval | 20 seconds – 24 hours | 24 hours |
+| Failures before down | 1 – 10 | 2 |
+
+The target is a domain name only — no scheme, no port, no path. Subdomains and underscore
+labels are fine, so `_dmarc.example.com` works.
+
+## Related
+
+- [DNS monitor reference](/docs/monitors/dns)
+- [Email authentication monitoring](/features/email-auth-monitoring) — SPF and DMARC specifically
+- [Domain expiry monitoring](/features/domain-expiry-monitoring)
+
+**CTA:** Start monitoring — free → `https://monitor.whatping.com`
