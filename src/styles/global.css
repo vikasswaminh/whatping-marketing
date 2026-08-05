@@ -178,6 +178,7 @@ samp {
 /* --- buttons -------------------------------------------------------------- */
 
 .btn {
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
@@ -199,11 +200,16 @@ samp {
   transform: translateY(0.5px);
 }
 
+/* `a.btn--primary` rather than `.btn--primary`: a bare class loses to any container
+   rule like `.site-nav a`, which is exactly how these labels turned white on orange
+   at 2.4:1. Matching specificity plus the :not(.btn) exclusions above. */
+a.btn--primary,
 .btn--primary {
   background: var(--accent);
   color: var(--accent-ink);
   box-shadow: var(--shadow-sm);
 }
+a.btn--primary:hover,
 .btn--primary:hover {
   background: var(--accent-hover);
   color: var(--accent-ink);
@@ -212,6 +218,7 @@ samp {
   background: var(--accent-active);
 }
 
+a.btn--secondary,
 .btn--secondary {
   background: var(--surface-raised);
   border-color: var(--hairline-strong);
@@ -282,6 +289,12 @@ samp {
   margin-top: 1.1em;
 }
 
+.prose > h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .prose h2 {
   margin-top: var(--space-xl);
   padding-top: var(--space-md);
@@ -327,7 +340,7 @@ samp {
   margin: var(--space-xl) 0;
 }
 
-.prose a {
+.prose a:not(.btn) {
   color: var(--text-primary);
   text-decoration-color: var(--accent-line);
 }
@@ -545,7 +558,7 @@ samp {
   margin-left: auto;
   font-size: var(--size-small);
 }
-.site-nav a {
+.site-nav a:not(.btn) {
   padding: 0.4rem 0.65rem;
   border-radius: var(--radius-sm);
   color: var(--text-tertiary);
@@ -554,7 +567,7 @@ samp {
     color var(--duration-fast) var(--ease),
     background var(--duration-fast) var(--ease);
 }
-.site-nav a:hover {
+.site-nav a:not(.btn):hover {
   color: var(--text-primary);
   background: var(--surface-raised);
 }
@@ -637,11 +650,11 @@ samp {
 .site-footer li + li {
   margin-top: 0.4rem;
 }
-.site-footer a {
+.site-footer a:not(.btn) {
   color: var(--text-tertiary);
   text-decoration: none;
 }
-.site-footer a:hover {
+.site-footer a:not(.btn):hover {
   color: var(--text-primary);
 }
 .site-footer__base {
@@ -710,7 +723,7 @@ samp {
   padding: 0;
   border-left: 1px solid var(--hairline);
 }
-.docs-sidebar a {
+.docs-sidebar a:not(.btn) {
   display: block;
   margin-left: -1px;
   padding: 0.28rem 0 0.28rem var(--space-xs);
@@ -721,7 +734,7 @@ samp {
     color var(--duration-fast) var(--ease),
     border-color var(--duration-fast) var(--ease);
 }
-.docs-sidebar a:hover {
+.docs-sidebar a:not(.btn):hover {
   color: var(--text-primary);
   border-left-color: var(--hairline-loud);
 }
@@ -745,7 +758,7 @@ samp {
   margin: 0;
   padding: 0;
 }
-.docs-toc a {
+.docs-toc a:not(.btn) {
   display: block;
   padding: 0.22rem 0;
   color: var(--text-quaternary);
@@ -753,7 +766,7 @@ samp {
   font-size: var(--size-small);
   line-height: 1.4;
 }
-.docs-toc a:hover {
+.docs-toc a:not(.btn):hover {
   color: var(--text-primary);
 }
 
@@ -774,7 +787,7 @@ samp {
   border-top: 1px solid var(--hairline);
   font-size: var(--size-small);
 }
-.docs-nextprev a {
+.docs-nextprev a:not(.btn) {
   max-width: 45%;
   padding: var(--space-2xs) var(--space-xs);
   border: 1px solid var(--hairline);
@@ -785,7 +798,7 @@ samp {
     border-color var(--duration-fast) var(--ease),
     background var(--duration-fast) var(--ease);
 }
-.docs-nextprev a:hover {
+.docs-nextprev a:not(.btn):hover {
   background: var(--surface-raised);
   border-color: var(--hairline-strong);
   color: var(--text-primary);
@@ -848,10 +861,10 @@ samp {
 .band--dark {
   border-block: 0 !important;
 }
-.band--dark a {
+.band--dark a:not(.btn) {
   color: var(--text-primary);
 }
-.band--dark a:hover {
+.band--dark a:not(.btn):hover {
   color: var(--accent-text);
 }
 
