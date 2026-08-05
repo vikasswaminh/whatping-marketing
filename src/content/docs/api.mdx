@@ -10,8 +10,11 @@ import Callout from "../../components/Callout.astro";
 Provision monitors from Terraform or CI, and read state back into your own dashboard.
 
 ```
-https://monitor-site.whatping.com/v1
+https://api.whatping.com/v1
 ```
+
+`monitor-site.whatping.com/v1` answers identically and is not going away — it is the same
+origin under a second name. Anything already integrated against it keeps working.
 
 ## Authentication
 
@@ -19,7 +22,7 @@ Create a key in workspace settings. It is shown once and stored hashed, so it ca
 recovered — only rotated.
 
 ```bash
-curl https://monitor-site.whatping.com/v1/me \
+curl https://api.whatping.com/v1/me \
   -H "Authorization: Bearer sk_your_key_here"
 ```
 
@@ -49,9 +52,9 @@ dashboard runs* — if the interface would refuse it, the API refuses it identic
 **Pagination** is by cursor, never offset:
 
 ```bash
-curl "https://monitor-site.whatping.com/v1/monitors?limit=50" -H "Authorization: Bearer $KEY"
+curl "https://api.whatping.com/v1/monitors?limit=50" -H "Authorization: Bearer $KEY"
 # -> { "data": [...], "next_cursor": "..." }
-curl "https://monitor-site.whatping.com/v1/monitors?cursor=..." -H "Authorization: Bearer $KEY"
+curl "https://api.whatping.com/v1/monitors?cursor=..." -H "Authorization: Bearer $KEY"
 ```
 
 `next_cursor` is `null` on the last page. `limit` is 1–100, default 25.
@@ -72,7 +75,7 @@ response with `idempotent-replay: true` instead of creating a second monitor. Re
 with a different body is a `409`. Records are kept 24 hours.
 
 ```bash
-curl -X POST https://monitor-site.whatping.com/v1/monitors \
+curl -X POST https://api.whatping.com/v1/monitors \
   -H "Authorization: Bearer $KEY" \
   -H "Idempotency-Key: deploy-$(git rev-parse --short HEAD)" \
   -H "content-type: application/json" \
@@ -112,7 +115,7 @@ page under [monitor types](/docs).
 
 ```bash
 # HTTP with a status range and a body assertion
-curl -X POST https://monitor-site.whatping.com/v1/monitors \
+curl -X POST https://api.whatping.com/v1/monitors \
   -H "Authorization: Bearer $KEY" -H "content-type: application/json" \
   -d '{
     "name": "checkout",
@@ -148,13 +151,13 @@ curl -X POST https://monitor-site.whatping.com/v1/monitors \
 
 ```bash
 # Everything currently down
-curl "https://monitor-site.whatping.com/v1/monitors?state=down" -H "Authorization: Bearer $KEY"
+curl "https://api.whatping.com/v1/monitors?state=down" -H "Authorization: Bearer $KEY"
 
 # Open incidents
-curl "https://monitor-site.whatping.com/v1/incidents?status=open" -H "Authorization: Bearer $KEY"
+curl "https://api.whatping.com/v1/incidents?status=open" -H "Authorization: Bearer $KEY"
 
 # Check results since a timestamp (epoch ms)
-curl "https://monitor-site.whatping.com/v1/monitors/$ID/results?since=1785000000000" \
+curl "https://api.whatping.com/v1/monitors/$ID/results?since=1785000000000" \
   -H "Authorization: Bearer $KEY"
 ```
 
@@ -167,8 +170,8 @@ Channels are created in the dashboard, because creating one means handing over a
 The API lists them and attaches them:
 
 ```bash
-curl https://monitor-site.whatping.com/v1/channels -H "Authorization: Bearer $KEY"
-curl -X PUT "https://monitor-site.whatping.com/v1/monitors/$ID/channels/$CHANNEL" \
+curl https://api.whatping.com/v1/channels -H "Authorization: Bearer $KEY"
+curl -X PUT "https://api.whatping.com/v1/monitors/$ID/channels/$CHANNEL" \
   -H "Authorization: Bearer $KEY"
 ```
 
@@ -183,8 +186,70 @@ a Telegram bot token. The API cannot be used to read back a credential you store
 - A monitor in another workspace returns `404`, not `403` — telling you an ID exists
   elsewhere would itself be information about another account.
 
+## The OpenAPI document
+
+[`/openapi.json`](/openapi.json) is OpenAPI 3.1, and it is **generated from the route table**
+rather than maintained beside it — so it cannot describe an endpoint that does not exist, and
+it cannot omit one that does. Point a generator at it:
+
+```bash
+curl -O https://whatping.com/openapi.json
+openapi-generator-cli generate -i openapi.json -g go -o ./whatping
+```
+
+## Recipes
+
+**Provision from CI, idempotently.** Key the header on the commit so a rerun of the same
+pipeline is a no-op rather than a duplicate:
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "Idempotency-Key: $SERVICE-$(git rev-parse --short HEAD)" \
+  -H "content-type: application/json" \
+  -d "{\"name\":\"$SERVICE\",\"type\":\"http\",\"url\":\"$HEALTH_URL\"}"
+```
+
+**Mirror open incidents onto an internal board.** Use a `read` key — it can call every `GET`
+and nothing else, so a compromised wall display cannot delete a monitor:
+
+```bash
+curl -s "https://api.whatping.com/v1/incidents?status=open" \
+  -H "Authorization: Bearer $READ_KEY" \
+  | jq -r '.data[] | [.monitor_id, .opened_at, .reason] | @tsv'
+```
+
+An incident carries `monitor_id`, not a name, so a board that shows names joins the two:
+
+```bash
+KEY_HDR="Authorization: Bearer $READ_KEY"
+names=$(curl -s https://api.whatping.com/v1/monitors -H "$KEY_HDR")
+curl -s "https://api.whatping.com/v1/incidents?status=open" -H "$KEY_HDR"   | jq -r --argjson m "$names" '
+      .data[] as $i
+      | ($m.data[] | select(.id == $i.monitor_id) | .name) as $name
+      | [$name, $i.opened_at, $i.reason] | @tsv'
+```
+
+Each incident also carries `external_check` — `agreed`, `disagreed` or `unavailable` — the
+[second opinion](/docs/alerting/second-opinion) verdict, which belongs on the board beside the
+reason.
+**Pause everything for a deploy.** Maintenance windows do not exist yet; this is how you work
+around that today, and it is honest about what it is:
+
+```bash
+for id in $(curl -s https://api.whatping.com/v1/monitors \
+    -H "Authorization: Bearer $KEY" | jq -r '.data[].id'); do
+  curl -X POST "https://api.whatping.com/v1/monitors/$id/pause" -H "Authorization: Bearer $KEY"
+done
+```
+
+**Export results before they age out.** Retention is 7 days and every results response carries
+`retention_days`, so a job that runs daily never silently loses a window.
+
 ## Related
 
+- [API overview](/features/api) — why it is shaped this way
+- [OpenAPI 3.1 spec](/openapi.json)
 - [Webhook payload](/docs/webhook-payload) — the push side
 - [Heartbeat ping endpoint](/docs/heartbeat-api)
 - [Limits](/docs/limits)

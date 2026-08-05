@@ -1,0 +1,75 @@
+---
+route: "/features/grpc-monitoring"
+title: "gRPC health check monitoring — WhatPing"
+description: "Call the standard grpc.health.v1.Health/Check and require SERVING. A port check on a gRPC service tells you the listener is up, not that the service is."
+h1: "The port is open. The service is not serving."
+---
+
+import Cta from "../../components/Cta.astro";
+
+## The problem
+
+A gRPC server binds its port at startup, before its dependencies are ready — often before the
+database pool has connected, the config has loaded, or the migration has finished. It will hold
+that port open through every one of those failures.
+
+So a TCP check on `:50051` goes green the moment the process starts, and stays green while the
+service reports `NOT_SERVING` to every real client behind it. The monitor and the users
+disagree, and the monitor is the one being believed.
+
+There is a standard answer to this, and most gRPC servers already implement it.
+
+## How it works
+
+WhatPing calls `grpc.health.v1.Health/Check` — the health checking protocol defined by the gRPC
+project itself, the same one Kubernetes uses for gRPC probes — and requires the response to be
+`SERVING`.
+
+Anything else fails with the reason attached, and the reasons are meaningfully different:
+
+- `NOT_SERVING` — the server is up and telling you it is not ready. This is the case a port
+  check cannot see.
+- `SERVICE_UNKNOWN` — the server does not know the service you named. A configuration mistake,
+  not an outage, and reported as such rather than as a connection failure.
+- a transport error or timeout — it did not answer at all.
+
+**A blank service name asks about the server as a whole**, which is what the specification
+defines and what most servers answer. Naming a service asks about that one service, which is
+what you want when several ride on one port and only one of them matters to you.
+
+TLS is a toggle. Server-authenticated, which is what a monitor needs.
+
+## Your server probably already has this
+
+Every mainstream gRPC implementation ships a health service — Go, Java, C++, Python, .NET, Rust
+— and registering it is typically a few lines at startup. If you run gRPC on Kubernetes with
+`grpcProbe` configured, it is already registered and this monitor needs no server-side work at
+all.
+
+## What it does not do
+
+- **No arbitrary method calls.** Health check only — this is a monitor, not a synthetic test
+  suite.
+- **No client certificates.** TLS is server-authenticated.
+- **No server reflection.** Service names are typed, not discovered.
+
+## What you'll see when it fires
+
+```
+🔴 DOWN — orders-api (api.example.com:50051): status NotServing
+🔴 DOWN — orders-api (api.example.com:50051): grpc NotFound: unknown service
+```
+
+## Limits
+
+- One probe location, 20 monitors per workspace, 7 days of history.
+- Private targets are refused by default, so an internal-only gRPC service is not reachable
+  from a hosted probe.
+
+## Related
+
+- [gRPC reference](/docs/monitors/grpc)
+- [HTTP and TCP monitoring](/features/uptime-monitoring) — the weaker signal on the same port
+- [Certificate monitoring](/features/certificate-monitoring)
+
+<Cta label="Start monitoring — free" href="https://monitor.whatping.com" secondaryLabel="Read the gRPC docs" secondaryHref="/docs/monitors/grpc" />

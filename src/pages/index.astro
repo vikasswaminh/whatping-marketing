@@ -27,7 +27,17 @@ const gaps = [
   },
 ];
 
-// Wide cells are the two things nothing else in this category does.
+// Wide cells are the things nothing else in this category does, plus the API — which is the
+// one cell that is not a monitor type and earns its width by being the reason a team adopts
+// this rather than clicking around a dashboard.
+//
+// The grid is four columns and every cell must land on it. Cell ORDER is load-bearing, not
+// just the count: the wide API cell goes last so the rows stay flush at *both* breakpoints —
+// 4-col ends `SMTP + All eleven + API(2)`, and 2-col ends `SMTP | All eleven` then API on its
+// own full-width row. With API in the middle, the 2-column layout stranded SMTP beside a gap.
+//
+// This also retires a combined "ICMP · UDP · gRPC · Mail" cell: a cell is a single anchor, so
+// four capabilities shared one vague link to /docs/.
 const monitorCells = [
   {
     tag: "Domain",
@@ -54,7 +64,7 @@ const monitorCells = [
   {
     tag: "TCP",
     title: "Port accepts a connection",
-    body: "Databases, SMTP, anything without HTTP.",
+    body: "Databases, brokers, anything without HTTP.",
     href: "/features/uptime-monitoring/",
   },
   {
@@ -76,11 +86,42 @@ const monitorCells = [
     href: "/features/dns-monitoring/",
   },
   {
-    tag: "ICMP · UDP · gRPC · Mail",
-    title: "The protocols a health check cannot reach",
-    body: "Ping with packet loss. DNS, NTP and STUN over UDP. gRPC health. SMTP and IMAP greetings with STARTTLS — where an expired certificate on port 587 shows up.",
-    href: "/docs/",
+    tag: "ICMP",
+    title: "Packet loss and median RTT",
+    body: "Unprivileged. No root, no CAP_NET_RAW.",
+    href: "/features/ping-monitoring/",
+  },
+  {
+    tag: "UDP",
+    title: "A real request, a required reply",
+    body: "DNS, NTP, STUN. No port-open guessing.",
+    href: "/features/udp-monitoring/",
+  },
+  {
+    tag: "gRPC",
+    title: "Health check must say SERVING",
+    body: "A bound port is not a ready service.",
+    href: "/features/grpc-monitoring/",
+  },
+  {
+    tag: "SMTP · IMAP",
+    title: "Greeting plus STARTTLS",
+    body: "Where an expired cert on 587 shows up.",
+    href: "/features/smtp-imap-monitoring/",
+  },
+  {
+    tag: "All eleven",
+    title: "Every type, side by side",
+    body: "With what each one cannot tell you.",
+    href: "/features/",
+  },
+  {
+    tag: "API",
+    title: "Create monitors from your pipeline",
+    body: "Bearer keys, read/write scopes, cursor pagination and Idempotency-Key so a rerun does not duplicate. Writes run the same validator as the dashboard, so the API accepts exactly what the interface accepts.",
+    href: "/features/api/",
     wide: true,
+    accent: true,
   },
 ];
 

@@ -1,0 +1,76 @@
+---
+route: "/features/smtp-imap-monitoring"
+title: "SMTP and IMAP monitoring — WhatPing"
+description: "Read the mail server greeting and complete a STARTTLS handshake. This is where an expired certificate on port 587 surfaces, and a TCP check never will."
+h1: "Your certificate on port 587 expires quietly"
+---
+
+import Cta from "../../components/Cta.astro";
+
+## The problem
+
+Certificate monitoring, almost everywhere, means port 443. That is where the website is, so
+that is where people look.
+
+Mail runs on 25, 587 and 143, usually with its own certificate, frequently issued by a
+different process from the one that renews the web certificate — and when it expires, the
+website stays perfectly fine. What breaks is submission: clients fail to send, queues back up,
+and the first signal is a user saying their mail is stuck.
+
+The second failure is quieter still. A mail daemon that has wedged will often keep its listener
+bound while answering nothing. The port accepts your connection and then sits there. **A TCP
+check calls that healthy**, because from TCP's point of view it is: the handshake completed.
+
+## How it works
+
+Connect, wait for the greeting, and require the right one — `220` for SMTP, `* OK` for IMAP. A
+server that accepts the connection and says nothing fails, which is the whole point.
+
+With STARTTLS enabled, it then negotiates TLS and completes the handshake. That step is what
+catches the expired certificate:
+
+```
+STARTTLS handshake failed: invalid peer certificate: Expired
+```
+
+Common ports are SMTP `25` and `587`, IMAP `143`. For the implicit-TLS ports — `465` and `993`
+— the handshake happens before any greeting, so those need a TCP monitor for now. Said here
+rather than discovered after you configure one.
+
+## Banners are not stored
+
+A mail greeting routinely carries an internal hostname and an exact software version. That is
+the target's information, not ours to keep, so **only the first token of a greeting is ever
+recorded** — enough to say what was wrong, not enough to be an inventory of your mail
+infrastructure sitting in someone else's database.
+
+## Pair it with email authentication
+
+This monitor watches the server. [Email authentication
+monitoring](/features/email-auth-monitoring) watches whether the internet will *accept* what
+that server sends — SPF and DMARC, checked daily.
+
+The two failures are unrelated and both silent. A working mail server with a broken SPF record
+delivers straight to spam, including the alerts telling you something is wrong.
+
+## What you'll see when it fires
+
+```
+🔴 DOWN — mx (mx.example.com:587): no greeting within timeout
+🔴 DOWN — mx (mx.example.com:587): unexpected greeting, wanted `220` and got `554`
+```
+
+## Limits
+
+- **No implicit TLS (465, 993).** Use a TCP monitor there.
+- No authentication — this checks the greeting and the TLS handshake, not whether a mailbox
+  accepts a login.
+- One probe location, 20 monitors per workspace, 7 days of history.
+
+## Related
+
+- [SMTP and IMAP reference](/docs/monitors/mail)
+- [Email authentication monitoring](/features/email-auth-monitoring)
+- [Certificate monitoring](/features/certificate-monitoring) — port 443
+
+<Cta label="Start monitoring — free" href="https://monitor.whatping.com" secondaryLabel="Read the mail docs" secondaryHref="/docs/monitors/mail" />

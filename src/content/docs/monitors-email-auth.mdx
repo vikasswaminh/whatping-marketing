@@ -27,6 +27,22 @@ The check fails if either is missing.
 
 No other configuration. SPF and DMARC are either published or they are not.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "example.com mail auth",
+    "type": "email-auth",
+    "host": "example.com"
+  }'
+```
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## Why this is worth a monitor
 
 Email authentication fails in a way that is almost perfectly designed to go unnoticed.

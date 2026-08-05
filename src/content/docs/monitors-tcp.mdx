@@ -27,6 +27,25 @@ SSH, a message broker, a game server.
 The host is a bare hostname or IP. `db.example.com`, not `tcp://db.example.com` and not
 `db.example.com/health`. A trailing dot is stripped and the host is lower-cased.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "postgres",
+    "type": "tcp",
+    "host": "db.example.com",
+    "port": 5432,
+    "interval_sec": 60,
+    "timeout_ms": 10000
+  }'
+```
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## What it does and does not tell you
 
 **It tells you** the port is open and something accepted a connection.

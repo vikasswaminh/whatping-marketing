@@ -46,6 +46,26 @@ which is usually right — that a server answered at all is the signal.
 | Expected reply prefix | hex, optional | — |
 | Timeout | 1 – 60 s | 10 s |
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "resolver",
+    "type": "udp",
+    "host": "1.1.1.1",
+    "port": 53,
+    "udp_payload": "dns",
+    "dns_query_name": "example.com",
+    "timeout_ms": 5000
+  }'
+```
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## The three outcomes
 
 ```

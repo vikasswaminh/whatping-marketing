@@ -31,13 +31,23 @@ the case where the server returns 200 and serves a broken page.
 For everything that isn't HTTP: a database port, a message broker, a game server. Either the
 port accepts a connection or it doesn't.
 
-**ICMP, UDP, gRPC and SMTP/IMAP**
-Ping a host and track packet loss. Ask a DNS, NTP or STUN service a real question and require
-a real answer — there is no generic "UDP port open" check, because that question cannot be
-answered. Call a gRPC health service and require `SERVING`. Read a mail server's greeting and
-complete a STARTTLS handshake, which is where an expired certificate on port 587 surfaces.
-[ICMP](/docs/monitors/icmp) · [UDP](/docs/monitors/udp) · [gRPC](/docs/monitors/grpc) ·
-[SMTP / IMAP](/docs/monitors/mail)
+**[ICMP ping](/features/ping-monitoring)**
+Packet loss and median round-trip time — the check that shows a path degrading before it fails.
+Runs unprivileged: no root, no `CAP_NET_RAW`.
+
+**[UDP](/features/udp-monitoring)**
+Ask a DNS, NTP or STUN service a real question and require a real answer. There is no generic
+"UDP port open" check, here or anywhere, because silence is produced equally by a healthy
+server, a firewall and a dead service.
+
+**[gRPC health](/features/grpc-monitoring)**
+Call `grpc.health.v1.Health/Check` and require `SERVING`. A gRPC server binds its port before
+its dependencies are ready, so a port check goes green while the service reports `NOT_SERVING`
+to every real client.
+
+**[SMTP and IMAP](/features/smtp-imap-monitoring)**
+Read the greeting, then complete a STARTTLS handshake — which is where an expired certificate
+on port 587 surfaces, because certificate monitoring everywhere else means port 443.
 
 **[Heartbeat monitoring](/features/heartbeat-monitoring)**
 Inverted monitoring for things that have no address to poll. Your cron job, backup script or
@@ -85,10 +95,12 @@ protects the path your alerts travel down.
 
 ## Automation
 
-**[REST API](/docs/api)** — provision monitors from Terraform or CI and read incidents,
-results and uptime back into your own dashboard. Bearer key auth, read/write scopes, cursor
+**[REST API](/features/api)** — provision monitors from Terraform or CI and read incidents,
+results and channels back into your own dashboard. Bearer key auth, read/write scopes, cursor
 pagination, and `Idempotency-Key` so a rerun does not create duplicates. Writes go through the
 same validation the dashboard uses, so the API accepts exactly what the interface accepts.
+The [OpenAPI 3.1 spec](/openapi.json) is generated from the route table, not written by hand.
+[Full reference](/docs/api).
 
 ---
 

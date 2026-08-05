@@ -28,6 +28,23 @@ returns no usable expiry date.
 Use the **registrable** domain — `example.com`, not `www.example.com`. Registration exists at
 the registrable level; a subdomain has no registry record of its own.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "example.com registration",
+    "type": "domain",
+    "host": "example.com",
+    "domain_warn_days": 45
+  }'
+```
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## It does not require the domain to resolve
 
 This is a registry lookup, not a DNS lookup, so a domain with no A record is monitorable.

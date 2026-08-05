@@ -1,0 +1,130 @@
+---
+/**
+ * The Open Graph card, as a page.
+ *
+ * Rendered rather than drawn, so it is built from the same tokens as the site and cannot
+ * drift from the palette the way an exported image does. `scripts/build-og.py` screenshots
+ * this at exactly 1200x630 and writes public/og.png; nothing else consumes it.
+ *
+ * Excluded from the sitemap in astro.config.mjs and marked noindex here — it is a build
+ * input that happens to be reachable, not a page.
+ */
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WhatPing</title>
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body class="og-body">
+    <div class="card band--dark">
+      <div class="row">
+        <span class="dot"></span>
+        <span class="word">WhatPing</span>
+      </div>
+
+      <h1>
+        The outage that returns <span class="two-hundred">200</span> right up until
+        it doesn&rsquo;t
+      </h1>
+
+      <p class="sub">
+        Certificate, domain, DNS and SPF monitoring — alongside HTTP, TCP, ping, UDP,
+        gRPC and cron heartbeats.
+      </p>
+
+      <div class="feet">
+        <span class="pill pill--up">UP</span>
+        <span class="pill pill--warn">WARN</span>
+        <span class="pill pill--down">DOWN</span>
+        <span class="host">whatping.com</span>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  /* Fixed pixel sizing on purpose: this is a 1200x630 canvas, not a responsive page. */
+  .og-body {
+    margin: 0;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+  }
+
+  .card {
+    box-sizing: border-box;
+    width: 1200px;
+    height: 630px;
+    padding: 72px 80px;
+    display: flex;
+    flex-direction: column;
+    background:
+      radial-gradient(60rem 34rem at 18% -14%, var(--accent-glow), transparent 60%),
+      var(--surface-canvas);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .word {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  h1 {
+    margin: 40px 0 0;
+    max-width: 17ch;
+    font-family: var(--font-display);
+    font-size: 78px;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+  }
+  .two-hundred {
+    font-family: var(--font-mono);
+    font-size: 0.76em;
+    color: var(--accent);
+  }
+
+  .sub {
+    margin: 28px 0 0;
+    max-width: 46ch;
+    font-size: 27px;
+    line-height: 1.45;
+    color: var(--text-tertiary);
+  }
+
+  .feet {
+    /* `auto` pushes the row to the bottom when there is slack; the padding guarantees a gap
+       above it when there is not, which is the case that looked wrong. */
+    margin-top: auto;
+    padding-top: 36px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .feet .pill {
+    font-size: 18px;
+  }
+  .host {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 22px;
+    color: var(--text-quaternary);
+  }
+</style>

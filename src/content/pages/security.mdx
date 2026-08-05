@@ -63,6 +63,23 @@ use an error message as a storage channel.
 **Telegram failures report the status code only**, never the response body, because the
 Telegram API echoes the request URL — which contains the bot token — back in its errors.
 
+**API keys are stored hashed**, the same way heartbeat tokens are. The plaintext `sk_…` is
+shown once at creation and cannot be recovered afterwards, only rotated — a leaked key is
+revoked, never "looked up".
+
+Four different rejections — unknown key, revoked key, expired key, key whose workspace is gone
+— return **one identical `401`**. Distinguishing them would turn the endpoint into an oracle
+for probing which keys once existed.
+
+**The API sends no CORS headers at all.** A key grants full access to its workspace, so a key
+in browser JavaScript is a leaked key. Refusing browser requests outright is a stronger
+position than documenting that you shouldn't. It also means channels cannot be created through
+the API — only listed and attached — because creating one means handing over a credential, and
+that belongs in one place with one audit trail.
+
+Every API response goes through the same redaction as the interface. A destination cannot be
+read back out through it.
+
 ---
 
 ## Alerting cannot corrupt monitoring

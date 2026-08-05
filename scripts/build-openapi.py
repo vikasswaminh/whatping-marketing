@@ -16,7 +16,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 ROUTES = ROOT / "packages/backend/convex/api/routes.ts"
 OUT = ROOT / "apps/marketing/public/openapi.json"
-SERVER = "https://monitor-site.whatping.com"
+SERVER = "https://api.whatping.com"
 
 # path -> method -> (summary, description)
 DOCS = {

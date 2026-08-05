@@ -30,6 +30,27 @@ Any of them failing counts as one failed check.
 | Re-alert every | 5 min – 24 h, or off | off | |
 | Second opinion | on / off | on | |
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "checkout",
+    "type": "http",
+    "url": "https://shop.example.com/health",
+    "accepted_status": "200-299",
+    "expected_keyword": "ready",
+    "max_redirects": 3,
+    "interval_sec": 60,
+    "down_threshold": 2
+  }'
+```
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## Accepted status expressions
 
 A comma-separated list of codes and inclusive ranges:

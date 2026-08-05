@@ -22,6 +22,10 @@ export const DOCS_NAV: { group: string; items: { href: string; label: string }[]
       { href: "/docs/monitors/domain/", label: "Domain expiry" },
       { href: "/docs/monitors/dns/", label: "DNS" },
       { href: "/docs/monitors/email-auth/", label: "Email auth" },
+      { href: "/docs/monitors/icmp/", label: "ICMP ping" },
+      { href: "/docs/monitors/udp/", label: "UDP" },
+      { href: "/docs/monitors/grpc/", label: "gRPC" },
+      { href: "/docs/monitors/mail/", label: "SMTP & IMAP" },
     ],
   },
   {
@@ -35,6 +39,7 @@ export const DOCS_NAV: { group: string; items: { href: string; label: string }[]
   {
     group: "Reference",
     items: [
+      { href: "/docs/api/", label: "API reference" },
       { href: "/docs/webhook-payload/", label: "Webhook payload" },
       { href: "/docs/heartbeat-api/", label: "Heartbeat ping" },
       { href: "/docs/limits/", label: "Limits" },

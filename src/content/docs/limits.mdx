@@ -92,6 +92,18 @@ h1: "Limits and defaults"
 | Page size | 1 – 100, default 25 |
 | Idempotency-Key replay window | 24 hours |
 
+## SMTP and IMAP monitors
+
+| Limit | Value |
+|---|---|
+| Port | 1 – 65535 |
+| STARTTLS | on or off; on by default |
+| Timeout | 1 – 60 s, default 10 s |
+| Greeting recorded | first token only |
+
+Implicit-TLS ports — 465 and 993 — are not supported; the handshake precedes the greeting.
+Use a TCP monitor there.
+
 ## Data
 
 | Item | Value |

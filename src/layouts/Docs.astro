@@ -14,9 +14,11 @@ interface Props {
   description: string;
   h1: string;
   headings?: Heading[];
+  /** Passed straight through to Base. Used by the FAQ for FAQPage markup. */
+  jsonLd?: Record<string, unknown>;
 }
 
-const { title, description, h1, headings = [] } = Astro.props;
+const { title, description, h1, headings = [], jsonLd } = Astro.props;
 
 // Only h2s. An "on this page" rail that mirrors every heading level stops being a map.
 const toc = headings.filter((h) => h.depth === 2);
@@ -28,7 +30,7 @@ const next =
   index >= 0 && index < DOCS_FLAT.length - 1 ? DOCS_FLAT[index + 1] : undefined;
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description} jsonLd={jsonLd}>
   <div class="shell docs">
     <DocsSidebar />
 

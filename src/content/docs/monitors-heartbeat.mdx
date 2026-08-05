@@ -33,6 +33,26 @@ overdue at 65 minutes.
 Set the grace to cover normal variance — a job that usually takes 2 minutes but occasionally
 takes 8 needs a grace period that accommodates the 8.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "nightly-backup",
+    "type": "push",
+    "push_expected_interval_sec": 86400,
+    "push_grace_sec": 3600
+  }'
+```
+
+The response carries `push_token` **once**. It is stored hashed and cannot be read back —
+only rotated with `POST /v1/monitors/{id}/rotate-token`.
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## The ping URL
 
 Shown **once**, when the monitor is created. The token is stored hashed and cannot be

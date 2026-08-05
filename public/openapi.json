@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://monitor-site.whatping.com"
+      "url": "https://api.whatping.com"
     }
   ],
   "components": {

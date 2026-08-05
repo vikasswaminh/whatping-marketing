@@ -10,7 +10,9 @@ export default defineConfig({
   // redirect hop, which a file-per-route build would need.
   trailingSlash: "always",
   build: { format: "directory" },
-  integrations: [mdx(), sitemap()],
+  // /og/ is the source for public/og.png, not a page anyone should land on. It carries a
+  // noindex tag as well; this keeps it out of the sitemap we actively submit.
+  integrations: [mdx(), sitemap({ filter: (page) => !page.includes("/og/") })],
   markdown: {
     shikiConfig: {
       // Code sits on a near-white surface now, so the highlighter has to be light too.

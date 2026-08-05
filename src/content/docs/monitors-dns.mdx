@@ -29,6 +29,27 @@ The check fails when:
 Subdomains and underscore labels are supported, so `_dmarc.example.com` and
 `_acme-challenge.example.com` both work.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "apex A record",
+    "type": "dns",
+    "host": "example.com",
+    "dns_record_type": "A",
+    "dns_expected": "203.0.113."
+  }'
+```
+
+`dns_expected` matches by substring, so a partial value is usually the right assertion — it
+survives a provider adding capacity, which an exact match does not.
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## Matching is by substring
 
 The expected value must appear **somewhere in** at least one record of that type. This is

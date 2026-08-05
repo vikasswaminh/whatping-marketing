@@ -85,7 +85,13 @@ revoked — all of them are recorded failures against a monitor whose state is u
 | Probe worker | Rust, systemd unit | Stateless, bounded concurrency, graceful drain |
 | Backend | Convex, on our own infrastructure | Owns configuration, state, incidents, alert dispatch, scheduled checks |
 | Dashboard | Next.js | Server-rendered, behind authentication |
+| [REST API](/features/api) | Convex HTTP actions on `api.whatping.com` | Bearer keys, per-key rate limits, no CORS |
 | Ingress | Cloudflare named tunnel | No inbound ports open on the host |
+
+The API is a third face on the same backend, not a service beside it. Both it and the dashboard
+call the identical mutation for every write, so there is no second validation path that could
+accept a monitor the prober cannot parse — which is a failure this project has already had
+once, and the reason the reuse is structural rather than a convention.
 
 ---
 
