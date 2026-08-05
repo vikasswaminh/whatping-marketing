@@ -151,7 +151,7 @@ The tone sweep returned nothing.
 
 ```bash
 grep -rniE 'unlimited|multi-?region|global (probe|network|location)|status page|\bSLA\b|\bSSO\b|SAML|sign in with google|pagerduty|opsgenie|\bSMS\b|99\.9|trusted by|soc ?2|iso ?27001|mobile app|self-host' \
-  apps/web/content/
+  apps/marketing/src/content/
 ```
 
 Every hit must map to a row in the table above. If it does not, delete the sentence — do not
@@ -161,7 +161,7 @@ Second sweep, for tone:
 
 ```bash
 grep -rniE 'seamless|effortless|peace of mind|worry-free|blazing|enterprise-grade|game.chang|revolutionar|!' \
-  apps/web/content/
+  apps/marketing/src/content/
 ```
 
 Expected result: nothing, except exclamation marks inside quoted code or literal alert text.

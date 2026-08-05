@@ -38,6 +38,48 @@ the problem is their own vantage point.
 
 ---
 
+## Visual system
+
+Implemented in `apps/marketing/src/styles/tokens.css`. Three tiers — generator, primitives,
+semantic — and nothing outside that file states a colour.
+
+**The architecture is borrowed from Linear; the identity is not.** Linear derives a whole
+theme from base, accent and contrast in LCH, and gets its depth from a surface ladder plus 1px
+hairlines with no drop shadows at all. That generator is worth copying. The palette is not:
+the documented failure mode of Linear-inspired sites is "a dark app with a purple button".
+
+So the accent is the product's own semantics. Up/down/warn *are* the brand colours, which is
+the one palette choice that could only belong to a monitoring tool.
+
+```
+--accent  oklch(0.78 0.155 155)   green — CTAs, links, active states, `up`
+--down    oklch(0.68 0.19   25)   incidents only
+--warn    oklch(0.82 0.15   78)   thresholds only
+```
+
+Surfaces are a lightness ramp — canvas, sunken, raised, overlay, hover — each about +0.025 L.
+Text is a four-step ladder. Interaction states are derived with `color-mix(in oklch, …)` rather
+than hand-picked, so changing the accent moves every state with it.
+
+**Type: Geist Sans and Geist Mono**, self-hosted. Tracking tightens as size grows — −0.038em at
+the display size down to 0 at 14px. That single rule is most of what makes headlines read as
+engineered rather than merely large.
+
+**Weight band is 400–600.** No 300, no 700+.
+
+**Exclusions carry as much of the look as the colours.** No drop shadows. No second accent. No
+gradients except one restrained radial wash behind the hero and the final CTA — read as light
+on a panel, not decoration. Radii cap at 16px.
+
+**Motion is scroll-driven CSS**, no JavaScript: `animation-timeline: view()` for reveals and
+`scroll()` for the header hairline. All of it inside `prefers-reduced-motion`.
+
+**Accessibility is asserted, not eyeballed.** `apps/marketing/scripts/verify-contrast.py`
+resolves every token pair to sRGB and fails the build below WCAG AA. It has already caught one
+real failure: the eyebrow tier at 3.58:1 against a card.
+
+---
+
 ## Voice
 
 Plain, specific, technical. Assume the reader has run a server, read a stack trace, and been
@@ -110,7 +152,7 @@ page.
 ```bash
 grep -rniE 'unlimited|multi-?region|global (probe|network|location)|status page|SLA|SSO|SAML|\
 sign in with google|pagerduty|opsgenie|\bSMS\b|99\.9|trusted by|soc ?2|iso ?27001' \
-  apps/web/content/
+  apps/marketing/src/content/
 ```
 
 Every hit must be a deliberate negative statement. If you cannot point at the sentence that
