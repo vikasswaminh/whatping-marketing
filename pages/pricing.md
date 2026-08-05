@@ -15,11 +15,13 @@ better than inventing a "Pro" column with a Contact Us button behind it.
 | | Included |
 |---|---|
 | Monitors | 20 per workspace |
-| Monitor types | All seven — HTTP, TCP, heartbeat, certificate, domain, DNS, email auth |
+| Monitor types | **All eleven.** Liveness: HTTP, TCP, ICMP, UDP, gRPC, SMTP, IMAP. Inverted: heartbeat. Expiry and drift: certificate, domain, DNS, email auth |
 | Check interval | From 20 seconds |
 | Alert channels | Email, webhook, ntfy, Telegram — any number per monitor |
 | Reminders while down | Included |
 | Second opinion | Included |
+| REST API | Included — 600 reads and 60 writes a minute, per key |
+| OpenAPI 3.1 spec | Published at [/openapi.json](/openapi.json) |
 | Check history | 7 days |
 | Team members | Any number, in one workspace |
 | Cost | Nothing |
@@ -50,8 +52,8 @@ designed, none built — see the [roadmap](/roadmap).
 
 ## Will it stay free?
 
-The parts you are using now — the seven monitor types, the alert channels, the reminders, the
-second opinion, at the current limits — will stay free.
+The parts you are using now — the eleven monitor types, the alert channels, the reminders, the
+second opinion, the API at its current rate limits — will stay free.
 
 If paid tiers arrive, they will be for things that cost real money to run: more monitors,
 longer retention, higher check frequency. Nobody will wake up to find their existing monitors

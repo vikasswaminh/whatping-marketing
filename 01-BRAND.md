@@ -158,10 +158,15 @@ page.
 
 ### Grep before shipping
 
+Word-boundary `\bSLAs?\b` and `\bSSO\b`, not the bare forms: unanchored `SLA` matches
+**Slack**, which appears legitimately all over the webhook documentation, and that noise buries
+the hits that matter. Tightening the pattern took the count from 71 to 50 without losing a
+single real one.
+
 ```bash
-grep -rniE 'unlimited|multi-?region|global (probe|network|location)|status page|SLA|SSO|SAML|\
-sign in with google|pagerduty|opsgenie|\bSMS\b|99\.9|trusted by|soc ?2|iso ?27001' \
-  apps/marketing/src/content/
+grep -rniE 'unlimited|multi-?region|global (probe|network|location)|status page|\bSLAs?\b|\
+\bSSO\b|SAML|sign in with google|pagerduty|opsgenie|\bSMS\b|99\.9|trusted by|soc ?2|\
+iso ?27001' apps/marketing/src/content/
 ```
 
 Every hit must be a deliberate negative statement. If you cannot point at the sentence that
@@ -180,7 +185,10 @@ The product has no users to quote yet. Do not invent any. These are true and str
   ledger and cannot corrupt what the monitor believes.
 - **Every check result is idempotent.** Results carry a producer-generated ID, so a retry
   after a network blip cannot open a second incident or double-page you.
-- **Nothing is claimed that isn't tested.** 187 backend tests and 22 worker tests, and every
-  monitor type was verified against a live target with a known-true answer before shipping.
+- **Nothing is claimed that isn't tested.** Every monitor type was verified against a live
+  target with a known-true answer before it shipped — a reachable host and a black-holed one
+  for ICMP, a real resolver for UDP, a real MX for SMTP. The backend and prober suites run on
+  every change. *Do not put a test count in copy:* it was wrong for two releases, and the
+  sentence is stronger without it.
 
 Each of those links to the docs page that explains it. That is the proof: the reader can check.

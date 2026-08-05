@@ -37,6 +37,28 @@ Common ports: SMTP `25` and `587`; IMAP `143`. For implicit-TLS ports — `465`,
 handshake happens before any greeting, so use a [TCP monitor](/docs/monitors/tcp) there for
 now.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "mx",
+    "type": "smtp",
+    "host": "mx.example.com",
+    "port": 587,
+    "starttls": true,
+    "timeout_ms": 15000
+  }'
+```
+
+Use `"type": "imap"` with port `143` for IMAP. They are two monitor types sharing one page,
+not one type with a protocol field.
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## Failure messages
 
 ```

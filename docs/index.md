@@ -17,22 +17,30 @@ later.
 
 ## Monitor types
 
-| Type | Answers | Reference |
-|---|---|---|
-| **HTTP** | Does this URL respond correctly? | [docs](/docs/monitors/http) |
-| **TCP** | Does this port accept a connection? | [docs](/docs/monitors/tcp) |
-| **Heartbeat** | Did my cron job run? | [docs](/docs/monitors/heartbeat) |
-| **Certificate** | How long until my TLS certificate expires? | [docs](/docs/monitors/ssl) |
-| **Domain** | How long until my registration expires? | [docs](/docs/monitors/domain) |
-| **DNS** | Does this record still say what it should? | [docs](/docs/monitors/dns) |
-| **Email auth** | Are SPF and DMARC still published? | [docs](/docs/monitors/email-auth) |
-| **ICMP** | Is this host reachable, and how lossy is the path? | [docs](/docs/monitors/icmp) |
-| **UDP** | Does this DNS, NTP or STUN service answer? | [docs](/docs/monitors/udp) |
-| **gRPC** | Does the health service report SERVING? | [docs](/docs/monitors/grpc) |
-| **SMTP / IMAP** | Does the mail server greet, and does STARTTLS work? | [docs](/docs/monitors/mail) |
+Eleven types is enough to be worth a decision column. The middle column is the question the
+type answers; the third is when to reach for it rather than something adjacent.
 
-HTTP, TCP and heartbeat run at your chosen interval, from 20 seconds. The other four default to
-once a day, because certificates and registrations change on a scale of months.
+| Type | Answers | Reach for it when | Reference |
+|---|---|---|---|
+| **HTTP** | Does this URL respond correctly? | Anything served over HTTP. Start here | [docs](/docs/monitors/http) |
+| **TCP** | Does this port accept a connection? | A port with no protocol you can assert on — a broker, a game server | [docs](/docs/monitors/tcp) |
+| **Heartbeat** | Did my cron job run? | The thing has no address to poll. Backups, cron, CI | [docs](/docs/monitors/heartbeat) |
+| **Certificate** | How long until my TLS certificate expires? | Anything on 443. Renewal should be routine, not an incident | [docs](/docs/monitors/ssl) |
+| **Domain** | How long until my registration expires? | Every domain you own. Nothing else predicts this failure | [docs](/docs/monitors/domain) |
+| **DNS** | Does this record still say what it should? | A record you would notice being wrong only after users did | [docs](/docs/monitors/dns) |
+| **Email auth** | Are SPF and DMARC still published? | You send mail — including your own alert emails | [docs](/docs/monitors/email-auth) |
+| **ICMP** | Is this host reachable, and how lossy is the path? | You want latency history, or the host serves nothing to poll | [docs](/docs/monitors/icmp) |
+| **UDP** | Does this DNS, NTP or STUN service answer? | A resolver, time server or STUN/TURN endpoint | [docs](/docs/monitors/udp) |
+| **gRPC** | Does the health service report SERVING? | gRPC, where a bound port is not a ready service | [docs](/docs/monitors/grpc) |
+| **SMTP / IMAP** | Does the mail server greet, and does STARTTLS work? | A mail server — and its certificate, which is not on 443 | [docs](/docs/monitors/mail) |
+
+**Two common mistakes.** A TCP monitor on a mail server or a gRPC port reports up while the
+service is broken — use the specific type. And an ICMP monitor is not a substitute for an HTTP
+one: a machine with a dead application answers pings perfectly.
+
+HTTP, TCP, ICMP, UDP, gRPC, SMTP and IMAP run at your chosen interval, from 20 seconds.
+Certificate, domain, DNS and email auth default to once a day, because certificates and
+registrations change on a scale of months.
 
 ---
 

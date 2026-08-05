@@ -32,7 +32,10 @@ WhatPing does not replace it.
   this, and it is the failure that disables your alerting itself.
 - **Domain registration expiry** as a first-class monitor with incidents and alerting.
 - **Free.** Not a limited free tier that pushes you to upgrade at 10 monitors — free, with all
-  seven monitor types, all four channels, reminders and second opinion included.
+  eleven monitor types, all four channels, reminders and second opinion included.
+- **A [REST API](/features/api) on a product that costs nothing.** Better Stack has an API too,
+  and it is a good one — this is not a feature they lack. The difference is the bill: bearer
+  keys, read/write scopes, cursor pagination and `Idempotency-Key`, at no cost.
 - **No seat pricing.** Add your whole team to a workspace at no cost.
 - **No upsell path.** There is no paid tier to be nudged toward, because none exists.
 - **Plain failure text.** Alerts say `no MX record contains "route2.mx."` or `certificate
@@ -44,6 +47,7 @@ WhatPing does not replace it.
 |---|---|---|
 | HTTP / TCP monitoring | ✓ | ✓ |
 | Keyword assertions | ✓ | ✓ |
+| ICMP / ping | ✓ | ✓ |
 | Heartbeat / cron monitoring | ✓ | ✓ |
 | Certificate expiry | ✓ | ✓ |
 | Domain registration expiry | ✓ | ✓ |
@@ -52,6 +56,7 @@ WhatPing does not replace it.
 | **Multi-region probing** | ✗ — one location | ✓ |
 | Independent second opinion | ✓ (one network) | ✓ (multi-region) |
 | Reminders while down | ✓ | ✓ |
+| REST API | ✓ | ✓ |
 | On-call scheduling / escalation | ✗ ([roadmap](/roadmap)) | ✓ |
 | Incident acknowledgement | ✗ ([roadmap](/roadmap)) | ✓ |
 | Status pages | ✗ ([roadmap](/roadmap)) | ✓ |

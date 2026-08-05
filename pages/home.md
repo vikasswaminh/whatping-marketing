@@ -54,16 +54,27 @@ everyone looks. So WhatPing looks somewhere else as well.
 
 `MonitorTypeGrid`, each card links to its feature page.
 
-| Type | One line | Link |
-|---|---|---|
-| **HTTP** | Status ranges, redirects, and a keyword assertion for when 200 is a lie | `/features/uptime-monitoring` |
-| **TCP** | A port either accepts a connection or it doesn't | `/features/uptime-monitoring` |
-| **Heartbeat** | Your cron job pings on success; we alert when it stops | `/features/heartbeat-monitoring` |
-| **Certificate** | Days until your TLS certificate expires, checked daily | `/features/certificate-monitoring` |
-| **Domain** | Days until your registration expires, read from the registry | `/features/domain-expiry-monitoring` |
-| **DNS** | Assert an A, AAAA, MX, TXT, CNAME or NS record still says what it should | `/features/dns-monitoring` |
-| **Email auth** | SPF and DMARC present and valid, so your mail keeps arriving | `/features/email-auth-monitoring` |
-| **ICMP · UDP · gRPC · Mail** | The protocols a health check cannot reach | `/docs` |
+The grid is four columns wide and every cell lands on it. **Order is load-bearing, not just
+the count** — the wide API cell goes last so the rows stay flush at both breakpoints: 4-column
+ends `SMTP + All eleven + API(2)`, and 2-column ends `SMTP | All eleven` then API on its own
+full-width row. With API in the middle, the 2-column layout stranded SMTP beside a gap. Do not
+add or move a cell without checking 1440 **and** 768.
+
+| Type | Width | One line | Link |
+|---|---|---|---|
+| **Domain** | wide, accent | Registration expiry, read from the registry | `/features/domain-expiry-monitoring` |
+| **Email auth** | wide, accent | SPF and DMARC present and valid, so your mail keeps arriving | `/features/email-auth-monitoring` |
+| **HTTP** | | Status ranges, redirects, and a keyword assertion for when 200 is a lie | `/features/uptime-monitoring` |
+| **TCP** | | A port either accepts a connection or it doesn't | `/features/uptime-monitoring` |
+| **Heartbeat** | | Your cron job pings on success; we alert when it stops | `/features/heartbeat-monitoring` |
+| **Certificate** | | Days until your TLS certificate expires, checked daily | `/features/certificate-monitoring` |
+| **DNS** | | Assert an A, AAAA, MX, TXT, CNAME or NS record still says what it should | `/features/dns-monitoring` |
+| **ICMP** | | Packet loss and median RTT, unprivileged | `/features/ping-monitoring` |
+| **UDP** | | A real request and a required reply — no port-open guessing | `/features/udp-monitoring` |
+| **gRPC** | | The health check must report `SERVING`; a bound port is not a ready service | `/features/grpc-monitoring` |
+| **SMTP · IMAP** | | Greeting plus STARTTLS, where an expired certificate on 587 shows up | `/features/smtp-imap-monitoring` |
+| **All eleven** | | Every type side by side, with what each one cannot tell you | `/features` |
+| **API** | wide, accent | Create monitors from your pipeline; same validator as the dashboard | `/features/api` |
 
 ---
 
@@ -136,9 +147,9 @@ the prober retries after a network blip, the replay is discarded rather than ope
 incident.
 → `/docs/concepts`
 
-**Nothing is claimed here that isn't tested.** 187 backend tests and 22 prober tests, and
-every monitor type was verified against a live target with a known-true answer before it
-shipped.
+**Nothing is claimed here that isn't tested.** Every monitor type was verified against a live
+target with a known-true answer before it shipped — a reachable host and a black-holed one for
+ICMP, a real resolver for UDP, a real MX for SMTP. Not a mock that agreed with the code.
 
 ---
 

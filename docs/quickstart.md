@@ -97,8 +97,25 @@ everything being fine.
 Leave it off for anything flaky. A repeating alert on a noisy monitor teaches you to ignore
 alerts.
 
+## 7. Or skip all of that and use the API
+
+Everything above is available over HTTP, and it is the same code path — both the dashboard and
+the API run the identical validator, so anything the interface accepts the API accepts, and
+anything it refuses the API refuses with the offending field named.
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{"name":"api","type":"http","url":"https://api.example.com/health"}'
+```
+
+Create the key in workspace settings. Send `Idempotency-Key` on creates and a pipeline that
+reruns will not accumulate duplicate monitors.
+
 ## What next
 
+- [API reference](/docs/api) — every endpoint, with curl for each
 - [Concepts](/docs/concepts) — how thresholds and incidents actually behave
 - [Heartbeat monitors](/docs/monitors/heartbeat) — for your backups and cron jobs
 - [Email auth monitoring](/docs/monitors/email-auth) — five seconds to set up, protects your

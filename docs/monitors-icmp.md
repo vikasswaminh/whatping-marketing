@@ -27,6 +27,25 @@ noticeably, and the number an operator glances at should reflect the typical cas
 A threshold of `0` means any lost packet fails the check. On a link you know is lossy, `25`
 or `50` reports genuine degradation without paging you for one dropped echo.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "gateway",
+    "type": "icmp",
+    "host": "gw.example.com",
+    "packet_count": 4,
+    "loss_threshold_pct": 25,
+    "interval_sec": 60
+  }'
+```
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## What it tells you, and what it does not
 
 ICMP proves a host is reachable and how far away it is. It says **nothing about whether the

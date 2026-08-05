@@ -112,6 +112,10 @@ drifted from the code is worse than no claim, because it will be believed.
 | Claim | Source |
 |---|---|
 | Base URL `/v1` on the Convex site host | `packages/backend/convex/http.ts` — `pathPrefix: "/v1/"` |
+| `api.whatping.com` and `monitor-site.whatping.com` both answer, identically | `deploy/62-cf-tunnel.sh` — two ingress rules to `:3211`; Convex routes by path, not host |
+| No CORS headers are sent | `api/router.ts` — no `Access-Control-*` anywhere in the file |
+| Fifteen endpoints | `api/routes.ts` — `routes` array length; asserted by `build-openapi.py` |
+| Channels cannot be created through the API | `api/routes.ts` — no `POST /v1/channels` route |
 | Bearer `sk_…` key auth, workspace-scoped | `convex/api/auth.ts` — `resolve` |
 | Read and write scopes; write implies read | `schema.ts` — `apiScope`; `api/router.ts` scope check |
 | Unknown, revoked and expired keys are indistinguishable | `api/auth.ts` — one `null` return; asserted in `api.test.ts` |
@@ -143,16 +147,20 @@ drifted from the code is worse than no claim, because it will be believed.
 
 | Claim | Source |
 |---|---|
-| 228 backend tests | `bun x vitest run` in `packages/backend` |
-| 36 prober tests | `cargo test` in `services/monitor-worker` |
+| The backend suite passes | `bun x vitest run` in `packages/backend` — 5 test files. No integer is published in marketing copy; see the note below |
+| 36 prober tests | `cargo test` in `services/monitor-worker` — `#[test]`/`#[tokio::test]` are 1:1 with test functions in Rust, so this one is countable without running it: 4 in `models.rs`, 19 in `probe.rs`, 13 in `protocols.rs` |
 | The heartbeat caught a prober regression within ~10 minutes | Commit `9d58d51` and the session that produced it |
 | A DNS error envelope once made a dead domain read as up | Commit `ca8dad4` |
 | DNS monitors ignored the configured record type | Commit `5cd993b` |
 | The uptime query would have failed at ~3.8 days of 20 s history | Commit `805d9f3`; Convex 16,384-document read ceiling |
 
 <Callout>
-Test counts change. Either re-run the suites before publishing and update them here, or replace
-the sentence with one that does not carry a number.
+Test counts change on every commit, and this one went stale twice — the site said "187 backend
+tests and 22 worker tests" for two releases while this file said 228 and 36. Marketing copy now
+carries **no backend test integer at all**, because a number nobody re-runs is a claim that
+decays into a false one. The stronger sentence was always the one beside it: every monitor type
+was verified against a live target with a known-true answer before it shipped, and that stays
+true no matter how many tests exist.
 </Callout>
 
 ## Deliberate negative statements

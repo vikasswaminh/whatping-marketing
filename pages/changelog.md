@@ -16,6 +16,61 @@ you cannot verify from history.
 
 ---
 
+## 6 August 2026
+
+**A public REST API**
+Provision monitors from CI or Terraform and read incidents, results and channels back out.
+Bearer key auth with read/write scopes, cursor pagination, per-key rate limits (600 reads and
+60 writes a minute, continuously refilling rather than windowed), and `Idempotency-Key` so a
+rerun of a pipeline does not accumulate duplicate monitors.
+
+Every write runs the *same validator the dashboard runs*. That was the design constraint the
+whole thing was built around: an API that validates differently from the interface is how a
+monitor gets created that the prober cannot parse, and this codebase had already had one
+outage of exactly that shape.
+[Docs](/docs/api) · [Overview](/features/api)
+
+**Four new monitor types — ICMP, UDP, gRPC and SMTP/IMAP**
+Ping with median round-trip time and a packet-loss threshold. UDP against DNS, NTP and STUN
+with a real request and a required reply. gRPC `grpc.health.v1.Health/Check` asserting
+`SERVING`. Mail server greeting plus a STARTTLS handshake, which is where an expired
+certificate on port 587 actually surfaces.
+
+ICMP runs unprivileged — a `SOCK_DGRAM` socket and a `ping_group_range` sysctl scoped to the
+worker's group, rather than root or `CAP_NET_RAW` on the binary.
+[ICMP](/features/ping-monitoring) · [UDP](/features/udp-monitoring) ·
+[gRPC](/features/grpc-monitoring) · [SMTP/IMAP](/features/smtp-imap-monitoring)
+
+**There is deliberately no generic "UDP port open" check**
+Not an omission. Silence over UDP is produced equally by a healthy server that ignores your
+packet, a firewall dropping it, and a service that died an hour ago — so a monitor built on it
+reports healthy for a dead service, which is worse than no monitor. Every UDP check sends
+something a real server answers and requires the answer.
+[Why](/docs/monitors/udp)
+
+**An OpenAPI 3.1 spec, generated rather than written**
+[`/openapi.json`](/openapi.json) is built from the API's route table, and the builder checks
+both directions. That earned its place on the first run: the initial version parsed 13 of 15
+routes, because one mapped pair uses JavaScript shorthand property syntax. Only the *reverse*
+check — "described in the spec but absent from the route table" — caught the two missing. A
+spec that advertises an endpoint which does not exist sends every reader down a dead end.
+
+**Fixed: the site said three shipped features did not exist**
+For two days after the API and the protocols shipped, the FAQ said there was no API, the
+limits page said the same, and the Uptime Kuma comparison had ICMP as a ✗ in our own column.
+The claims list is meant to prevent overstatement and it had no mechanism for the opposite
+failure. Corrected in both the content package and the built site.
+
+**Fixed: a deploy that failed while every check reported green**
+The Pages deploy script called `bunx` without it being on `PATH`. `set -e` did not catch it,
+because the caller piped the script to `tail` and the pipeline returned tail's exit code. The
+render check then passed — against the *previous* deployment, which was still being served.
+
+The check now compares the CSS hashes in `dist/index.html` against the live page and fails on
+a mismatch. A green run that proves nothing is worse than a red one.
+
+---
+
 ## 3 August 2026
 
 **External second opinion on HTTP incidents**

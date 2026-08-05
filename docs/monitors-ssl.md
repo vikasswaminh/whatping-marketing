@@ -30,6 +30,23 @@ literals — a scheme or path is stripped where it is unambiguous and rejected w
 
 Certificates are checked on port 443.
 
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "example.com cert",
+    "type": "ssl",
+    "host": "example.com",
+    "cert_warn_days": 30
+  }'
+```
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
 ## Choosing a threshold
 
 | Situation | Suggested |

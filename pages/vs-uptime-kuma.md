@@ -43,6 +43,11 @@ for that.
   tell "it's down" from "we can't reach it".
 - **Reminders while still down.** Uptime Kuma has resend, so this is close — WhatPing's version
   carries the elapsed time and the second-opinion verdict in the reminder.
+- **A documented [REST API](/features/api).** Provision monitors from CI or Terraform and read
+  incidents and results back out, with an OpenAPI spec generated from the route table rather
+  than written by hand. Uptime Kuma's interface is a socket.io connection intended for its own
+  frontend; the community wrappers around it are capable, but there is no versioned HTTP API
+  with a published contract.
 - **Nothing to run.** No container, no reverse proxy, no certificate, no upgrades, no database
   to back up. Which matters more than it sounds: an Uptime Kuma instance that dies is a
   monitoring system that has stopped, and nothing tells you.
@@ -66,7 +71,7 @@ for that.
 | Maintenance windows | ✗ ([roadmap](/roadmap)) | ✓ |
 | gRPC health check | ✓ | ✓ |
 | SMTP / IMAP banner + STARTTLS | ✓ | ✗ |
-| Public REST API | ✓ | ✗ |
+| Public REST API | ✓ | ✗ (community socket.io wrappers) |
 | Notification integrations | 4 | ~20 |
 | Monitor limit | 20 per workspace | unlimited |
 | Check history | 7 days | as long as your disk allows |

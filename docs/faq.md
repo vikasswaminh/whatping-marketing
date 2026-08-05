@@ -86,7 +86,7 @@ Yes. Monitor anything you own or are authorised to monitor.
 
 ## Is there an API?
 
-Yes. A REST API at `https://monitor-site.whatping.com/v1` covers monitors, incidents, check
+Yes. A REST API at `https://api.whatping.com/v1` covers monitors, incidents, check
 results and alert channels — enough to provision from Terraform or CI and read state back
 into your own dashboard.
 
