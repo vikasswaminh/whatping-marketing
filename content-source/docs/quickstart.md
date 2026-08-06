@@ -1,0 +1,123 @@
+---
+route: "/docs/quickstart"
+title: "Quickstart — WhatPing docs"
+description: "Create an account, add your first monitor, attach an alert channel, and confirm it fires. About five minutes."
+h1: "Quickstart"
+---
+
+## 1. Create an account
+
+Go to [monitor.whatping.com](https://monitor.whatping.com) and sign up with an email address
+and a password. Passwords need at least 8 characters including upper case, lower case and a
+digit.
+
+You will get a verification code by email — verification is required, not optional. You can
+also sign in with a one-time code instead of a password if you prefer.
+
+A workspace is created for you. Everything — monitors, channels, members — belongs to a
+workspace.
+
+## 2. Add your first monitor
+
+Start with a **domain expiry monitor**, not an HTTP one. It takes thirty seconds and it covers
+the failure with no other warning signal.
+
+1. **Add monitor**
+2. Type: **Domain registration expiry**
+3. Domain: your apex domain, e.g. `example.com` — no `https://`, no path
+4. Warn below: `30` days
+5. **Create**
+
+The first check runs within about fifteen minutes. When it does, the monitor shows your
+registrar, the expiry date and days remaining.
+
+<Callout type="note">
+A bare domain is required for the certificate, domain, DNS and email-auth types.
+`example.com`, not `https://example.com/`.
+</Callout>
+
+## 3. Add an HTTP monitor
+
+1. **Add monitor** → **HTTP**
+2. URL: `https://your-site.example.com/`
+3. Interval: `60` seconds
+4. Accepted status: `200-299` — a range rather than a single code, so a `204` or `206` is not
+   a false alarm
+5. **Create**
+
+The monitor starts in `pending` and moves to `up` after its first successful check.
+
+To catch the "200 but broken" case, add a keyword assertion: a string that appears on a working
+page and would be missing on a broken one — a nav item, a heading, or an element you know
+renders after the database call.
+
+## 4. Attach an alert channel
+
+A monitor with no channel changes state silently. Pick the fastest one to prove:
+
+**ntfy** — no account, no token.
+1. Install the ntfy app, or open [ntfy.sh](https://ntfy.sh) in a browser
+2. Subscribe to an unguessable topic, e.g. `whatping-a7f3c9d2e1`
+3. In WhatPing: **Channels** → **Add** → **ntfy** → `https://ntfy.sh/whatping-a7f3c9d2e1`
+4. Attach it to your monitor
+
+<Callout type="warning">
+The topic name **is** the credential — anyone who knows it can read your alerts. Use something
+random, not `whatping-alerts`.
+</Callout>
+
+Email, webhook and Telegram setup are in [alert channels](/docs/alerting/channels).
+
+## 5. Prove it fires
+
+Do not wait for a real outage to discover the channel was misconfigured.
+
+Create a throwaway HTTP monitor pointing at a URL that fails — a hostname that does not exist
+works well:
+
+1. **Add monitor** → **HTTP** → `https://this-host-does-not-exist.example.com/`
+2. Interval: `20` seconds, Failures before down: `1`
+3. Attach your channel
+4. **Create**
+
+Within about a minute the monitor goes `down` and you get an alert reading something like:
+
+```
+🔴 DOWN — test (https://this-host-does-not-exist.example.com/): dns error: failed to lookup address
+```
+
+Delete the monitor once you have seen the alert arrive.
+
+## 6. Turn on reminders where it matters
+
+For your genuinely important monitors, set **Re-alert every** to `30` minutes. One alert is a
+single point of failure; if it fails to deliver, an ongoing outage looks identical to
+everything being fine.
+
+Leave it off for anything flaky. A repeating alert on a noisy monitor teaches you to ignore
+alerts.
+
+## 7. Or skip all of that and use the API
+
+Everything above is available over HTTP, and it is the same code path — both the dashboard and
+the API run the identical validator, so anything the interface accepts the API accepts, and
+anything it refuses the API refuses with the offending field named.
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{"name":"api","type":"http","url":"https://api.example.com/health"}'
+```
+
+Create the key in workspace settings. Send `Idempotency-Key` on creates and a pipeline that
+reruns will not accumulate duplicate monitors.
+
+## What next
+
+- [API reference](/docs/api) — every endpoint, with curl for each
+- [Concepts](/docs/concepts) — how thresholds and incidents actually behave
+- [Heartbeat monitors](/docs/monitors/heartbeat) — for your backups and cron jobs
+- [Email auth monitoring](/docs/monitors/email-auth) — five seconds to set up, protects your
+  alert path
+- [Limits](/docs/limits)

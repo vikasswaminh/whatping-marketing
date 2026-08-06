@@ -1,0 +1,95 @@
+---
+route: "/vs/uptime-kuma"
+title: "WhatPing vs Uptime Kuma — an honest comparison"
+description: "Uptime Kuma is self-hosted, unlimited and has status pages. WhatPing is hosted, and monitors domain expiry, DNS and SPF. Where each one wins."
+h1: "WhatPing vs Uptime Kuma"
+---
+
+## Start here: Uptime Kuma is excellent
+
+It is the default self-hosted monitor for good reasons. It is free, it is genuinely
+open-source, it runs in one Docker container, it has a large and active community, it supports
+around twenty notification integrations, and it has been battle-tested by an enormous number of
+installations.
+
+If you want to own your monitoring outright, run it on a box you control, and never depend on a
+third party staying in business — Uptime Kuma is the right answer and WhatPing is not competing
+for that.
+
+## Where Uptime Kuma wins
+
+- **You host it.** Your data, your box, your rules. WhatPing is hosted only; there is no
+  self-host option today.
+- **Unlimited monitors.** WhatPing caps at 20 per workspace.
+- **Status pages.** Public status pages with custom domains. WhatPing has none.
+- **Maintenance windows.** Suppress alerts during planned work. WhatPing cannot do this.
+- **Around 20 notification integrations** — Slack, Discord, Gotify, Pushover, Signal, Matrix,
+  webhooks and more. WhatPing has four.
+- **Community and longevity.** Thousands of contributors and users. WhatPing is one developer
+  and a few months old.
+- **More protocol types still** — Docker containers, Steam game servers, Radius, and a
+  longer list of one-off integrations.
+
+## Where WhatPing wins
+
+- **Domain expiry monitoring.** Uptime Kuma has no equivalent. An expired registration takes
+  down every service on the domain at once — including the email that would have told you.
+- **Email authentication monitoring.** SPF and DMARC, checked daily. Nothing in Uptime Kuma
+  watches the path your alerts travel down.
+- **DNS record assertions across A, AAAA, MX, TXT, CNAME and NS**, with substring matching, run
+  as a first-class monitor type with incidents and alerting.
+- **An external second opinion.** When a check fails, WhatPing asks an independent network
+  whether it agrees, and labels the incident. Uptime Kuma has one vantage point and no way to
+  tell "it's down" from "we can't reach it".
+- **Reminders while still down.** Uptime Kuma has resend, so this is close — WhatPing's version
+  carries the elapsed time and the second-opinion verdict in the reminder.
+- **A documented [REST API](/features/api).** Provision monitors from CI or Terraform and read
+  incidents and results back out, with an OpenAPI spec generated from the route table rather
+  than written by hand. Uptime Kuma's interface is a socket.io connection intended for its own
+  frontend; the community wrappers around it are capable, but there is no versioned HTTP API
+  with a published contract.
+- **Nothing to run.** No container, no reverse proxy, no certificate, no upgrades, no database
+  to back up. Which matters more than it sounds: an Uptime Kuma instance that dies is a
+  monitoring system that has stopped, and nothing tells you.
+
+## Side by side
+
+| | WhatPing | Uptime Kuma |
+|---|---|---|
+| HTTP / TCP monitoring | ✓ | ✓ |
+| Keyword assertions | ✓ | ✓ |
+| Accepted status ranges | ✓ | ✓ |
+| Heartbeat / cron monitoring | ✓ | ✓ |
+| Certificate expiry | ✓ | ✓ |
+| **Domain registration expiry** | ✓ | ✗ |
+| **DNS record assertions** | ✓ | partial (DNS monitor type) |
+| **SPF / DMARC monitoring** | ✓ | ✗ |
+| **External second opinion** | ✓ | ✗ |
+| Reminders while down | ✓ | ✓ |
+| ICMP / ping | ✓ | ✓ |
+| Status pages | ✗ ([roadmap](/roadmap)) | ✓ |
+| Maintenance windows | ✗ ([roadmap](/roadmap)) | ✓ |
+| gRPC health check | ✓ | ✓ |
+| SMTP / IMAP banner + STARTTLS | ✓ | ✗ |
+| Public REST API | ✓ | ✗ (community socket.io wrappers) |
+| Notification integrations | 4 | ~20 |
+| Monitor limit | 20 per workspace | unlimited |
+| Check history | 7 days | as long as your disk allows |
+| Self-hostable | ✗ | ✓ |
+| Cost | free (beta) | free |
+
+## How to choose
+
+**Use Uptime Kuma if** you want to self-host, you need status pages or maintenance windows
+today, you have more than 20 things to watch, or you want an integration list that already
+covers your stack.
+
+**Use WhatPing if** you want the expiry-and-drift class of failure covered — domain, certificate,
+DNS, SPF — and you would rather not operate a monitoring server.
+
+**Use both**, honestly. They cost nothing and they cover different failures. Point Uptime Kuma
+at your services, point WhatPing at your domain registration and your email authentication, and
+have each one monitor the other's host. That last part is worth doing regardless of what you
+pick: nothing catches a dead monitoring system except another monitoring system.
+
+**CTA:** Start monitoring — free → `https://monitor.whatping.com`

@@ -1,0 +1,152 @@
+---
+route: "/docs/monitors/heartbeat"
+title: "Heartbeat monitors — WhatPing docs"
+description: "Monitor cron jobs, backups and CI pipelines by having them ping a URL on success. Alerts when the ping stops arriving."
+h1: "Heartbeat monitors"
+---
+
+## What it checks
+
+Inverted monitoring. Instead of WhatPing polling your job, your job tells WhatPing it ran.
+
+You get a URL. Your job requests it after finishing successfully. If a ping does not arrive
+within the expected interval plus the grace period, the check fails. Cross the failure threshold
+and an incident opens, exactly like any other monitor.
+
+Use it for anything with no address to poll: backups, cron jobs, CI pipelines, queue workers,
+certificate renewal hooks, data syncs.
+
+## Fields
+
+| Field | Range | Default |
+|---|---|---|
+| Expected ping interval | 1 minute – 7 days | 1 hour |
+| Grace period | 0 seconds and up | 5 minutes |
+| Failures before down | 1 – 10 | 2 |
+| Re-alert every | 5 min – 24 h, or off | off |
+
+The deadline is **expected interval + grace**. A job that runs hourly with a 5-minute grace is
+overdue at 65 minutes.
+
+Set the grace to cover normal variance — a job that usually takes 2 minutes but occasionally
+takes 8 needs a grace period that accommodates the 8.
+
+## Create it with the API
+
+```bash
+curl -X POST https://api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{
+    "name": "nightly-backup",
+    "type": "push",
+    "push_expected_interval_sec": 86400,
+    "push_grace_sec": 3600
+  }'
+```
+
+The response carries `push_token` **once**. It is stored hashed and cannot be read back —
+only rotated with `POST /v1/monitors/{id}/rotate-token`.
+
+Field names are snake_case and an unknown one is a `422` naming the field, never a silent
+drop. Full reference: [API](/docs/api).
+
+## The ping URL
+
+Shown **once**, when the monitor is created. The token is stored hashed and cannot be
+recovered — only rotated, which invalidates the old one.
+
+```
+https://<your-whatping-host>/monitor/ping/<token>
+```
+
+`GET` and `POST` both work. Full reference: [heartbeat ping endpoint](/docs/heartbeat-api).
+
+<Callout type="warning">
+Anyone with the URL can mark your job as healthy. Store it like a credential — a CI secret, an
+environment variable, a root-only file. Not in a repository.
+</Callout>
+
+## Where to put the ping
+
+The rule: **ping only on success, at the end of the happy path.** Never in a `finally` block, a
+trap handler, or an `always()` CI step — that reports "I ran" when you meant "I worked".
+
+**cron**
+```bash
+0 3 * * * /usr/local/bin/backup.sh && curl -fsS https://.../monitor/ping/<token>
+```
+The `&&` is the whole design. A failing backup does not ping.
+
+**Bash script**
+```bash
+set -euo pipefail
+pg_dump mydb | gzip > /backups/mydb.sql.gz
+curl -fsS --retry 3 "$WHATPING_PING_URL"
+```
+With `set -e`, reaching the last line means everything before it worked.
+
+**systemd**
+```ini
+[Service]
+ExecStart=/usr/local/bin/backup.sh
+ExecStartPost=/usr/bin/curl -fsS ${WHATPING_PING_URL}
+```
+`ExecStartPost` runs only if `ExecStart` succeeded.
+
+**GitHub Actions**
+```yaml
+- name: Report success
+  if: success()
+  run: curl -fsS "${{ secrets.WHATPING_PING_URL }}"
+```
+`if: success()`, never `if: always()`.
+
+**Python**
+```python
+run_the_job()          # raises on failure
+requests.get(PING_URL, timeout=10)
+```
+
+## Why the deadline is evaluated in the backend
+
+Worth understanding, because it is the difference between a heartbeat monitor that works and
+one that only appears to.
+
+If the component that runs your checks also decides whether a heartbeat is overdue, then when
+that component dies it stops noticing everything — including its own death. Silence looks
+exactly like health.
+
+So heartbeat deadlines are evaluated on a schedule inside the backend, a different process on
+different infrastructure from the prober.
+
+WhatPing uses this on itself: the probe worker sends its own heartbeat, and the backend alerts
+if it stops. That caught a real regression where a parsing bug froze the worker on a stale
+configuration — it kept probing and looked entirely normal, and the heartbeat was the only
+signal.
+
+## Failure message
+
+```
+🔴 DOWN — nightly-backup (push every 86400s): no ping received for 25h 12m
+```
+
+## Worked example
+
+A nightly backup that runs at 03:00 and takes up to 40 minutes:
+
+```
+Expected ping interval: 24 hours
+Grace period:           1 hour
+Failures before down:   1
+Re-alert every:         6 hours
+```
+
+Threshold 1, because a backup that missed one night is already worth knowing about — there is
+no second window to wait for.
+
+## Related
+
+- [Ping endpoint reference](/docs/heartbeat-api)
+- [Concepts](/docs/concepts)
+- [Troubleshooting](/docs/troubleshooting)

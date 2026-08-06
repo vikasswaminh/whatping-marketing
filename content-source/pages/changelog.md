@@ -1,0 +1,127 @@
+---
+route: "/changelog"
+title: "Changelog — WhatPing"
+description: "Dated record of what shipped, including the bugs found and fixed along the way."
+h1: "Changelog"
+---
+
+## Intro
+
+What shipped, and — where it is instructive — what was broken and how it was found. A
+changelog that only lists features is a marketing page with dates on it.
+
+Entries are newest first. **Build note for the implementing agent:** seed this page from
+`git log --date=short --pretty='%ad %h %s'` and keep the format below. Do not backfill dates
+you cannot verify from history.
+
+---
+
+## 6 August 2026
+
+**A public REST API**
+Provision monitors from CI or Terraform and read incidents, results and channels back out.
+Bearer key auth with read/write scopes, cursor pagination, per-key rate limits (600 reads and
+60 writes a minute, continuously refilling rather than windowed), and `Idempotency-Key` so a
+rerun of a pipeline does not accumulate duplicate monitors.
+
+Every write runs the *same validator the dashboard runs*. That was the design constraint the
+whole thing was built around: an API that validates differently from the interface is how a
+monitor gets created that the prober cannot parse, and this codebase had already had one
+outage of exactly that shape.
+[Docs](/docs/api) · [Overview](/features/api)
+
+**Four new monitor types — ICMP, UDP, gRPC and SMTP/IMAP**
+Ping with median round-trip time and a packet-loss threshold. UDP against DNS, NTP and STUN
+with a real request and a required reply. gRPC `grpc.health.v1.Health/Check` asserting
+`SERVING`. Mail server greeting plus a STARTTLS handshake, which is where an expired
+certificate on port 587 actually surfaces.
+
+ICMP runs unprivileged — a `SOCK_DGRAM` socket and a `ping_group_range` sysctl scoped to the
+worker's group, rather than root or `CAP_NET_RAW` on the binary.
+[ICMP](/features/ping-monitoring) · [UDP](/features/udp-monitoring) ·
+[gRPC](/features/grpc-monitoring) · [SMTP/IMAP](/features/smtp-imap-monitoring)
+
+**There is deliberately no generic "UDP port open" check**
+Not an omission. Silence over UDP is produced equally by a healthy server that ignores your
+packet, a firewall dropping it, and a service that died an hour ago — so a monitor built on it
+reports healthy for a dead service, which is worse than no monitor. Every UDP check sends
+something a real server answers and requires the answer.
+[Why](/docs/monitors/udp)
+
+**An OpenAPI 3.1 spec, generated rather than written**
+[`/openapi.json`](/openapi.json) is built from the API's route table, and the builder checks
+both directions. That earned its place on the first run: the initial version parsed 13 of 15
+routes, because one mapped pair uses JavaScript shorthand property syntax. Only the *reverse*
+check — "described in the spec but absent from the route table" — caught the two missing. A
+spec that advertises an endpoint which does not exist sends every reader down a dead end.
+
+**Fixed: the site said three shipped features did not exist**
+For two days after the API and the protocols shipped, the FAQ said there was no API, the
+limits page said the same, and the Uptime Kuma comparison had ICMP as a ✗ in our own column.
+The claims list is meant to prevent overstatement and it had no mechanism for the opposite
+failure. Corrected in both the content package and the built site.
+
+**Fixed: a deploy that failed while every check reported green**
+The Pages deploy script called `bunx` without it being on `PATH`. `set -e` did not catch it,
+because the caller piped the script to `tail` and the pipeline returned tail's exit code. The
+render check then passed — against the *previous* deployment, which was still being served.
+
+The check now compares the CSS hashes in `dist/index.html` against the live page and fails on
+a mismatch. A green run that proves nothing is worse than a red one.
+
+---
+
+## 3 August 2026
+
+**External second opinion on HTTP incidents**
+When an incident opens on an HTTP monitor, an independent network is asked whether it can reach
+the target, and the incident is labelled `agreed`, `disagreed` or `unavailable`. It never
+delays the alert — confirming an unreachable target can take 30 seconds, so the alert goes
+first and the verdict follows. Verdicts annotate rather than suppress.
+[Docs](/docs/alerting/second-opinion)
+
+**Reminders while an incident is still open**
+Off by default; 5 minutes to 24 hours when enabled. Reminders carry the elapsed time and the
+second-opinion verdict. The delivery ledger gained an attempt column so a reminder is not
+deduplicated as a replay of the original alert.
+[Docs](/docs/alerting/re-alert)
+
+**Fixed: a domain that does not exist was reporting as up**
+DNS lookups report a nonexistent name as an HTTP 200 success with an error nested inside the
+record set. A DNS monitor with no expected value fell through both guards and called a dead
+domain healthy. Found by live verification, not by unit tests — the stubs were as wrong as the
+code.
+
+**Fixed: DNS monitors ignored the configured record type**
+CNAME, NS and AAAA monitors were silently checking the default record set instead. MX and TXT
+happened to work by coincidence.
+
+**Fixed: a new monitor type could freeze the probe worker**
+Adding the intelligence monitor types made the worker reject its entire configuration
+response, so it kept serving a stale snapshot and looked healthy from outside. The worker's own
+heartbeat monitor was the only thing that caught it, about ten minutes in. Unknown monitor
+types now degrade instead of failing the parse.
+
+**Four new monitor types** — certificate expiry, domain registration expiry, DNS record
+assertions, and SPF/DMARC monitoring.
+[Docs](/docs)
+
+**Accepted status ranges and redirect depth**
+`200-299,301` style expressions, and redirect following from 0 to 10. A `204` API or a
+redirecting site was previously unmonitorable.
+
+**Fixed: uptime queries would have started failing at scale**
+The uptime calculation read every result in the window against a hard document ceiling. A
+20-second monitor would have crossed it at roughly 3.8 days of history. It looked fine only
+because no monitor had run that long yet.
+
+---
+
+## 2 August 2026
+
+**Deploy from git on the VM**, with dependency and Rust versions pinned, so a deploy rebuilds
+only what changed.
+
+**First release** — HTTP, TCP and heartbeat monitors; incidents with a configurable failure
+threshold; email, webhook, ntfy and Telegram alert channels; uptime percentages; and a Rust
+probe worker with its own heartbeat monitor.

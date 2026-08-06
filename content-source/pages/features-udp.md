@@ -1,0 +1,78 @@
+---
+route: "/features/udp-monitoring"
+title: "UDP monitoring — WhatPing"
+description: "Monitor DNS, NTP and STUN services by sending a real request and requiring a real reply. There is no generic UDP port check, and this page explains why not."
+h1: "Most UDP monitoring is a check that cannot fail"
+---
+
+## The problem
+
+TCP has a handshake. You connect, and the answer is yes, no, or a timeout — three outcomes, two
+of which are definite.
+
+UDP has none of that. You send a packet into the dark. Either something comes back or nothing
+does, and **nothing is produced equally by a healthy server that ignores your packet, a
+firewall dropping it silently, and a service that died an hour ago.**
+
+So a monitor that offers a "UDP port" field and reports up when the send succeeds is not
+measuring anything. `sendto()` returning success means your kernel handed the packet to the
+network card. It says nothing whatsoever about the far end. A check like that reports healthy
+for a dead service — worse than having no monitor, because you believe it.
+
+WhatPing does not offer that check. Uptime Kuma does not either, for the same reason.
+
+## How it works
+
+Every UDP monitor sends something a real server answers, and requires the answer.
+
+| Payload | What goes out | Who answers it |
+|---|---|---|
+| **DNS** | A query for a name you choose | resolvers — `1.1.1.1`, your own BIND, a load balancer VIP |
+| **NTP** | An NTPv4 client request | time servers |
+| **STUN** | An RFC 5389 binding request | STUN and TURN servers behind your WebRTC stack |
+| **Raw** | Bytes you supply as hex | anything whose protocol you know |
+
+You can also require the reply to begin with a hex prefix. Leaving that blank is usually right:
+that the server answered *at all* is the signal, and asserting on the body of a reply tends to
+break on a version upgrade rather than on an outage.
+
+## The one definitive negative UDP offers
+
+When a host is reachable but nothing is bound to the port, it normally returns an ICMP
+port-unreachable, which arrives on a connected UDP socket as `ECONNREFUSED`. That **is**
+conclusive — the host actively told you nothing is listening.
+
+It is reported separately from silence, because the two mean different things and collapsing
+them into one vague failure throws away the only certainty available:
+
+```
+port unreachable (ICMP): nothing is listening
+no reply within timeout (a UDP drop is indistinguishable from a dead service)
+```
+
+The second message is deliberately wordy. A UDP timeout genuinely does not prove the service is
+down, and an alert that implies certainty it does not have is how people learn to stop trusting
+alerts.
+
+## What you'll see when it fires
+
+```
+🔴 DOWN — resolver (1.1.1.1:53): no reply within timeout (a UDP drop is
+indistinguishable from a dead service)
+```
+
+## Limits
+
+- **No generic port-open check.** Not a roadmap item. The question is not answerable.
+- Four payload types. If your protocol is not one of them, raw hex is the escape hatch.
+- One probe location, 20 monitors per workspace, 7 days of history.
+
+## Related
+
+- [UDP reference](/docs/monitors/udp) — fields, presets and the three outcomes
+- [DNS record monitoring](/features/dns-monitoring) — for asserting what a record *says*, not
+  whether the resolver answers
+- [Ping monitoring](/features/ping-monitoring)
+
+**CTA:** Start monitoring — free → `https://monitor.whatping.com`
+**Secondary:** Read the UDP docs → `/docs/monitors/udp`
