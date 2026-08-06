@@ -1,35 +1,36 @@
 #!/usr/bin/env python3
-"""Every API example in the docs, checked against the code that would receive it.
+"""Every API example in the docs, checked against the published contract.
 
 The docs carry a create snippet on all eleven monitor-type pages. An unknown field is a `422`
-by design — `toInternal` in `convex/api/routes.ts` rejects rather than ignores — so one wrong
-field name turns a documented example into one that cannot work, and no other check notices:
-the page still builds, still renders, and still links correctly.
+by design — the API rejects rather than ignores — so one wrong field name turns a documented
+example into one that cannot work, and no other check notices: the page still builds, still
+renders, and still links correctly.
 
-This is the static half of that verification. It reads the shipped markdown and the shipped
-TypeScript and asserts they agree:
+**Source of truth is `public/openapi.json`**, generated in the core repo from
+`convex/api/routes.ts` and vendored here. This repo deliberately does not read the backend
+source — the marketing site is standalone, and the published spec is the contract a reader
+actually gets. A stale spec is the core repo's drift check to catch, not this one's.
 
-  1. every field name in every example exists in the `FIELDS` map
-  2. every `type` value is a literal in `monitorType`
-  3. every example carries the fields that type actually requires
+    python3 scripts/verify-api-examples.py
 
-It is not a substitute for POSTing them (`deploy/_docs-api-verify.sh` does that against a live
-deployment), but it needs no credentials and no network, so it can run on every change.
+Three checks, all against `components.schemas.MonitorCreate`:
 
-    python3 apps/marketing/scripts/verify-api-examples.py
+  1. every field name in every example exists in the schema
+  2. every `type` value is in the documented enum
+  3. every example carries the fields that type needs to actually work
 """
 import json
 import pathlib
 import re
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]
-DOCS = ROOT / "apps/marketing/src/content/docs"
-ROUTES = ROOT / "packages/backend/convex/api/routes.ts"
-SCHEMA = ROOT / "packages/backend/convex/schema.ts"
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+DOCS = ROOT / "src/content/docs"
+SPEC = ROOT / "public/openapi.json"
 
-# Fields every type needs beyond `name` and `type`, read from how the probes are configured.
-# Kept short deliberately: this asserts the example is *usable*, not that it is exhaustive.
+# Fields each type needs beyond `name` and `type` to be a *usable* example rather than merely
+# a valid one. The API would accept a `tcp` monitor with no port; a reader copying that would
+# not end up with a working monitor.
 REQUIRED = {
     "http": {"url"},
     "tcp": {"host", "port"},
@@ -47,22 +48,30 @@ REQUIRED = {
 
 
 def main() -> int:
-    fields = set(re.findall(r"^\s{2}([a-z_]+):\s*\"", ROUTES.read_text(encoding="utf-8"), re.M))
+    if not SPEC.exists():
+        print(f"{SPEC} is missing — it is what this validates against", file=sys.stderr)
+        return 2
 
-    # Scope to the monitorType union specifically. Matching v.literal across the whole file
-    # pulls in monitorState, channelType and apiScope too — 27 literals instead of 12 — which
-    # would let "webhook" or "pending" pass as a monitor type. A check that accepts anything
-    # is worse than no check, because it reports PASS.
-    block = re.search(r"export const monitorType = v\.union\((.*?)\n\);", SCHEMA.read_text(encoding="utf-8"), re.S)
-    if not block:
-        print("could not find the monitorType union in schema.ts", file=sys.stderr)
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    try:
+        create = spec["components"]["schemas"]["MonitorCreate"]
+        fields = set(create["properties"])
+        types = set(create["properties"]["type"]["enum"])
+    except KeyError as e:
+        print(
+            f"the spec has no MonitorCreate request schema ({e}) — regenerate it in the core "
+            f"repo with build-openapi.py and re-vendor it here",
+            file=sys.stderr,
+        )
         return 2
-    types = set(re.findall(r'v\.literal\("([a-z\-]+)"\)', block.group(1)))
-    if not fields or not types:
-        print("could not parse FIELDS or monitorType — the regexes have rotted", file=sys.stderr)
+
+    # A truncated spec would make every example pass by having nothing to fail against.
+    if len(fields) < 20 or len(types) < 10:
+        print(f"spec looks truncated: {len(fields)} fields, {len(types)} types", file=sys.stderr)
         return 2
-    print(f"FIELDS in routes.ts : {len(fields)}")
-    print(f"monitorType literals: {len(types)}\n")
+
+    print(f"spec fields : {len(fields)}")
+    print(f"spec types  : {len(types)}\n")
 
     failures: list[str] = []
     checked = 0
@@ -74,7 +83,6 @@ def main() -> int:
             failures.append(f"{path.stem}: no 'Create it with the API' section")
             continue
 
-        # Join the shell line-continuations, then lift the -d '<json>' payload.
         joined = block.group(1).replace("\\\n", " ")
         payload = re.search(r"-d '(\{.*?\})'\s*$", joined, re.S)
         if not payload:
@@ -92,15 +100,15 @@ def main() -> int:
 
         unknown = sorted(set(body) - fields)
         if unknown:
-            problems.append(f"unknown field(s) {unknown} — the API would return 422")
+            problems.append(f"field(s) not in the spec {unknown} — the API would return 422")
 
         mtype = body.get("type")
         if mtype not in types:
-            problems.append(f"type {mtype!r} is not a monitorType literal")
+            problems.append(f"type {mtype!r} is not in the documented enum")
         else:
             missing = sorted(REQUIRED.get(mtype, set()) - set(body))
             if missing:
-                problems.append(f"missing required field(s) for {mtype}: {missing}")
+                problems.append(f"missing field(s) for {mtype}: {missing}")
 
         if problems:
             failures.extend(f"{path.stem}: {p}" for p in problems)

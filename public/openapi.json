@@ -17,6 +17,215 @@
         "scheme": "bearer",
         "description": "A workspace API key, `sk_\u2026`. Scoped read or write."
       }
+    },
+    "schemas": {
+      "MonitorCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "http",
+              "tcp",
+              "push",
+              "ssl",
+              "domain",
+              "dns",
+              "email-auth",
+              "icmp",
+              "udp",
+              "grpc",
+              "smtp",
+              "imap"
+            ]
+          },
+          "interval_sec": {
+            "type": "integer"
+          },
+          "timeout_ms": {
+            "type": "integer"
+          },
+          "down_threshold": {
+            "type": "integer"
+          },
+          "repeat_every_min": {
+            "type": "integer"
+          },
+          "confirm_externally": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "expected_status": {
+            "type": "integer"
+          },
+          "accepted_status": {
+            "type": "string"
+          },
+          "max_redirects": {
+            "type": "integer"
+          },
+          "expected_keyword": {
+            "type": "string"
+          },
+          "keyword_inverted": {
+            "type": "boolean"
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "push_expected_interval_sec": {
+            "type": "integer"
+          },
+          "push_grace_sec": {
+            "type": "integer"
+          },
+          "cert_warn_days": {
+            "type": "integer"
+          },
+          "domain_warn_days": {
+            "type": "integer"
+          },
+          "dns_record_type": {
+            "type": "string"
+          },
+          "dns_expected": {
+            "type": "string"
+          },
+          "packet_count": {
+            "type": "integer"
+          },
+          "loss_threshold_pct": {
+            "type": "integer"
+          },
+          "udp_payload": {
+            "type": "string"
+          },
+          "udp_payload_hex": {
+            "type": "string"
+          },
+          "udp_expect_hex": {
+            "type": "string"
+          },
+          "dns_query_name": {
+            "type": "string"
+          },
+          "grpc_service": {
+            "type": "string"
+          },
+          "starttls": {
+            "type": "boolean"
+          },
+          "tls": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ]
+      },
+      "MonitorUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "interval_sec": {
+            "type": "integer"
+          },
+          "timeout_ms": {
+            "type": "integer"
+          },
+          "down_threshold": {
+            "type": "integer"
+          },
+          "repeat_every_min": {
+            "type": "integer"
+          },
+          "confirm_externally": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          },
+          "expected_status": {
+            "type": "integer"
+          },
+          "accepted_status": {
+            "type": "string"
+          },
+          "max_redirects": {
+            "type": "integer"
+          },
+          "expected_keyword": {
+            "type": "string"
+          },
+          "keyword_inverted": {
+            "type": "boolean"
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "push_expected_interval_sec": {
+            "type": "integer"
+          },
+          "push_grace_sec": {
+            "type": "integer"
+          },
+          "cert_warn_days": {
+            "type": "integer"
+          },
+          "domain_warn_days": {
+            "type": "integer"
+          },
+          "dns_record_type": {
+            "type": "string"
+          },
+          "dns_expected": {
+            "type": "string"
+          },
+          "packet_count": {
+            "type": "integer"
+          },
+          "loss_threshold_pct": {
+            "type": "integer"
+          },
+          "udp_payload": {
+            "type": "string"
+          },
+          "udp_payload_hex": {
+            "type": "string"
+          },
+          "udp_expect_hex": {
+            "type": "string"
+          },
+          "dns_query_name": {
+            "type": "string"
+          },
+          "grpc_service": {
+            "type": "string"
+          },
+          "starttls": {
+            "type": "boolean"
+          },
+          "tls": {
+            "type": "boolean"
+          }
+        }
+      }
     }
   },
   "security": [
@@ -923,6 +1132,16 @@
               }
             }
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitorCreate"
+              }
+            }
+          }
         }
       }
     },
@@ -1450,7 +1669,17 @@
               "type": "string"
             }
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitorUpdate"
+              }
+            }
+          }
+        }
       }
     },
     "/v1/monitors/{id}/channels": {

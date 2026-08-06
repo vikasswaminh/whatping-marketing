@@ -5,7 +5,7 @@ The site is light-first with dark full-bleed bands, so every pair exists twice a
 to hold. This is the load-bearing check for this palette: orange on cream is about 2.2:1, so
 the accent has separate fill and text forms and only the dark one is ever used for words.
 
-    python3 apps/marketing/scripts/verify-contrast.py
+    python3 scripts/verify-contrast.py
 """
 import pathlib
 import re

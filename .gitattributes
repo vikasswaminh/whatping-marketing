@@ -1,0 +1,16 @@
+# Normalise everything to LF in the repository.
+#
+# This is not cosmetic. The site is built by Cloudflare's Linux builders and the deploy
+# scripts run on Linux hosts; a shell script checked in with CRLF fails there with a
+# "bad interpreter" error that names the wrong cause. Authoring happens on Windows, so
+# without this the first commit from a machine with core.autocrlf unset would break the build.
+* text=auto eol=lf
+
+# Explicit for the ones where a stray CR is fatal rather than merely untidy.
+*.sh   text eol=lf
+*.py   text eol=lf
+*.mjs  text eol=lf
+
+*.png binary
+*.woff2 binary
+*.ico binary

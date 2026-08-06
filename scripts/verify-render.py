@@ -10,7 +10,7 @@ Screenshots come from OllaGraph's /v1/screenshot. Element-scoped captures use it
 parameter, so a contrast assertion is independent of viewport width and layout position —
 the crop *is* the element.
 
-    OLLAGRAPH_API_KEY=... python3 apps/marketing/scripts/verify-render.py
+    OLLAGRAPH_API_KEY=... python3 scripts/verify-render.py
     BASE_URL=https://<hash>.whatping-marketing.pages.dev ... # check a deployment before cutover
 
 PNG decoding is hand-rolled on purpose. This runs on a deploy host that should not accumulate

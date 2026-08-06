@@ -9,7 +9,7 @@ screenshot API cannot reach localhost, so using it here would need the image to 
 before it could be generated — deploy, capture, commit, deploy again. A local browser closes
 that loop.
 
-    python3 apps/marketing/scripts/build-og.py            # builds and previews for you
+    python3 scripts/build-og.py            # builds and previews for you
     OG_URL=http://localhost:3001/og/ python3 ... build-og.py   # against a preview already up
 
 Requires playwright: `pip install playwright && playwright install chromium`. If it is not

@@ -17,16 +17,16 @@ Checked in **both** directions, for the same reason `build-openapi.py` is: a sid
 pointing at a page that does not exist is the mirror-image defect, and only the reverse pass
 finds it.
 
-    python3 apps/marketing/scripts/verify-routes.py
+    python3 scripts/verify-routes.py
 """
 import pathlib
 import re
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]
-DIST = ROOT / "apps/marketing/dist"
-CONTENT = ROOT / "apps/marketing/src/content"
-SITE_TS = ROOT / "apps/marketing/src/lib/site.ts"
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+DIST = ROOT / "dist"
+CONTENT = ROOT / "src/content"
+SITE_TS = ROOT / "src/lib/site.ts"
 
 FRONT_ROUTE = re.compile(r'^route:\s*"?([^"\n]+)"?', re.M)
 LINK = re.compile(r"\]\((/[^)#\s]*)\)")
