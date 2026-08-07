@@ -179,18 +179,37 @@ def centre(pixels, width: int, height: int, fx=0.20, fy=0.25):
     return [pixels[y * width + x] for y in range(y0, y1) for x in range(x0, x1)]
 
 
-def foreground_background(pixels) -> tuple[tuple, tuple]:
+def foreground_background(pixels) -> tuple[tuple | None, tuple]:
     """Most common colour is the fill; the text is the most common colour far from it.
 
     Anti-aliasing produces a long tail of intermediate shades, so "far" is a contrast
     threshold rather than an exact match — the first candidate past 1.6:1 is the ink.
+
+    **Counted in buckets, not exact values.** Counting exact pixels breaks on any textured
+    surface: the site's grain overlay dithers a flat fill into dozens of shades that differ
+    by one or two levels, so all 24 candidate slots filled with variants of the *background*
+    and the text never placed at all. Every assertion then reported around 1.00:1 with two
+    near-identical colours — `#feb004 on #feb003` — which reads as a catastrophic contrast
+    failure and is really a failure to measure. A 16-level bucket collapses grain and
+    anti-aliasing into one entry while staying far below any difference contrast cares
+    about; the representative returned is the true modal pixel inside the winning bucket,
+    so the ratio is computed on a colour that is actually on screen.
+
+    Returns (None, bg) when no candidate separates from the fill, so the caller can say it
+    could not find the foreground rather than inventing a contrast number for it.
     """
-    common = Counter(pixels).most_common(24)
-    bg = common[0][0]
-    for colour, _ in common[1:]:
+    groups: dict[tuple, Counter] = {}
+    for p in pixels:
+        groups.setdefault((p[0] // 16, p[1] // 16, p[2] // 16), Counter())[p] += 1
+
+    ranked = sorted(groups.values(), key=lambda c: -sum(c.values()))
+    reps = [c.most_common(1)[0][0] for c in ranked[:24]]
+
+    bg = reps[0]
+    for colour in reps[1:]:
         if contrast(colour, bg) >= 1.6:
             return colour, bg
-    return common[1][0] if len(common) > 1 else bg, bg
+    return None, bg
 
 
 # --- checks ----------------------------------------------------------------------------
@@ -275,6 +294,18 @@ def main() -> int:
 
         w, h, pixels = decode_png(png)
         fg, bg = foreground_background(centre(pixels, w, h))
+
+        # No foreground is a *measurement* failure, not a contrast one. Reporting it as
+        # "1.00:1" would be indistinguishable from genuinely invisible text, and the two
+        # need completely different fixes — so it gets its own line and its own wording.
+        if fg is None:
+            failures.append(
+                f"{label}: no foreground found against {hexof(bg)} — the crop for "
+                f"{selector} is one flat colour, so this asserted nothing"
+            )
+            print(f"  BAD {label:<28}    ——     no foreground on {hexof(bg)}  ({selector})")
+            continue
+
         r = contrast(fg, bg)
         ok = r >= need
         if not ok:
