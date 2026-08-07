@@ -7,6 +7,10 @@ import Heartbeat from "./Heartbeat.astro";
  * Built from the same tokens as the rest of the page, so it is the product's actual interface
  * vocabulary rather than a picture of it. Every row here is a monitor type that exists, and
  * the failure text is the literal string the product sends.
+ *
+ * Rows arrive in sequence on load — a panel coming up, not a card fading in. The stagger is
+ * short enough to read as a boot and not as a delay, and it is off entirely under
+ * prefers-reduced-motion.
  */
 
 const rows = [
@@ -54,9 +58,8 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
   .status {
     margin: 0;
     background: var(--surface-raised);
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-xs);
     overflow: hidden;
     font-size: var(--size-small);
   }
@@ -66,22 +69,24 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
     align-items: center;
     gap: var(--space-2xs);
     padding: var(--space-xs) var(--space-sm);
-    border-bottom: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline-strong);
     background: var(--surface-overlay);
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
     font-size: var(--size-eyebrow);
-    letter-spacing: 0.12em;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-tertiary);
   }
   .status__dot {
     width: 6px;
     height: 6px;
-    border-radius: 50%;
+    border-radius: var(--radius-xs);
     background: var(--status-up);
   }
   .status__count {
     margin-left: auto;
+    font-family: var(--font-mono);
     color: var(--text-quaternary);
   }
 
@@ -93,21 +98,23 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
 
   .status__row {
     display: grid;
-    grid-template-columns: 3.6rem minmax(0, 1fr) auto;
+    grid-template-columns: 3.9rem minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--space-2xs) var(--space-xs);
     padding: 0.6rem var(--space-sm);
     border-bottom: 1px solid var(--hairline);
-    animation: row-in 0.5s var(--ease) both;
-    animation-delay: calc(0.06s * var(--i) + 0.1s);
+    animation: row-boot 0.42s var(--ease) both;
+    animation-delay: calc(0.07s * var(--i) + 0.12s);
   }
   .status__row:last-child {
     border-bottom: 0;
   }
-  @keyframes row-in {
+  /* Rows arrive from the left, the way a list populates as records come back —
+     rather than fading up, which is how a card animates. */
+  @keyframes row-boot {
     from {
       opacity: 0;
-      transform: translateY(6px);
+      transform: translateX(-8px);
     }
   }
 
@@ -141,6 +148,7 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
     font-size: var(--size-eyebrow);
     color: var(--text-tertiary);
     text-align: right;
+    font-variant-numeric: tabular-nums;
   }
   .status__meta--down {
     color: var(--status-down);
@@ -151,7 +159,7 @@ const label = { up: "UP", down: "DOWN", warn: "WARN" } as const;
 
   .status__foot {
     padding: var(--space-sm);
-    border-top: 1px solid var(--hairline);
+    border-top: 1px solid var(--hairline-strong);
     background: var(--surface-sunken);
   }
   .status__foot p {

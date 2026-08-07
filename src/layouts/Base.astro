@@ -9,9 +9,15 @@ interface Props {
   description: string;
   /** Overrides the default JSON-LD block. */
   jsonLd?: Record<string, unknown>;
+  /**
+   * The scroll rail runs down the left margin of the console. Docs turn it off:
+   * the manual is a paper surface inset into the machine, and a live instrument
+   * marker running alongside it reads as chrome that escaped its own layer.
+   */
+  rail?: boolean;
 }
 
-const { title, description, jsonLd } = Astro.props;
+const { title, description, jsonLd, rail = true } = Astro.props;
 const canonical = new URL(Astro.url.pathname, SITE_URL).href;
 ---
 
@@ -43,10 +49,13 @@ const canonical = new URL(Astro.url.pathname, SITE_URL).href;
     <meta name="twitter:image" content={new URL("/og.png", SITE_URL).href} />
 
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="theme-color" content="#fffaeb" />
+    {/* These two cannot read CSS variables, so they are the one documented place
+        outside tokens.css that states a colour. Keep them in step with
+        --console-void, --signal-amber and --signal-red. */}
+    <meta name="theme-color" content="#08090a" />
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fffaeb'/%3E%3Crect x='6' y='14' width='3' height='10' fill='%23ff8205'/%3E%3Crect x='12' y='9' width='3' height='15' fill='%23ff8205'/%3E%3Crect x='18' y='6' width='3' height='18' fill='%23e10500'/%3E%3Crect x='24' y='12' width='3' height='12' fill='%23ff8205'/%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308090a'/%3E%3Crect x='6' y='14' width='3' height='10' fill='%23ffb000'/%3E%3Crect x='12' y='9' width='3' height='15' fill='%23ffb000'/%3E%3Crect x='18' y='6' width='3' height='18' fill='%23ff5c4d'/%3E%3Crect x='24' y='12' width='3' height='12' fill='%23ffb000'/%3E%3C/svg%3E"
     />
 
     {
@@ -60,6 +69,7 @@ const canonical = new URL(Astro.url.pathname, SITE_URL).href;
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
+    {rail && <div class="rail" aria-hidden="true" />}
     <Header />
     <main id="main">
       <slot />

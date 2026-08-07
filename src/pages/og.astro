@@ -20,15 +20,17 @@ import "../styles/global.css";
     <meta name="robots" content="noindex, nofollow" />
   </head>
   <body class="og-body">
-    <div class="card band--dark">
+    <div class="card">
       <div class="row">
         <span class="dot"></span>
         <span class="word">WhatPing</span>
       </div>
 
       <h1>
-        The outage that returns <span class="two-hundred">200</span> right up until
-        it doesn&rsquo;t
+        The outage that returns <span class="readout"
+          ><span class="readout__label">HTTP</span><span class="readout__value">200</span
+          ><span class="readout__caret"></span></span
+        > right up until it doesn&rsquo;t
       </h1>
 
       <p class="sub">
@@ -47,6 +49,14 @@ import "../styles/global.css";
 </html>
 
 <style>
+  /* No grain and no scan lines on the card. They are a live-surface effect, and
+     on a static PNG they only defeat the compressor: keeping them took og.png
+     from 95KB to 484KB for texture nobody sees at thumbnail size. */
+  .og-body::before,
+  .og-body::after {
+    display: none;
+  }
+
   /* Fixed pixel sizing on purpose: this is a 1200x630 canvas, not a responsive page. */
   .og-body {
     margin: 0;
@@ -73,38 +83,69 @@ import "../styles/global.css";
     gap: 14px;
   }
   .dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-xs);
     background: var(--accent);
+    box-shadow: 0 0 0 6px var(--accent-glow);
   }
   .word {
-    font-family: var(--font-mono);
-    font-size: 26px;
-    letter-spacing: 0.14em;
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: 24px;
+    font-weight: var(--weight-strong);
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--text-secondary);
   }
 
   h1 {
     margin: 40px 0 0;
-    max-width: 17ch;
+    max-width: 19ch;
     font-family: var(--font-display);
-    font-size: 78px;
-    line-height: 1.04;
+    font-stretch: var(--width-display);
+    font-weight: var(--weight-display);
+    font-size: 60px;
+    line-height: 1.12;
     letter-spacing: -0.03em;
     color: var(--text-primary);
   }
-  .two-hundred {
+
+  /* Same readout as the hero. The card is generated from this page precisely so
+     the two cannot drift. The caret does not blink here — it is a still. */
+  .readout {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.06em 0.42em 0.1em;
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius-xs);
+    background: var(--accent-soft);
+    font-size: 0.74em;
+    translate: 0 0.04em;
+  }
+  .readout__label {
     font-family: var(--font-mono);
-    font-size: 0.76em;
-    color: var(--accent);
+    font-size: 0.5em;
+    letter-spacing: 0.16em;
+    color: var(--text-quaternary);
+  }
+  .readout__value {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-strong);
+    letter-spacing: -0.02em;
+    color: var(--accent-text);
+  }
+  .readout__caret {
+    width: 0.42em;
+    height: 0.92em;
+    background: var(--accent);
   }
 
   .sub {
     margin: 28px 0 0;
-    max-width: 46ch;
-    font-size: 27px;
+    max-width: 50ch;
+    font-size: 25px;
     line-height: 1.45;
     color: var(--text-tertiary);
   }

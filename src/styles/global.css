@@ -1,6 +1,8 @@
-@import "@fontsource-variable/geist";
+/* Display and UI. wdth.css rather than the bare import: it carries the width axis
+   (75%–112.5%) that --width-display sets, and the bare entrypoint does not. */
+@import "@fontsource-variable/martian-mono/wdth.css";
+@import "@fontsource-variable/ibm-plex-sans";
 @import "@fontsource-variable/geist-mono";
-@import "@fontsource/instrument-serif";
 @import "./tokens.css";
 
 /* ==========================================================================
@@ -28,7 +30,7 @@ body {
   font-size: var(--size-body);
   font-weight: var(--weight-regular);
   letter-spacing: var(--track-body);
-  line-height: 1.6;
+  line-height: 1.65;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -51,6 +53,35 @@ svg {
   max-width: 100%;
 }
 
+/* --- texture -------------------------------------------------------------- */
+
+/* Grain over a scan line, fixed to the viewport so it reads as the surface of a
+   screen rather than as something printed on the page. Both are SVG/gradient,
+   so this costs no request. `pointer-events: none` matters — the overlay covers
+   every link on the site. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: var(--texture-grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 89;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--texture-scan) 0 1px,
+    transparent 1px 3px
+  );
+}
+
 /* --- structure ------------------------------------------------------------ */
 
 .shell {
@@ -64,6 +95,81 @@ svg {
   max-width: var(--measure);
 }
 
+/* `clip` rather than `hidden`: it stops the deliberate right-edge bleeds (the
+   hero panel, the section rules) from producing a horizontal scrollbar without
+   creating a scroll container, which `hidden` would — and which would break the
+   sticky header. The header sits outside `main`, so nothing else is affected. */
+main {
+  overflow-x: clip;
+}
+
+/* Column rules at the shell's outer edge. This is what turns a stack of
+   sections into a panel with bays: the content is inset from a visible frame
+   rather than floating in the middle of a page. */
+.ruled {
+  position: relative;
+}
+.ruled::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: min(100%, var(--shell));
+  margin-inline: auto;
+  border-inline: 1px solid var(--hairline);
+  pointer-events: none;
+}
+
+/* Scroll position as an instrument readout: a hairline down the left margin
+   with an amber segment tracking progress. Scroll-driven, so no listener. */
+.rail {
+  position: fixed;
+  top: 3.5rem;
+  bottom: 0;
+  left: max(calc(var(--gutter) / 2), calc((100vw - var(--shell)) / 2 + var(--gutter) / 3));
+  width: var(--rail);
+  z-index: 40;
+  /* The track has to be visible or the amber segment reads as a stray mark
+     rather than as a position on a scale. --hairline disappears on the void. */
+  background: var(--hairline-strong);
+  pointer-events: none;
+}
+.rail::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 12%;
+  background: var(--accent);
+  box-shadow: 0 0 10px 1px var(--accent-glow);
+}
+@supports (animation-timeline: scroll()) {
+  .rail::after {
+    animation: rail-track linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes rail-track {
+    from {
+      top: 0%;
+    }
+    to {
+      top: 88%;
+    }
+  }
+}
+@supports not (animation-timeline: scroll()) {
+  .rail::after {
+    top: 0;
+  }
+}
+@media (max-width: 62rem) {
+  .rail {
+    display: none;
+  }
+}
+
 .skip {
   position: absolute;
   left: -9999px;
@@ -72,21 +178,26 @@ svg {
   left: var(--gutter);
   top: 0.5rem;
   z-index: 200;
-  background: var(--text-primary);
-  color: var(--surface-canvas);
+  background: var(--accent);
+  color: var(--accent-ink);
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
+  font-family: var(--font-display);
   font-size: var(--size-small);
 }
 
 /* --- typography ----------------------------------------------------------- */
 
+/* h1/h2 are set in the wide mono. They are panel legends, not prose — which is
+   also why the tracking is barely negative: a mono's sidebearings are already
+   even, so the aggressive display tracking a serif needs would only crowd it. */
 h1,
 h2 {
   margin: 0;
   color: var(--text-primary);
   font-family: var(--font-display);
-  font-weight: var(--weight-regular);
+  font-stretch: var(--width-display);
+  font-weight: var(--weight-display);
   line-height: var(--leading-display);
   text-wrap: balance;
 }
@@ -95,8 +206,8 @@ h4 {
   margin: 0;
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-weight: var(--weight-medium);
-  line-height: 1.25;
+  font-weight: var(--weight-strong);
+  line-height: 1.3;
   text-wrap: balance;
 }
 
@@ -114,7 +225,7 @@ h3 {
 }
 h4 {
   font-size: var(--size-title);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--track-title);
 }
 
 p,
@@ -138,7 +249,7 @@ a:hover {
 
 strong {
   color: var(--text-primary);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-strong);
 }
 
 code,
@@ -149,17 +260,27 @@ samp {
   font-feature-settings: "ss01";
 }
 
+/* Section labels, stencilled onto the panel: wide mono, strongly positive
+   tracking, a live marker, and a rule running out to the frame. */
 .eyebrow {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
   margin: 0 0 var(--space-md);
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-eyebrow);
   font-weight: var(--weight-medium);
   letter-spacing: var(--track-eyebrow);
   text-transform: uppercase;
   color: var(--text-quaternary);
+}
+.eyebrow::before {
+  content: "";
+  flex: none;
+  width: 5px;
+  height: 5px;
+  background: var(--accent-indicator);
 }
 .eyebrow::after {
   content: "";
@@ -168,36 +289,44 @@ samp {
   background: var(--hairline);
 }
 
+/* Runs the rule out past the frame to the viewport edge. Opt-in, because inside
+   the docs grid this would cross the table-of-contents column. `main` clips, so
+   it costs no horizontal scrollbar. */
+.eyebrow--bleed {
+  margin-right: calc((100% - 100vw) / 2);
+}
+
 .lede {
   color: var(--text-secondary);
   font-size: var(--size-body-lg);
-  line-height: 1.55;
-  /* 50, not 58. `ch` measures the `0` advance, and Geist's zero is wide relative to its
-     average glyph — 58ch measured 684px, which rendered as 74 characters, past the top of
-     the comfortable 45–75 band. Measured from a screenshot, not assumed. */
-  max-width: 50ch;
+  line-height: 1.6;
+  /* 54ch on Plex Sans. `ch` measures the `0` advance and Plex's zero is close to
+     its average glyph, so this lands nearer its nominal count than the 50ch the
+     previous face needed. Both were measured from a screenshot, not assumed. */
+  max-width: 54ch;
 }
 
 /* --- buttons -------------------------------------------------------------- */
 
 .btn {
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
-  padding: 0.6rem 1rem;
+  padding: 0.62rem 1.05rem;
   border: 1px solid transparent;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-small);
   font-weight: var(--weight-medium);
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   text-decoration: none;
   white-space: nowrap;
   transition:
     background var(--duration-fast) var(--ease),
     border-color var(--duration-fast) var(--ease),
     color var(--duration-fast) var(--ease),
-    transform var(--duration-fast) var(--ease);
+    box-shadow var(--duration-fast) var(--ease);
 }
 .btn:active {
   transform: translateY(0.5px);
@@ -205,17 +334,17 @@ samp {
 
 /* `a.btn--primary` rather than `.btn--primary`: a bare class loses to any container
    rule like `.site-nav a`, which is exactly how these labels turned white on orange
-   at 2.4:1. Matching specificity plus the :not(.btn) exclusions above. */
+   at 2.4:1. Matching specificity plus the :not(.btn) exclusions elsewhere. */
 a.btn--primary,
 .btn--primary {
   background: var(--accent);
   color: var(--accent-ink);
-  box-shadow: var(--shadow-sm);
 }
 a.btn--primary:hover,
 .btn--primary:hover {
   background: var(--accent-hover);
   color: var(--accent-ink);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 .btn--primary:active {
   background: var(--accent-active);
@@ -223,14 +352,13 @@ a.btn--primary:hover,
 
 a.btn--secondary,
 .btn--secondary {
-  background: var(--surface-raised);
+  background: transparent;
   border-color: var(--hairline-strong);
   color: var(--text-primary);
-  box-shadow: var(--shadow-2xs);
 }
 .btn--secondary:hover {
-  background: var(--surface-overlay);
-  border-color: var(--hairline-loud);
+  background: var(--surface-raised);
+  border-color: var(--accent-line);
   color: var(--text-primary);
 }
 
@@ -252,19 +380,19 @@ a.btn--secondary,
   box-shadow: var(--shadow-sm);
 }
 
-/* Status is always a labelled pill, never bare coloured text. With orange as the
-   brand, a red word on an orange-accented page stops carrying information — the
-   word DOWN does the work and the colour reinforces it. */
+/* Status is always a labelled chip, never bare coloured text. Amber is both the
+   accent and WARN here, so a bare coloured word would stop carrying information
+   — the word DOWN does the work and the colour reinforces it. */
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.12rem 0.5rem;
-  border-radius: var(--radius-pill);
+  gap: 0.32rem;
+  padding: 0.14rem 0.42rem;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   font-weight: var(--weight-medium);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -298,19 +426,22 @@ a.btn--secondary,
   border-top: 0;
 }
 
+/* Prose headings drop to the normal width. The display width is right for a
+   four-word panel legend and wrong for a sentence-length section heading. */
 .prose h2 {
   margin-top: var(--space-xl);
   padding-top: var(--space-md);
   border-top: 1px solid var(--hairline);
   font-size: var(--size-headline);
+  font-stretch: var(--width-ui);
   letter-spacing: var(--track-heading);
 }
 
 .prose h3 {
   margin-top: var(--space-lg);
   font-size: var(--size-title);
-  letter-spacing: -0.01em;
-  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-title);
+  font-weight: var(--weight-strong);
   color: var(--text-primary);
 }
 
@@ -327,13 +458,14 @@ a.btn--secondary,
   margin-top: 0.35em;
 }
 .prose li::marker {
-  color: var(--text-quaternary);
+  color: var(--accent-indicator);
+  font-family: var(--font-mono);
 }
 
 .prose blockquote {
   margin-inline: 0;
   padding: 0.1rem 0 0.1rem var(--space-sm);
-  border-left: 2px solid var(--hairline-strong);
+  border-left: 2px solid var(--accent-line);
   color: var(--text-tertiary);
 }
 
@@ -357,7 +489,7 @@ a.btn--secondary,
 }
 
 .prose pre {
-  background: var(--surface-overlay) !important;
+  background: var(--surface-sunken) !important;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
@@ -387,10 +519,11 @@ a.btn--secondary,
   text-align: left;
   padding: 0 var(--space-md) var(--space-2xs) 0;
   border-bottom: 1px solid var(--hairline-strong);
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-eyebrow);
   font-weight: var(--weight-medium);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-quaternary);
   white-space: nowrap;
@@ -417,8 +550,7 @@ a.btn--secondary,
   background: var(--surface-raised);
   border: 1px solid var(--hairline);
   border-left-width: 3px;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-2xs);
+  border-radius: var(--radius-sm);
   padding: var(--space-xs) var(--space-sm);
   font-size: var(--size-small);
   color: var(--text-tertiary);
@@ -432,10 +564,11 @@ a.btn--secondary,
 .callout__label {
   display: block;
   margin-bottom: 0.3rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-eyebrow);
   font-weight: var(--weight-medium);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-eyebrow);
   text-transform: uppercase;
 }
 .callout--note {
@@ -461,7 +594,7 @@ a.btn--secondary,
 
 .heartbeat {
   display: flex;
-  gap: 3px;
+  gap: 2px;
   align-items: flex-end;
   height: var(--hb-height, 2.5rem);
 }
@@ -470,7 +603,7 @@ a.btn--secondary,
   min-width: 2px;
   max-width: 6px;
   background: var(--status-up);
-  border-radius: 1px;
+  border-radius: 0;
   transform-origin: bottom;
   animation: hb-rise 0.55s var(--ease) both;
 }
@@ -493,8 +626,8 @@ a.btn--secondary,
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in oklch, var(--surface-canvas) 86%, transparent);
-  backdrop-filter: saturate(140%) blur(12px);
+  background: color-mix(in oklch, var(--console-void) 82%, transparent);
+  backdrop-filter: saturate(130%) blur(14px);
   border-bottom: 1px solid transparent;
   transition: border-color var(--duration) var(--ease);
 }
@@ -515,13 +648,13 @@ a.btn--secondary,
   }
   @keyframes header-settle {
     to {
-      border-bottom-color: var(--hairline);
+      border-bottom-color: var(--hairline-strong);
     }
   }
 }
 @supports not (animation-timeline: scroll()) {
   .site-header {
-    border-bottom-color: var(--hairline);
+    border-bottom-color: var(--hairline-strong);
   }
 }
 
@@ -530,16 +663,19 @@ a.btn--secondary,
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
-  font-size: var(--size-body);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
+  font-size: var(--size-small);
   font-weight: var(--weight-strong);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
   color: var(--text-primary);
   text-decoration: none;
 }
+/* A panel LED, not a dot: square, and it actually pulses. */
 .wordmark .dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--radius-xs);
   background: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
   animation: pulse 2.8s var(--ease) infinite;
@@ -550,7 +686,7 @@ a.btn--secondary,
     opacity: 1;
   }
   50% {
-    opacity: 0.4;
+    opacity: 0.35;
   }
 }
 
@@ -559,11 +695,15 @@ a.btn--secondary,
   align-items: center;
   gap: var(--space-3xs);
   margin-left: auto;
-  font-size: var(--size-small);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .site-nav a:not(.btn) {
-  padding: 0.4rem 0.65rem;
-  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-xs);
   color: var(--text-tertiary);
   text-decoration: none;
   transition:
@@ -576,22 +716,26 @@ a.btn--secondary,
 }
 .site-nav a[aria-current="page"] {
   color: var(--text-primary);
+  box-shadow: inset 0 -1px 0 0 var(--accent-indicator);
 }
 .site-nav .btn {
   margin-left: var(--space-2xs);
+  padding-block: 0.45rem;
 }
 
 .nav-toggle {
   display: none;
   margin-left: auto;
   padding: 0.4rem 0.7rem;
-  background: var(--surface-raised);
+  background: transparent;
   border: 1px solid var(--hairline-strong);
-  /* Pill, like every other control. It was the one shape not in the system. */
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font: inherit;
-  font-size: var(--size-small);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
+  font-size: var(--size-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
@@ -608,15 +752,19 @@ a.btn--secondary,
     gap: 0;
     padding: var(--space-2xs) var(--gutter) var(--space-md);
     background: var(--surface-canvas);
-    border-bottom: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline-strong);
   }
   .site-nav[data-open="true"] {
     display: flex;
   }
   .site-nav a {
-    padding: 0.7rem 0;
+    padding: 0.75rem 0;
     border-radius: 0;
     border-bottom: 1px solid var(--hairline);
+  }
+  .site-nav a[aria-current="page"] {
+    box-shadow: none;
+    color: var(--accent-text);
   }
   .site-nav .btn {
     margin: var(--space-sm) 0 0;
@@ -629,7 +777,9 @@ a.btn--secondary,
 .site-footer {
   margin-top: var(--space-2xl);
   padding: var(--space-xl) 0 var(--space-2xl);
-  border-top: 1px solid var(--hairline);
+  border-top: 1px solid var(--hairline-strong);
+  background: var(--surface-canvas);
+  color: var(--text-secondary);
   font-size: var(--size-small);
 }
 .site-footer__cols {
@@ -639,10 +789,11 @@ a.btn--secondary,
 }
 .site-footer h2 {
   margin-bottom: var(--space-xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-eyebrow);
   font-weight: var(--weight-medium);
-  letter-spacing: 0.14em;
+  letter-spacing: var(--track-eyebrow);
   text-transform: uppercase;
   color: var(--text-quaternary);
 }
@@ -659,7 +810,7 @@ a.btn--secondary,
   text-decoration: none;
 }
 .site-footer a:not(.btn):hover {
-  color: var(--text-primary);
+  color: var(--accent-text);
 }
 .site-footer__base {
   display: flex;
@@ -690,6 +841,14 @@ a.btn--secondary,
 
 /* --- docs ----------------------------------------------------------------- */
 
+/* The manual: a paper surface bounded top and bottom by console chrome. The
+   band is full-bleed, so the header and footer read as the machine the manual
+   is sitting in. Tokens are remapped by .band--paper — no component knows. */
+.docs-band {
+  padding-block: var(--space-lg) var(--space-2xl);
+  border-block: 1px solid var(--hairline-strong);
+}
+
 .docs {
   display: grid;
   grid-template-columns: 14rem minmax(0, 1fr) 12rem;
@@ -711,10 +870,11 @@ a.btn--secondary,
 
 .docs-sidebar h2 {
   margin: var(--space-md) 0 var(--space-3xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-eyebrow);
   font-weight: var(--weight-medium);
-  letter-spacing: 0.14em;
+  letter-spacing: var(--track-eyebrow);
   text-transform: uppercase;
   color: var(--text-quaternary);
 }
@@ -750,10 +910,11 @@ a.btn--secondary,
 
 .docs-toc h2 {
   margin: 0 0 var(--space-2xs);
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-eyebrow);
   font-weight: var(--weight-medium);
-  letter-spacing: 0.14em;
+  letter-spacing: var(--track-eyebrow);
   text-transform: uppercase;
   color: var(--text-quaternary);
 }
@@ -795,7 +956,7 @@ a.btn--secondary,
   max-width: 45%;
   padding: var(--space-2xs) var(--space-xs);
   border: 1px solid var(--hairline);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   text-decoration: none;
   transition:
@@ -804,16 +965,16 @@ a.btn--secondary,
 }
 .docs-nextprev a:not(.btn):hover {
   background: var(--surface-raised);
-  border-color: var(--hairline-strong);
+  border-color: var(--accent-line);
   color: var(--text-primary);
-  box-shadow: var(--shadow-xs);
 }
 .docs-nextprev span {
   display: block;
   margin-bottom: 0.15rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-stretch: var(--width-ui);
   font-size: var(--size-eyebrow);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--track-eyebrow);
   text-transform: uppercase;
   color: var(--text-quaternary);
 }
@@ -836,15 +997,16 @@ a.btn--secondary,
     max-height: none;
     padding: 0;
     border: 1px solid var(--hairline);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-sm);
     background: var(--surface-raised);
   }
   .docs-sidebar summary {
     padding: var(--space-xs) var(--space-sm);
     cursor: pointer;
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
     font-size: var(--size-eyebrow);
-    letter-spacing: 0.12em;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-tertiary);
   }
@@ -856,20 +1018,6 @@ a.btn--secondary,
   .docs-sidebar summary {
     display: none;
   }
-}
-
-/* --- full-bleed dark bands ------------------------------------------------ */
-
-/* The reference is a cream page with black sections. Bands remap the semantic
-   tokens (see .band--dark in tokens.css), so components inside need no changes. */
-.band--dark {
-  border-block: 0 !important;
-}
-.band--dark a:not(.btn) {
-  color: var(--text-primary);
-}
-.band--dark a:not(.btn):hover {
-  color: var(--accent-text);
 }
 
 /* --- scroll-driven reveals ------------------------------------------------ */
@@ -895,7 +1043,8 @@ a.btn--secondary,
     scroll-behavior: auto;
   }
   .heartbeat span,
-  .wordmark .dot {
+  .wordmark .dot,
+  .rail::after {
     animation: none;
   }
   *,

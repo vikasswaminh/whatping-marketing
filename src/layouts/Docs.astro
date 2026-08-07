@@ -30,55 +30,60 @@ const next =
   index >= 0 && index < DOCS_FLAT.length - 1 ? DOCS_FLAT[index + 1] : undefined;
 ---
 
-<Base title={title} description={description} jsonLd={jsonLd}>
-  <div class="shell docs">
-    <DocsSidebar />
+<Base title={title} description={description} jsonLd={jsonLd} rail={false}>
+  {/* The manual. `.band--paper` remaps the semantic tokens, so every component
+      inside — sidebar, prose, callouts, pills — works unchanged on a light
+      ground. Full-bleed, with console chrome above and below it. */}
+  <div class="band--paper docs-band">
+    <div class="shell docs">
+      <DocsSidebar />
 
-    <div class="docs-main">
-      <div class="page-head">
-        <p class="eyebrow">Documentation</p>
-        <h1>{h1}</h1>
+      <div class="docs-main">
+        <div class="page-head">
+          <p class="eyebrow">Documentation</p>
+          <h1>{h1}</h1>
+        </div>
+
+        <article class="prose">
+          <slot />
+        </article>
+
+        {
+          (prev || next) && (
+            <nav class="docs-nextprev" aria-label="Pagination">
+              {prev ? (
+                <a href={prev.href}>
+                  <span>Previous</span>
+                  {prev.label}
+                </a>
+              ) : (
+                <span />
+              )}
+              {next && (
+                <a href={next.href} style="text-align:right">
+                  <span>Next</span>
+                  {next.label}
+                </a>
+              )}
+            </nav>
+          )
+        }
       </div>
 
-      <article class="prose">
-        <slot />
-      </article>
-
       {
-        (prev || next) && (
-          <nav class="docs-nextprev" aria-label="Pagination">
-            {prev ? (
-              <a href={prev.href}>
-                <span>Previous</span>
-                {prev.label}
-              </a>
-            ) : (
-              <span />
-            )}
-            {next && (
-              <a href={next.href} style="text-align:right">
-                <span>Next</span>
-                {next.label}
-              </a>
-            )}
+        toc.length > 1 && (
+          <nav class="docs-toc" aria-label="On this page">
+            <h2>On this page</h2>
+            <ul>
+              {toc.map((h) => (
+                <li>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ul>
           </nav>
         )
       }
     </div>
-
-    {
-      toc.length > 1 && (
-        <nav class="docs-toc" aria-label="On this page">
-          <h2>On this page</h2>
-          <ul>
-            {toc.map((h) => (
-              <li>
-                <a href={`#${h.slug}`}>{h.text}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )
-    }
   </div>
 </Base>
