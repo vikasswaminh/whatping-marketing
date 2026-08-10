@@ -166,22 +166,28 @@ discovering it when a window comes back short. It is 7.
 
 ## Alert channels
 
-Channels are created in the dashboard, because creating one means handing over a credential.
-The API lists them and attaches them:
+Create, list, attach and delete notification channels — webhook, ntfy, Telegram or email:
 
 ```bash
-curl https://api.whatping.com/v1/channels -H "Authorization: Bearer $KEY"
-curl -X PUT "https://api.whatping.com/v1/monitors/$ID/channels/$CHANNEL" \
-  -H "Authorization: Bearer $KEY"
+# create (type-specific fields: webhook{url} · ntfy{topic_url} · telegram{bot_token,chat_id} · email{to})
+curl -X POST https://api.whatping.com/v1/channels -H "Authorization: Bearer $KEY" \
+  -H "content-type: application/json" \
+  -d '{"name":"ops","type":"webhook","url":"https://hooks.slack.com/services/T/B/XXXX"}'
+
+curl https://api.whatping.com/v1/channels -H "Authorization: Bearer $KEY"          # list
+curl -X PUT    "https://api.whatping.com/v1/monitors/$ID/channels/$CHANNEL" -H "Authorization: Bearer $KEY"  # attach
+curl -X DELETE "https://api.whatping.com/v1/monitors/$ID/channels/$CHANNEL" -H "Authorization: Bearer $KEY"  # detach
+curl -X DELETE "https://api.whatping.com/v1/channels/$CHANNEL"             -H "Authorization: Bearer $KEY"  # delete
 ```
 
 Destinations come back redacted — `https://hooks.slack.com/…`, never the full URL, and never
-a Telegram bot token. The API cannot be used to read back a credential you stored.
+a Telegram bot token. The API cannot be used to read back a credential you stored, and a webhook
+URL that resolves to a private address is refused. For fleet-as-code, keep channels and monitors
+in one file and converge them — see the `whatping-sync` tool.
 
 ## What the API does not do
 
 - **No CORS.** Server-side and CI use only.
-- **Channels cannot be created** through it, only listed and attached.
 - **Workspaces, members and billing** are dashboard-only.
 - A monitor in another workspace returns `404`, not `403` — telling you an ID exists
   elsewhere would itself be information about another account.
@@ -193,7 +199,7 @@ rather than maintained beside it — so it cannot describe an endpoint that does
 it cannot omit one that does. Point a generator at it:
 
 ```bash
-curl -O https://whatping.com/openapi.json
+curl -O https://www.whatping.com/openapi.json
 openapi-generator-cli generate -i openapi.json -g go -o ./whatping
 ```
 

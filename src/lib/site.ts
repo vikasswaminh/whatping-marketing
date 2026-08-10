@@ -1,4 +1,4 @@
-export const SITE_URL = "https://whatping.com";
+export const SITE_URL = "https://www.whatping.com";
 export const APP_URL = "https://monitor.whatping.com";
 export const CONTACT_EMAIL = "hello@whatping.com";
 

@@ -29,7 +29,7 @@ import zlib
 from collections import Counter
 
 API = "https://api.ollagraph.com/v1/screenshot"
-BASE = os.environ.get("BASE_URL", "https://whatping.com").rstrip("/")
+BASE = os.environ.get("BASE_URL", "https://www.whatping.com").rstrip("/")
 KEY = os.environ.get("OLLAGRAPH_API_KEY", "")
 OUT = pathlib.Path(os.environ.get("SHOTS_DIR", "/tmp/whatping-shots"))
 
