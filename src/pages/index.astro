@@ -157,7 +157,7 @@ const jsonLd = {
 
 <Base title={title} description={description} jsonLd={jsonLd}>
   <!-- Hero -->
-  <section class="hero band--dark">
+  <section class="hero ruled">
     <div class="shell hero__grid">
       <div class="hero__copy">
         <p class="hero__badge">
@@ -166,8 +166,11 @@ const jsonLd = {
         </p>
 
         <h1 class="hero__h1">
-          The outage that returns <span class="hero__200">200</span> right up until
-          it doesn&rsquo;t
+          The outage that returns <span class="readout"
+            ><span class="readout__label" aria-hidden="true">HTTP</span><span
+              class="readout__value">200</span
+            ><span class="readout__caret" aria-hidden="true"></span></span
+          > right up until it doesn&rsquo;t
         </h1>
 
         <p class="lede hero__lede">
@@ -193,9 +196,9 @@ const jsonLd = {
   </section>
 
   <!-- The gap -->
-  <section class="band">
+  <section class="band ruled">
     <div class="shell">
-      <p class="eyebrow reveal">01 — The gap</p>
+      <p class="eyebrow eyebrow--bleed reveal">01 — The gap</p>
       <h2 class="band__h reveal">
         Four outages your health check will never predict
       </h2>
@@ -216,18 +219,18 @@ const jsonLd = {
   </section>
 
   <!-- Monitor types, bento -->
-  <section class="band">
+  <section class="band ruled">
     <div class="shell">
-      <p class="eyebrow reveal">02 — Monitor types</p>
+      <p class="eyebrow eyebrow--bleed reveal">02 — Monitor types</p>
       <h2 class="band__h reveal">Everything worth watching</h2>
       <Bento cells={monitorCells} />
     </div>
   </section>
 
   <!-- Alerting -->
-  <section class="band">
+  <section class="band ruled">
     <div class="shell">
-      <p class="eyebrow reveal">03 — Alerting</p>
+      <p class="eyebrow eyebrow--bleed reveal">03 — Alerting</p>
       <h2 class="band__h reveal">
         Alerts that keep working when the first one doesn&rsquo;t
       </h2>
@@ -254,7 +257,7 @@ const jsonLd = {
           <p><a href="/features/alerting/">How alerting works →</a></p>
         </div>
 
-        <figure class="terminal surface--terminal reveal">
+        <figure class="terminal reveal">
           <figcaption>alert stream</figcaption>
           <pre><code><span class="t-down">🔴 DOWN</span> — api (https://api.example.com):
 connect failed: Connection refused (os error 111)
@@ -270,9 +273,9 @@ connect failed: Connection refused (os error 111)
   </section>
 
   <!-- How it works -->
-  <section class="band">
+  <section class="band ruled">
     <div class="shell">
-      <p class="eyebrow reveal">04 — How it works</p>
+      <p class="eyebrow eyebrow--bleed reveal">04 — How it works</p>
       <h2 class="band__h reveal">Three moving parts</h2>
 
       <ol class="steps">
@@ -307,15 +310,15 @@ connect failed: Connection refused (os error 111)
   </section>
 
   <!-- Proof -->
-  <section class="band">
+  <section class="band ruled">
     <div class="shell">
-      <p class="eyebrow reveal">05 — Proof</p>
+      <p class="eyebrow eyebrow--bleed reveal">05 — Proof</p>
       <h2 class="band__h reveal">No testimonials. Here is what you can check instead.</h2>
 
       <div class="proof">
         {
           proof.map((item, i) => (
-            <div class="reveal" style={`--i:${i}`}>
+            <div class="proof__item reveal" style={`--i:${i}`}>
               <h3 class="proof__h">{item.h}</h3>
               <p class="proof__p">{item.p}</p>
               <p>
@@ -329,9 +332,9 @@ connect failed: Connection refused (os error 111)
   </section>
 
   <!-- Final CTA -->
-  <section class="band band--last band--dark">
+  <section class="band band--last ruled">
     <div class="shell">
-      <div class="final panel reveal">
+      <div class="final reveal">
         <h2 class="final__h">Start with the one you keep forgetting</h2>
         <p class="final__p">
           Add a domain expiry monitor. Thirty seconds, no cost, and it covers the
@@ -348,23 +351,32 @@ connect failed: Connection refused (os error 111)
 
 <style>
   /* --- hero --- */
-  /* Full-bleed black band inside a cream page — the reference's core move. */
   .hero {
-    padding: clamp(3.5rem, 9vw, 7rem) 0 var(--space-section);
+    padding: clamp(3rem, 7vw, 5.5rem) 0 var(--space-section);
+    border-bottom: 1px solid var(--hairline);
     background:
-      radial-gradient(
-        70rem 38rem at 22% -18%,
-        var(--accent-glow),
-        transparent 60%
-      ),
+      radial-gradient(58rem 30rem at 18% -20%, var(--accent-glow), transparent 62%),
       var(--surface-canvas);
   }
 
+  /* Twelve columns, asymmetric. The copy takes half and the panel takes the rest
+     plus some — see .hero__visual. */
   .hero__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-    gap: clamp(2rem, 5vw, 4rem);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 3.5rem);
     align-items: center;
+  }
+  .hero__copy {
+    grid-column: 1 / 7;
+  }
+  /* The panel runs past the right column rule. An instrument that fits neatly
+     inside the frame looks like a screenshot; one that overruns it looks like
+     there is more of it than the page can show. `main` clips, so this costs no
+     horizontal scrollbar. */
+  .hero__visual {
+    grid-column: 7 / -1;
+    margin-right: calc(-1 * clamp(2rem, 7vw, 8rem));
   }
 
   .hero__badge {
@@ -372,32 +384,71 @@ connect failed: Connection refused (os error 111)
     align-items: center;
     gap: 0.45rem;
     margin: 0 0 var(--space-md);
-    padding: 0.3rem 0.8rem;
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius-pill);
-    background: var(--surface-raised);
-    font-family: var(--font-mono);
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
     font-size: var(--size-eyebrow);
+    letter-spacing: 0.06em;
     color: var(--text-tertiary);
   }
   .hero__badge-dot {
     width: 5px;
     height: 5px;
-    border-radius: 50%;
     background: var(--accent);
   }
 
   .hero__h1 {
     font-size: var(--size-display-xl);
     letter-spacing: var(--track-display);
-    line-height: 1.02;
-    max-width: 15ch;
+    line-height: 1.12;
+    max-width: 18ch;
+    /* `balance` is wrong here. It optimises for even line lengths, and with the
+       readout boxed inline that produced a line reading `[HTTP 200]   right`
+       with the gap opened up to match the line above. `pretty` only guards the
+       last line, which is the behaviour this headline actually wants. */
+    text-wrap: pretty;
   }
-  .hero__200 {
+
+  /* The readout. The whole argument of the page is that this number is a liar,
+     so it is set as what it actually is: a value on an instrument, boxed and
+     labelled, with a caret still blinking after it. */
+  .readout {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.06em 0.42em 0.1em;
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius-xs);
+    background: var(--accent-soft);
+    font-size: 0.74em;
+    vertical-align: baseline;
+    translate: 0 0.04em;
+  }
+  .readout__label {
     font-family: var(--font-mono);
-    font-size: 0.78em;
-    letter-spacing: -0.01em;
-    color: var(--accent);
+    font-size: 0.5em;
+    letter-spacing: 0.16em;
+    color: var(--text-quaternary);
+  }
+  .readout__value {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-strong);
+    letter-spacing: -0.02em;
+    color: var(--accent-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .readout__caret {
+    width: 0.42em;
+    height: 0.92em;
+    background: var(--accent);
+    animation: caret 1.15s steps(1) infinite;
+  }
+  @keyframes caret {
+    50% {
+      opacity: 0;
+    }
   }
 
   .hero__lede {
@@ -419,7 +470,7 @@ connect failed: Connection refused (os error 111)
   }
 
   /* Below the two-column breakpoint the hero stacks, so its vertical rhythm — tuned at
-     1440 where the copy and the card sit side by side — becomes 1.3 viewports of scrolling
+     1440 where the copy and the panel sit side by side — becomes 1.3 viewports of scrolling
      before the first section. Trimmed here rather than globally. */
   @media (max-width: 62rem) {
     .hero {
@@ -430,9 +481,13 @@ connect failed: Connection refused (os error 111)
       grid-template-columns: minmax(0, 1fr);
       gap: clamp(1.75rem, 4vw, 2.5rem);
     }
+    .hero__copy,
+    .hero__visual {
+      grid-column: 1 / -1;
+    }
     .hero__h1 {
-      max-width: 18ch;
-      font-size: clamp(2.5rem, 1.1rem + 5.2vw, 3.75rem);
+      max-width: 20ch;
+      font-size: clamp(1.85rem, 0.9rem + 4.2vw, 2.75rem);
     }
     .hero__cta {
       margin-top: var(--space-md);
@@ -449,7 +504,7 @@ connect failed: Connection refused (os error 111)
     padding-bottom: var(--space-2xl);
   }
   .band__h {
-    max-width: 22ch;
+    max-width: 24ch;
     margin-bottom: var(--space-lg);
   }
   .band__link {
@@ -461,17 +516,20 @@ connect failed: Connection refused (os error 111)
   }
 
   /* --- the gap --- */
+  /* Bays again: shared rules over a hairline ground, same as the monitor grid. */
   .gaps {
     display: grid;
-    gap: var(--space-2xs);
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
   .gap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     padding: var(--space-md);
-    background: var(--surface-raised);
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-sm);
+    background: var(--surface-canvas);
   }
   .gap__tag {
     align-self: flex-start;
@@ -479,8 +537,8 @@ connect failed: Connection refused (os error 111)
   .gap__h {
     margin: var(--space-xs) 0 var(--space-2xs);
     font-size: var(--size-body-lg);
-    font-weight: var(--weight-medium);
-    letter-spacing: -0.01em;
+    font-weight: var(--weight-strong);
+    letter-spacing: var(--track-title);
     color: var(--text-primary);
   }
   .gap__p {
@@ -489,9 +547,9 @@ connect failed: Connection refused (os error 111)
     color: var(--text-tertiary);
   }
   .gap__foot {
-    margin: var(--space-sm) 0 0;
-    padding-top: var(--space-xs);
-    border-top: 1px solid var(--hairline);
+    width: 100%;
+    margin: auto 0 0;
+    padding-top: var(--space-sm);
     font-family: var(--font-mono);
     font-size: var(--size-eyebrow);
     color: var(--text-quaternary) !important;
@@ -513,21 +571,24 @@ connect failed: Connection refused (os error 111)
     }
   }
 
-  /* Colours come from .surface--terminal in tokens.css; this is shape only. */
+  /* The alert stream is literally terminal output, so it is set as terminal
+     output. On a console page it no longer needs its own inverted surface — it
+     just needs to sit one step down from the page. */
   .terminal {
     margin: 0;
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-xs);
+    background: var(--surface-sunken);
     overflow: hidden;
   }
   .terminal figcaption {
     padding: var(--space-2xs) var(--space-sm);
-    border-bottom: 1px solid var(--hairline);
-    background: var(--surface-raised);
-    font-family: var(--font-mono);
+    border-bottom: 1px solid var(--hairline-strong);
+    background: var(--surface-overlay);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
     font-size: var(--size-eyebrow);
-    letter-spacing: 0.12em;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-quaternary);
   }
@@ -568,7 +629,8 @@ connect failed: Connection refused (os error 111)
   .steps span {
     font-family: var(--font-mono);
     font-size: var(--size-small);
-    color: var(--text-quaternary);
+    color: var(--accent-text);
+    font-variant-numeric: tabular-nums;
   }
   @media (max-width: 40rem) {
     .steps li {
@@ -583,10 +645,14 @@ connect failed: Connection refused (os error 111)
     gap: var(--space-lg);
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
+  .proof__item {
+    padding-top: var(--space-sm);
+    border-top: 2px solid var(--hairline-strong);
+  }
   .proof__h {
     margin-bottom: var(--space-2xs);
     font-size: var(--size-body);
-    font-weight: var(--weight-medium);
+    font-weight: var(--weight-strong);
     letter-spacing: var(--track-body);
     color: var(--text-primary);
   }
@@ -600,18 +666,17 @@ connect failed: Connection refused (os error 111)
 
   /* --- final --- */
   .final {
-    padding: clamp(2.5rem, 6vw, 4rem);
+    padding: clamp(2.5rem, 6vw, 4rem) var(--space-md);
     text-align: center;
-    border: 0;
-    box-shadow: none;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-xs);
     background:
-      radial-gradient(44rem 22rem at 50% 130%, var(--accent-glow), transparent 68%),
+      radial-gradient(38rem 20rem at 50% 128%, var(--accent-glow), transparent 66%),
       var(--surface-raised);
-    border-radius: var(--radius-2xl);
   }
   .final__h {
     margin-inline: auto;
-    max-width: 20ch;
+    max-width: 22ch;
   }
   .final__p {
     margin: var(--space-sm) auto 0;
@@ -625,5 +690,11 @@ connect failed: Connection refused (os error 111)
   /* Stagger reveals within a group. */
   .reveal {
     animation-delay: calc(var(--i, 0) * 60ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .readout__caret {
+      animation: none;
+    }
   }
 </style>

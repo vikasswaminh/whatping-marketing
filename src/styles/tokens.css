@@ -1,121 +1,139 @@
 /* ==========================================================================
-   WhatPing design tokens — capacity.so design language
+   WhatPing design tokens — operator console
 
    Three tiers. Nothing outside this file states a colour.
 
-     1. Brand      — the eight exact brand values, as hex.
-     2. Surfaces   — light-first, with a dark set scoped to .band--dark.
-     3. Semantic   — what components reference. Derived with color-mix.
+     1. Signal    — the eight exact brand values, as hex.
+     2. Surfaces  — dark-first, with a paper set scoped to .band--paper.
+     3. Semantic  — what components reference.
 
-   Brand values stay hex on purpose: they are exact, and round-tripping them
-   through OKLCH would land somewhere fractionally different for no benefit.
-   Derived states use `color-mix(in oklch, …)`, which is where perceptual
-   uniformity actually earns its place.
+   Dark-first is the point, not a preference. The product is an instrument that
+   watches things; the site is typeset as the readout it sells rather than as a
+   brochure about one. Docs invert to paper because long-form reference reading
+   is a different job from being sold to — same grid, same type, other material.
 
-   Light page, dark full-bleed bands. The dark set is a *section* treatment,
-   not a colour scheme, so it is a class rather than a media query.
+   The previous palette was capacity.so's: a cream page with dark bands. It was
+   competent and it was someone else's. This one is ours.
    ========================================================================== */
 
 :root {
-  /* --- 1. brand -------------------------------------------------------- */
+  /* --- 1. signal ------------------------------------------------------- */
 
-  --brand-orange: #ff8205;
-  --brand-orange-light: #ffaf00;
-  --brand-orange-dark: #fa500f;
-  --brand-yellow: #ffd800;
-  --brand-red: #e10500;
-  --brand-beige-light: #fffaeb;
-  --brand-beige-medium: #fff0c3;
-  --brand-beige-dark: #e9e2cb;
+  /* Amber phosphor. Chosen over the usual terminal green because green is
+     already spoken for here — it means UP — and an accent that collides with a
+     status colour stops carrying information. */
+  --signal-amber: #ffb000;
+  --signal-amber-bright: #ffc94d;
+  /* The paper form. Amber on paper is ~1.7:1, so words on the manual surface
+     take this instead. See the note under --accent-text. */
+  --signal-amber-deep: #9a4a00;
+  --signal-green: #35d67f;
+  --signal-red: #ff5c4d;
 
-  /* --- 2. surfaces, light ---------------------------------------------- */
+  /* Cold near-black with a faint cyan cast: a screen, not anodised metal. */
+  --console-void: #08090a;
+  --console-bay: #0e1113;
+  --paper-stock: #e9e7e1;
 
-  --surface-canvas: var(--brand-beige-light);
-  --surface-raised: #fcfbf8;
-  --surface-sunken: var(--brand-beige-medium);
-  --surface-overlay: #ffffff;
-  --surface-hover: #fffdf5;
+  /* --- 2. surfaces, console -------------------------------------------- */
 
-  --text-primary: #252525;
-  --text-secondary: #4a4a4a;
-  /* Tertiary is #8e8e8e in the reference. On cream that is 3.2:1 — fine for
-     large text, short of AA for the 12px eyebrows this site uses it for, so
-     the eyebrow tier is darkened separately below. verify-contrast.py holds
-     the line. */
-  --text-tertiary: #6b6b6b;
-  --text-quaternary: #747063;
+  --surface-canvas: var(--console-void);
+  --surface-raised: var(--console-bay);
+  --surface-sunken: #0b0d0f;
+  --surface-overlay: #14181a;
+  --surface-hover: #171c1e;
 
-  --hairline: #ebebeb;
-  /* beige-dark #e9e2cb is the reference value, but on cream it is 1.24:1 —
-     effectively invisible. Darkened until a border is actually a border. */
-  --hairline-strong: #dfd5b4;
-  --hairline-loud: #c9bd97;
+  --text-primary: #f4f6f6;
+  --text-secondary: #c8d0d1;
+  --text-tertiary: #9aa5a7;
+  /* 5.39:1 on canvas, 5.12:1 on a bay. The eyebrow tier is set in this and
+     eyebrows are 11px, so it has to clear AA as small text rather than large. */
+  --text-quaternary: #7c8789;
 
-  /* Status. Orange is the brand here, so these have to work alongside it
-     rather than instead of it — see the pill rule in global.css: status is
-     always a labelled pill, never bare coloured text. */
-  --status-up: #197948;
-  --status-down: #d50500;
-  --status-warn: #c33904;
+  --hairline: #1b2124;
+  --hairline-strong: #2a3236;
+  --hairline-loud: #3c464b;
+
+  --status-up: var(--signal-green);
+  --status-down: var(--signal-red);
+  /* Amber is the accent *and* the warning, deliberately. On a monitoring
+     product the brand colour being the attention colour is correct rather than
+     confused. The mitigation is the rule in 01-BRAND.md: status is always a
+     labelled pill, never bare coloured text — DOWN does the work, the colour
+     reinforces it. */
+  --status-warn: var(--signal-amber);
   --status-idle: var(--text-quaternary);
 
-  --status-up-bg: #e6f4ec;
-  --status-down-bg: #fdeceb;
-  --status-warn-bg: var(--brand-beige-medium);
+  --status-up-bg: #06170e;
+  --status-down-bg: #1c0a08;
+  --status-warn-bg: #1d1200;
 
   /* --- 3. semantic ------------------------------------------------------ */
 
-  --accent: var(--brand-orange);
-  /* Orange-on-cream is 2.2:1 as text, and even brand-orange-dark #fa500f only
-     reaches 3.2:1. So the fill and the text forms of the accent are different
-     tokens: #ff8205 fills buttons (with near-black labels at 7.7:1), and words
-     use a darkened orange solved to 4.75:1 for headroom over the AA floor.
-     Same reasoning for the status colours below — the brand hues are kept, the
-     lightness is solved. verify-contrast.py holds all of it. */
-  --accent-text: #cd3c04;
-  --accent-ink: #1a0d00;
-  --accent-hover: color-mix(in oklch, var(--accent), black 10%);
-  --accent-active: color-mix(in oklch, var(--accent), black 18%);
-  --accent-soft: var(--brand-beige-medium);
-  --accent-line: color-mix(in oklch, var(--accent) 45%, var(--hairline));
-  /* Indicators are non-text UI, which WCAG 1.4.11 holds to 3:1. #ff8205 on cream is
-     2.38:1 — found by the render check reading the docs sidebar bar, not by the token
-     audit, which was never looking at it. */
-  --accent-indicator: var(--accent-text);
-  --accent-glow: color-mix(in oklch, var(--brand-yellow) 22%, transparent);
+  /* The old palette needed two accent forms because orange on cream was 2.2:1
+     as text. Amber on #08090a is 10.87:1, so the fill and the text form are the
+     same value here and the split collapses. It does not disappear — it moves
+     to .band--paper, where it comes back for the same reason it existed. */
+  --accent: var(--signal-amber);
+  --accent-text: var(--signal-amber);
+  --accent-ink: #120b00;
+  --accent-hover: var(--signal-amber-bright);
+  --accent-active: color-mix(in oklch, var(--signal-amber), black 12%);
+  --accent-soft: var(--status-warn-bg);
+  --accent-line: color-mix(in oklch, var(--accent) 42%, var(--hairline));
+  /* Non-text UI is held to 3:1 by WCAG 1.4.11. Amber clears that on every
+     surface in this set, so unlike the previous palette the indicator does not
+     need a separate darker value. */
+  --accent-indicator: var(--accent);
+  --accent-glow: color-mix(in oklch, var(--signal-amber) 13%, transparent);
 
-  --focus-ring: color-mix(in oklch, var(--brand-orange-dark) 65%, transparent);
-  --selection: color-mix(in oklch, var(--brand-yellow) 45%, transparent);
+  --focus-ring: color-mix(in oklch, var(--signal-amber) 75%, transparent);
+  --selection: color-mix(in oklch, var(--signal-amber) 30%, transparent);
 
   /* --- typography ------------------------------------------------------- */
 
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  /* Display and UI are set in a *monospace*. That is the whole typographic
+     idea: headings, nav, buttons and section labels are instrument labelling,
+     so they are set in the face that labels instruments. Long-form prose is
+     not — mono at length is tiring — so body copy drops to Plex Sans, and
+     numbers and code stay in a tighter mono than the display face.
 
-  --size-display-xl: clamp(2.75rem, 1.5rem + 5.6vw, 5rem);
-  --size-display-lg: clamp(2.1rem, 1.45rem + 2.9vw, 3.375rem);
-  --size-display-md: clamp(1.7rem, 1.35rem + 1.6vw, 2.375rem);
-  --size-headline: clamp(1.4rem, 1.22rem + 0.8vw, 1.6875rem);
-  --size-title: 1.3125rem;
-  --size-body-lg: 1.125rem;
+     Martian Mono ships a width axis (75%–112.5%). --width-display uses the top
+     of it; if the axis is ever missing the type merely stops being wide. */
+  --font-display: "Martian Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
+
+  --width-display: 112.5%;
+  --width-ui: 100%;
+
+  /* A wide mono eats roughly 1.4x the horizontal space of the serif this
+     replaces, so the display ramp is scaled down to hold the same measure. */
+  --size-display-xl: clamp(1.85rem, 0.95rem + 3.5vw, 3rem);
+  --size-display-lg: clamp(1.5rem, 1.08rem + 1.8vw, 2.375rem);
+  --size-display-md: clamp(1.25rem, 1.05rem + 0.95vw, 1.75rem);
+  --size-headline: clamp(1.08rem, 0.98rem + 0.5vw, 1.3125rem);
+  --size-title: 1.125rem;
+  --size-body-lg: 1.0625rem;
   --size-body: 1rem;
   --size-small: 0.875rem;
-  --size-eyebrow: 0.75rem;
+  --size-eyebrow: 0.6875rem;
   --size-mono: 0.8125rem;
 
-  /* capacity.so uses a flat display tracking rather than a size-scaled ramp:
-     -0.05em on the hero, -0.03em on section heads, leading 1.08. */
-  --track-display: -0.05em;
-  --track-heading: -0.03em;
+  /* Mono needs far less negative tracking than a serif — the sidebearings are
+     already even. The eyebrow tier goes strongly *positive* instead, which is
+     what makes a label read as stencilled onto a panel. */
+  --track-display: -0.03em;
+  --track-heading: -0.02em;
+  --track-title: -0.01em;
   --track-body: 0;
-  --track-eyebrow: 0.12em;
-  --leading-display: 1.08;
+  --track-eyebrow: 0.18em;
+  --leading-display: 1.06;
 
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-strong: 600;
-  --weight-display: 500;
+  --weight-display: 600;
 
   /* --- space and shape -------------------------------------------------- */
 
@@ -127,29 +145,43 @@
   --space-lg: 2rem;
   --space-xl: 3rem;
   --space-2xl: 4rem;
-  --space-section: clamp(4rem, 8vw, 7rem);
+  --space-section: clamp(3.5rem, 7vw, 6rem);
 
-  /* Their base is .625rem, with the scale derived by ±2 and ±4px. */
-  --radius: 0.625rem;
-  --radius-xs: 0.125rem;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 12px);
+  /* Panels are machined, not rounded. The scale is kept so nothing breaks, but
+     it collapses to near-zero — a 10px radius reads as software, a 2px radius
+     reads as a milled edge. The pill survives for status only. */
+  --radius: 2px;
+  --radius-xs: 0;
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
   --radius-pill: 999px;
 
-  /* Shadows are back. Their absence was Linear's discipline, not a universal
-     rule, and this reference leans on soft black elevation. Values verbatim. */
-  --shadow-2xs: 0 1px 3px 0 #0000000d;
-  --shadow-xs: 0 1px 2px 0 #00000014;
-  --shadow-sm: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
-  --shadow-md: 0 1px 3px 0 #0000001a, 0 2px 4px -1px #0000001a;
-  --shadow-lg: 0 1px 3px 0 #0000001a, 0 4px 6px -1px #0000001a;
+  /* Elevation on near-black is carried by the hairline, not by shadow — a drop
+     shadow under a black panel on a black page is invisible work. The tokens
+     stay defined so components that ask for one get nothing rather than break.
+     .band--paper turns them back on, because there they read. */
+  --shadow-2xs: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
 
   --measure: 68ch;
   --shell: 78rem;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
+
+  /* The rail: a 1px instrument margin down the left of the shell. */
+  --rail: 1px;
+  --rail-gap: clamp(0.75rem, 2vw, 1.5rem);
+
+  /* Texture. Flat #08090a is a void; grain and a scan line give it a surface to
+     be. Both are deliberately near the threshold of noticing — the moment you
+     can see the effect rather than the depth, it has gone too far. */
+  --texture-grain: 0.038;
+  --texture-scan: color-mix(in oklch, var(--text-primary) 3.5%, transparent);
 
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
   --duration-fast: 120ms;
@@ -157,88 +189,71 @@
 }
 
 /* --------------------------------------------------------------------------
-   Dark bands. Full-bleed sections inside a light page — the hero and the
-   closing CTA — so this remaps the same semantic names rather than defining
-   new ones. Every component inside works unchanged.
+   Paper. The docs are a printed manual slipped into the console — same grid,
+   same type, other material. This remaps the same semantic names, so every
+   component works inside it unchanged; it is a surface, not a second theme.
    -------------------------------------------------------------------------- */
 
-.band--dark {
-  --surface-canvas: #0a0a0a;
-  --surface-raised: #1c1c1c;
-  --surface-sunken: #141414;
-  --surface-overlay: #232323;
-  --surface-hover: #272727;
+.band--paper {
+  --surface-canvas: var(--paper-stock);
+  --surface-raised: #f3f1ec;
+  --surface-sunken: #ded9cf;
+  --surface-overlay: #faf9f6;
+  --surface-hover: #f7f5f1;
 
-  --text-primary: #fafafa;
-  --text-secondary: #d4d4d4;
-  --text-tertiary: #a1a1aa;
-  --text-quaternary: #8e8e8e;
+  --text-primary: #16181a;
+  --text-secondary: #3a3f42;
+  --text-tertiary: #575e61;
+  /* 4.73:1 on paper. #6a7276 was the natural-looking value and it lands at
+     3.97:1 — verify-contrast.py refused it. */
+  --text-quaternary: #5f6669;
 
-  --hairline: #27272a;
-  --hairline-strong: #3f3f46;
-  --hairline-loud: #52525b;
+  --hairline: #cfcabe;
+  --hairline-strong: #b3aa99;
+  --hairline-loud: #968b74;
 
-  /* On black, orange is legible as text — so the text form goes back to the
-     brighter brand value rather than the darkened one. */
-  --accent-text: var(--brand-orange-light);
-  --accent-indicator: var(--brand-orange);
-  --accent-soft: #2a1a05;
-  --accent-glow: color-mix(in oklch, var(--brand-orange) 16%, transparent);
+  /* Here the two-form accent comes back: amber fills, deep amber is the only
+     form words are ever set in. 5.06:1. */
+  --accent-text: var(--signal-amber-deep);
+  --accent-indicator: var(--signal-amber-deep);
+  --accent-hover: color-mix(in oklch, var(--signal-amber), black 8%);
+  --accent-soft: #f0e6d2;
+  --accent-glow: color-mix(in oklch, var(--signal-amber) 18%, transparent);
 
-  --status-up: #4ade80;
-  --status-down: #ff6b66;
-  --status-warn: var(--brand-orange-light);
-  --status-up-bg: #0f2a1b;
-  --status-down-bg: #2c1210;
-  --status-warn-bg: #2a1a05;
+  /* Status hues are re-solved for a light ground rather than reused. */
+  --status-up: #0f6b3c;
+  --status-down: #b3200f;
+  --status-warn: #8a4a00;
+  --status-up-bg: #dcece2;
+  --status-down-bg: #f6e2df;
+  --status-warn-bg: #f2e7cf;
 
-  --focus-ring: color-mix(in oklch, var(--brand-orange-light) 70%, transparent);
-  --selection: color-mix(in oklch, var(--brand-orange) 40%, transparent);
+  --focus-ring: color-mix(in oklch, var(--signal-amber-deep) 70%, transparent);
+  --selection: color-mix(in oklch, var(--signal-amber) 42%, transparent);
 
-  /* Shadows do not read on black; the hairline carries elevation there. */
-  --shadow-xs: none;
-  --shadow-sm: none;
-  --shadow-md: none;
-  --shadow-lg: none;
+  /* Shadow reads on paper, so it comes back — but hairline-first, still. */
+  --shadow-2xs: 0 1px 2px 0 #1618180d;
+  --shadow-xs: 0 1px 2px 0 #16181812;
+  --shadow-sm: 0 1px 2px 0 #16181814;
+  --shadow-md: 0 1px 3px 0 #16181818;
+  --shadow-lg: 0 2px 8px -2px #1618181f;
 
   background: var(--surface-canvas);
   color: var(--text-secondary);
 }
 
-/* --------------------------------------------------------------------------
-   Terminal surface. The alert stream is literally terminal output, so it stays
-   dark on the cream page rather than being inverted into something it is not.
-   Same mechanism as .band--dark: remap the semantic names, change no component.
-   -------------------------------------------------------------------------- */
-
-.surface--terminal {
-  --surface-canvas: #0a0a0a;
-  --surface-raised: #1c1c1c;
-  --text-primary: #fafafa;
-  --text-secondary: #d4d4d4;
-  --text-tertiary: #a1a1aa;
-  --text-quaternary: #8e8e8e;
-  --hairline: #27272a;
-  --hairline-strong: #3f3f46;
-  --status-up: #4ade80;
-  --status-down: #ff6b66;
-  --status-warn: var(--brand-orange-light);
-
-  background: var(--surface-canvas);
-  color: var(--text-tertiary);
-}
-
-@property --surface-tint {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: transparent;
-}
-
 @media (prefers-contrast: more) {
   :root {
-    --text-tertiary: #4a4a4a;
-    --text-quaternary: #5a5648;
-    --hairline: #d8d8d8;
-    --hairline-strong: #c9c0a6;
+    --text-tertiary: #c3cccd;
+    --text-quaternary: #a7b1b2;
+    --hairline: #2a3236;
+    --hairline-strong: #465256;
+  }
+
+  .band--paper {
+    --text-tertiary: #35393b;
+    --text-quaternary: #43494b;
+    --hairline: #b3aa99;
+    --hairline-strong: #8d8371;
   }
 }

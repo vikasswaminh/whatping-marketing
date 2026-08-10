@@ -16,6 +16,11 @@ set -euo pipefail
 PROJECT="${PROJECT:-whatping-marketing}"
 ZONE_NAME="${ZONE_NAME:-whatping.com}"
 ATTACH_DOMAINS="${ATTACH_DOMAINS:-0}"
+# The project's production branch is `main`, so deploying to it publishes to whatping.com
+# immediately. ANY other value produces a preview deployment on its own *.pages.dev URL and
+# leaves the production alias alone — which is what you want for measuring a change before
+# it is live. verify-render.py takes that URL as BASE_URL.
+DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
 API=https://api.cloudflare.com/client/v4
 
 say() { printf '==> %s\n' "$*"; }
@@ -119,15 +124,18 @@ else
 fi
 
 # --- 3. deploy -----------------------------------------------------------------
-say "deploying dist/"
+say "deploying dist/ to branch '${DEPLOY_BRANCH}'"
 export CLOUDFLARE_API_TOKEN="$TOKEN"
 export CLOUDFLARE_ACCOUNT_ID="$CF_ACCOUNT_ID"
 cd "$(dirname "$0")/.."
 # NOT `bunx --bun`. Under Bun's runtime wrangler prints its banner, uploads nothing and exits
 # 0 — a silent no-op that leaves the previous deployment live while every check downstream
-# reports success. Node is what it expects.
-bunx wrangler@4 pages deploy dist \
-  --project-name "$PROJECT" --branch main --commit-dirty=true
+# reports success. Node is what it expects — so npx is an equally correct runner, and the
+# fallback matters on any box without bun installed.
+if command -v bunx >/dev/null 2>&1; then RUNNER="bunx"; else RUNNER="npx --yes"; fi
+echo "    runner: ${RUNNER}"
+$RUNNER wrangler@4 pages deploy dist \
+  --project-name "$PROJECT" --branch "$DEPLOY_BRANCH" --commit-dirty=true
 
 # Trust the upload count, not the exit code. Wrangler has been observed to exit 0 having done
 # nothing at all, which is exactly the failure this line exists to catch.

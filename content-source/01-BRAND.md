@@ -40,42 +40,57 @@ the problem is their own vantage point.
 
 ## Visual system
 
-Implemented in `apps/marketing/src/styles/tokens.css`. Three tiers — brand, surfaces, semantic
-— and nothing outside that file states a colour. The one exception is the `theme-color` meta
-tag and the favicon data-URI in `Base.astro`, which cannot read CSS variables.
+Implemented in `src/styles/tokens.css`. Three tiers — signal, surfaces, semantic — and nothing
+outside that file states a colour. The one exception is the `theme-color` meta tag and the
+favicon data-URI in `Base.astro`, which cannot read CSS variables.
 
-**The design language is capacity.so's**, extracted from their compiled CSS rather than
-eyeballed. A cream page with full-bleed black bands, orange brand, soft shadows, 10px radii.
+**The design language is an operator console.** Dark-first: the product is an instrument that
+watches things, so the site is typeset as the readout it sells rather than as a brochure about
+one. Near-black with a faint cyan cast, amber phosphor, hairlines instead of shadows, milled
+2px corners instead of 10px software radii.
+
+*This replaced a cream-and-orange palette extracted from capacity.so. That system was competent
+and contrast-verified, and it was someone else's.*
 
 ```
---brand-orange        #ff8205     --brand-beige-light   #fffaeb
---brand-orange-light  #ffaf00     --brand-beige-medium  #fff0c3
---brand-orange-dark   #fa500f     --brand-beige-dark    #e9e2cb
---brand-yellow        #ffd800     --brand-red           #e10500
+--signal-amber        #ffb000     --console-void   #08090a
+--signal-amber-bright #ffc94d     --console-bay    #0e1113
+--signal-amber-deep   #9a4a00     --paper-stock    #e9e7e1
+--signal-green        #35d67f     --signal-red     #ff5c4d
 
-light   canvas #fffaeb · card #fcfbf8 · text #252525 · hairline #ebebeb
-dark    canvas #0a0a0a · card #1c1c1c · text #fafafa · hairline #27272a
-radius  0.625rem base, ±2/4px derived, pill for buttons
-shadow  0 1px 3px #0000001a, 0 2px 4px -1px #0000001a  (md)
+console  canvas #08090a · bay #0e1113 · text #f4f6f6 · hairline #1b2124
+paper    canvas #e9e7e1 · card #f3f1ec · ink  #16181a · hairline #cfcabe
+radius   2px, collapsing to 0 for panels; pill retained for status chips only
+shadow   none on the console — the hairline carries elevation on near-black
+texture  SVG grain at 3.8% over a 3px scan line, fixed to the viewport
 ```
 
-**Dark is a section treatment, not a colour scheme.** `.band--dark` remaps the same semantic
-names, so the hero and the closing CTA are black bands inside a cream page and every component
-inside them works unchanged. `.surface--terminal` does the same for the alert-stream block.
+**Docs are paper, and that is a material, not a second theme.** `.band--paper` remaps the same
+semantic names, so the sidebar, prose, callouts and pills all work inside it unchanged. The
+manual is a light surface inset into the machine, with console chrome above and below it — long
+-form reference reading is a different job from being sold to.
 
-**Type: Instrument Serif for h1/h2, Geist for body, Geist Mono for data.** Display tracking is
-flat at −0.05em with 1.08 leading, matching the reference rather than the size-scaled ramp the
-previous system used.
+**Type: Martian Mono for display and UI, IBM Plex Sans for body, Geist Mono for data.** Headings,
+nav, buttons and section labels are instrument labelling, so they are set in the face that
+labels instruments — Martian Mono at the top of its width axis (112.5%). Prose is not, because
+mono at length is tiring, so body copy drops to Plex Sans. Display tracking is only −0.03em: a
+mono's sidebearings are already even, and the aggressive tracking a serif needs would crowd it.
+The eyebrow tier goes strongly *positive* (+0.18em), which is what makes a label read as
+stencilled onto a panel rather than as small caps.
 
-**Accent has two forms, and this is load-bearing.** `#ff8205` on cream is 2.2:1 — it fails AA
-as text, and even `#fa500f` only reaches 3.2:1. So `--accent` fills buttons (with a near-black
-label at 7.7:1) and `--accent-text` `#cd3c04` is the only orange that words are ever set in.
-Same reasoning for the status colours: brand hue kept, lightness solved to 4.75:1.
+**Amber is the accent and WARN both, deliberately.** On a monitoring product the brand colour
+being the attention colour is correct rather than confused. The mitigation is the pill rule
+below, unchanged from the previous palette and still load-bearing.
 
-**Status is always a labelled pill, never bare coloured text.** With orange as the brand, a red
-word on an orange-accented page stops carrying information. `DOWN` does the work; the colour
-reinforces it. This is the mitigation for a collision that was accepted deliberately — on a
-monitoring product, orange chrome and amber warnings occupy the same visual register.
+**The two-form accent split collapses on the console and returns on paper.** Orange on cream was
+2.2:1, which forced `--accent` (fill) and `--accent-text` (words) apart. Amber on `#08090a` is
+10.88:1, so on the console they are one value. On paper amber measures **1.48:1** — verified by
+deliberately reverting it — so `--accent-text` there is `--signal-amber-deep` `#9a4a00` at
+5.06:1, and it is the only form words are ever set in on that surface.
+
+**Status is always a labelled pill, never bare coloured text.** With amber as both the brand and
+the warning, a bare coloured word stops carrying information. `DOWN` does the work; the colour
+reinforces it.
 
 *Exception, deliberate:* a **value or an error string that sits beside its own pill** may take
 the status colour — `21 days` next to `WARN`, `connection refused` next to `DOWN`. The pill has
@@ -83,9 +98,11 @@ already named the state, so the colour is reinforcing a label the reader has, no
 for one they do not. The rule is about colour carrying meaning *alone*; it never does here.
 Bare status-coloured text with no pill in the same row is still out.
 
-**Accessibility is asserted, not eyeballed.** `apps/marketing/scripts/verify-contrast.py`
-resolves every pair in **both** surface sets and fails below WCAG AA. It caught eight failures
-in the first pass of this palette, including every status pill.
+**Accessibility is asserted, not eyeballed.** `scripts/verify-contrast.py` resolves every pair in
+**both** surface sets — console and paper — and fails below WCAG AA. All 30 pairs passed on the
+first run of this palette; the values were solved before they were written, not adjusted after.
+Two of them have been deliberately broken and restored since, because a guard that has never
+gone red is not yet a guard.
 
 ---
 
@@ -164,11 +181,17 @@ the hits that matter. Tightening the pattern took the count from 71 to 50 withou
 single real one.
 
 ```bash
-grep -rniE 'unlimited|multi-?region|global (probe|network|location)|status page|\bSLAs?\b|\
-\bSSO\b|SAML|sign in with google|pagerduty|opsgenie|\bSMS\b|99\.9|trusted by|soc ?2|\
-iso ?27001' apps/marketing/src/content/
+grep -rniE -e 'unlimited|multi-?region|global (probe|network|location)' \
+           -e 'status page|\bSLAs?\b|\bSSO\b|SAML|sign in with google' \
+           -e 'pagerduty|opsgenie|\bSMS\b|99\.9|trusted by|soc ?2|iso ?27001' \
+           src/content/ src/pages/ src/components/
 ```
 
+**Separate `-e` patterns, with the continuations outside the quotes.** The previous form in
+this file wrapped one long pattern with a backslash *inside* the single quotes, where a
+backslash-newline is a literal backslash rather than a line continuation. grep exited with
+`Trailing backslash` and matched nothing, so the check reported clean while testing zero
+files. The corrected form returns 51 hits; the broken one returned 0.
 Every hit must be a deliberate negative statement. If you cannot point at the sentence that
 makes it negative, delete it.
 

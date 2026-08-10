@@ -34,7 +34,7 @@ PAIRS = [
 ]
 
 # Scopes to audit: (label, css selector block to read values from, fallback scope)
-SCOPES = [(":root", "light"), (".band--dark", "dark band")]
+SCOPES = [(":root", "console"), (".band--paper", "manual")]
 
 
 def parse_scope(css: str, selector: str) -> dict[str, str]:

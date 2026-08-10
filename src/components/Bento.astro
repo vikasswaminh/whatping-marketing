@@ -1,10 +1,14 @@
 ---
 /**
- * Bento grid.
+ * The bay grid.
  *
  * Cells are sized by importance rather than uniformly: the two monitor types nothing else in
  * the category does — domain expiry and email auth — take double width, which is the grid
  * doing editorial work instead of just tiling.
+ *
+ * They share their rules rather than floating apart. A 1px gap over a hairline ground reads as
+ * one machined panel divided into bays; gapped cards with their own borders and shadows read as
+ * a web page about a panel. Same markup, opposite impression.
  */
 interface Cell {
   tag: string;
@@ -31,7 +35,12 @@ const { cells } = Astro.props;
         href={cell.href}
         style={`--i:${i}`}
       >
-        <span class="bento__tag">{cell.tag}</span>
+        <span class="bento__head">
+          <span class="bento__tag">{cell.tag}</span>
+          <span class="bento__idx" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+        </span>
         <h3 class="bento__title">{cell.title}</h3>
         <p class="bento__body">{cell.body}</p>
         <span class="bento__more" aria-hidden="true">→</span>
@@ -44,7 +53,10 @@ const { cells } = Astro.props;
   .bento {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-2xs);
+    /* The gap *is* the rule: 1px of the hairline ground showing between cells. */
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
   }
 
   .bento__cell {
@@ -52,71 +64,85 @@ const { cells } = Astro.props;
     display: flex;
     flex-direction: column;
     padding: var(--space-md);
-    background: var(--surface-raised);
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius-lg);
+    background: var(--surface-canvas);
     text-decoration: none;
     overflow: hidden;
     transition:
       background var(--duration) var(--ease),
-      border-color var(--duration) var(--ease),
-      transform var(--duration) var(--ease);
+      box-shadow var(--duration) var(--ease);
   }
+  /* No lift on hover. A bay is milled into the panel; it does not float above it.
+     The feedback is the surface warming and the top edge lighting up. */
   .bento__cell:hover {
-    background: var(--surface-overlay);
-    border-color: var(--hairline-strong);
-    transform: translateY(-2px);
+    background: var(--surface-raised);
+    box-shadow: inset 0 2px 0 0 var(--accent-indicator);
   }
 
   .bento__cell--wide {
     grid-column: span 2;
   }
 
-  /* The differentiators get a hairline in the accent rather than a fill — one accent used
-     sparingly is the whole discipline. */
+  /* The differentiators are pre-lit along the top edge — one accent, used
+     sparingly, is the whole discipline. */
   .bento__cell--accent {
-    border-color: var(--accent-line);
+    box-shadow: inset 0 2px 0 0 var(--accent-line);
   }
   .bento__cell--accent:hover {
-    border-color: var(--accent);
+    box-shadow: inset 0 2px 0 0 var(--accent-indicator);
+  }
+
+  .bento__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2xs);
   }
 
   .bento__tag {
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
     font-size: var(--size-eyebrow);
     font-weight: var(--weight-medium);
-    letter-spacing: 0.12em;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-quaternary);
   }
   .bento__cell--accent .bento__tag {
-    color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  /* Bay numbering. Instrument panels label their bays; so does this one. */
+  .bento__idx {
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    color: var(--hairline-loud);
+    font-variant-numeric: tabular-nums;
   }
 
   .bento__title {
     margin: var(--space-xs) 0 var(--space-3xs);
     font-size: var(--size-body-lg);
-    font-weight: var(--weight-medium);
+    font-weight: var(--weight-strong);
     letter-spacing: var(--track-title);
     color: var(--text-primary);
-    line-height: 1.25;
+    line-height: 1.3;
   }
 
   .bento__body {
     margin: 0;
     font-size: var(--size-small);
     color: var(--text-tertiary);
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   .bento__more {
     margin-top: var(--space-sm);
     font-size: var(--size-small);
-    color: var(--text-quaternary);
+    color: var(--hairline-loud);
     transition: color var(--duration-fast) var(--ease);
   }
   .bento__cell:hover .bento__more {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   @media (max-width: 62rem) {

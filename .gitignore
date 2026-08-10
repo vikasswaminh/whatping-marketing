@@ -4,3 +4,11 @@ dist/
 __pycache__/
 *.pyc
 .DS_Store
+
+# This is a bun repo — package.json scripts say `bun run build`, and the README says so.
+# Cloudflare Pages picks its package manager by which lockfile it finds, so committing an
+# npm or yarn lockfile would silently switch the builder without anything else changing.
+# Running npm locally is fine; committing what it leaves behind is not.
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
