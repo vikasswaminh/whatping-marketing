@@ -67,11 +67,12 @@ jobs:
           name: site-dist
           path: dist
 
-      # Node runtime deliberately (wrangler-action runs wrangler under Node). NEVER `bunx --bun`
-      # wrangler: under Bun it prints its banner, uploads nothing, and exits 0 — a silent no-op.
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: "4"
-          command: pages deploy dist --project-name whatping-marketing --branch main --commit-dirty=true
+      # Invoke wrangler directly under Node via npx (node/npm are on the VM). We do NOT use
+      # cloudflare/wrangler-action here: on this runner it auto-selected `bun` for its install
+      # step, which isn't on the deploy job's PATH, and failed. NEVER `bunx --bun` wrangler either
+      # — under Bun it prints its banner, uploads nothing, and exits 0 (a silent no-op). GitHub
+      # masks the secret values in logs regardless of how they're passed.
+      - run: npx --yes wrangler@4 pages deploy dist --project-name whatping-marketing --branch main --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
