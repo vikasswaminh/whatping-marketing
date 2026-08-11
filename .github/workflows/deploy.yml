@@ -1,19 +1,20 @@
 name: deploy
 
 # Push to `main`  -> build + verify + PRODUCTION deploy to Cloudflare Pages (whatping.com/www).
-# Pull request     -> build + verify ONLY. No deploy, no secret in scope: the CF token lives in
-#                     the `production` GitHub Environment, which is restricted to the `main`
-#                     branch, so a PR-branch run (including one that edited this workflow) is
-#                     denied it by GitHub. That is the exfiltration guard — keep it.
 #
-# On-demand previews are a workstation task: `DEPLOY_BRANCH=<x> bash deploy/cf-pages-deploy.sh`.
-# Domain / DNS / apex->www redirect changes also stay on the workstation (they need a broader
-# token and touch a zone carrying live mail). See deploy/CI.md.
+# Runs on a SELF-HOSTED runner (`nh-4c8g-318` = the production VM 10.1.30.29), as the non-root
+# `ghrunner` user. There is deliberately NO `pull_request` trigger: a self-hosted runner executes
+# workflow code on the box, so we never let an unmerged PR run on the production host. Only pushes
+# to `main` (already-merged, trusted code) run here. The CF token still lives in the `main`-only
+# `production` GitHub Environment, referenced solely by the deploy job.
+#
+# On-demand previews / PR validation are a workstation task: `DEPLOY_BRANCH=<x> bash
+# deploy/cf-pages-deploy.sh`. Domain / DNS / apex->www redirect changes also stay on the
+# workstation (broader token; touch a zone carrying live mail). See deploy/CI.md.
 
 on:
   push:
     branches: [main]
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -26,7 +27,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, whatping]
     steps:
       - uses: actions/checkout@v4
 
@@ -58,7 +59,7 @@ jobs:
     needs: build
     # Production only. The `if` and the environment's main-only branch policy are belt-and-braces.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, whatping]
     environment: production
     steps:
       - uses: actions/download-artifact@v4
