@@ -30,22 +30,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      # This is a bun repo (npm/yarn/pnpm lockfiles are gitignored so they can't switch the
+      # builder). No lockfile is committed, so `bun install` resolves from package.json; the
+      # build + verify gate below fails the run before any deploy if a resolution regresses.
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
+          bun-version: "1.3.14"
 
-      # `npm ci` is exact-lockfile: it fails loudly if package-lock.json has drifted, which is
-      # the point. (Local dev may use bun; CI matches the committed npm lockfile.)
-      - run: npm ci
+      - run: bun install
 
       # astro build -> dist/. Must precede verify: verify-routes.py asserts every content route
       # exists in dist/.
-      - run: npm run build
+      - run: bun run build
 
-      # Pure-stdlib gate (routes + contrast + api-examples). A red verify fails the run here,
-      # before the deploy job is ever reached.
-      - run: npm run verify
+      # Pure-stdlib gate (routes + contrast + api-examples; python3 ships on ubuntu-latest).
+      # A red verify fails the run here, before the deploy job is ever reached.
+      - run: bun run verify
 
       - uses: actions/upload-artifact@v4
         with:
