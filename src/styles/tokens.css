@@ -177,6 +177,12 @@
   --rail: 1px;
   --rail-gap: clamp(0.75rem, 2vw, 1.5rem);
 
+  /* The graticule: a faint square grid ruled onto the screen, one shade above
+     the scan line. Built like --texture-scan (text-primary at a low percent) so
+     it belongs to the surface rather than sitting on top of it. */
+  --grid-size: 40px;
+  --grid-line: color-mix(in oklch, var(--text-primary) 4.5%, transparent);
+
   /* Texture. Flat #08090a is a void; grain and a scan line give it a surface to
      be. Both are deliberately near the threshold of noticing — the moment you
      can see the effect rather than the depth, it has gone too far. */

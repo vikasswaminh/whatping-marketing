@@ -75,11 +75,22 @@ body::before {
   inset: 0;
   z-index: 89;
   pointer-events: none;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    var(--texture-scan) 0 1px,
-    transparent 1px 3px
-  );
+  /* Square graticule over the scan line — both fixed, so the whole surface reads
+     as one ruled screen rather than as texture printed on a scrolling page. The
+     grid is a shade above the scan; the shell-edge rails (.ruled) still frame the
+     content on top of it. */
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+    repeating-linear-gradient(
+      to bottom,
+      var(--texture-scan) 0 1px,
+      transparent 1px 3px
+    );
+  background-size:
+    var(--grid-size) var(--grid-size),
+    var(--grid-size) var(--grid-size),
+    auto;
 }
 
 /* --- structure ------------------------------------------------------------ */
