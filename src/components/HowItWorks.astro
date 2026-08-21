@@ -1,0 +1,48 @@
+---
+import ProcessStep from "./ProcessStep.astro";
+
+const steps = [
+  {
+    stepNumber: "STEP 01",
+    icon: "📡",
+    title: "Add Monitor",
+    description: "Input your website url, API, or TCP socket address."
+  },
+  {
+    stepNumber: "STEP 02",
+    icon: "🔍",
+    title: "Probing",
+    description: "Nodes check your services at your specified frequency."
+  },
+  {
+    stepNumber: "STEP 03",
+    icon: "⚠️",
+    title: "Detect",
+    description: "Failures are instantly verified by adjacent nodes."
+  },
+  {
+    stepNumber: "STEP 04",
+    icon: "📢",
+    title: "Alert",
+    description: "Receive high-priority alerts on chosen channels."
+  }
+];
+---
+<section class="homepage-section" id="how-it-works">
+  <div class="container">
+    <h2 class="section-title">How it works</h2>
+    <p class="section-subtitle">A simple, automated workflow that takes less than 3 minutes to set up.</p>
+    
+    <div class="process-grid">
+      {steps.map((step, idx) => (
+        <ProcessStep 
+          stepNumber={step.stepNumber} 
+          icon={step.icon} 
+          title={step.title} 
+          description={step.description}
+          showArrow={idx < steps.length - 1}
+        />
+      ))}
+    </div>
+  </div>
+</section>

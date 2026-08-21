@@ -1,0 +1,38 @@
+---
+import FeatureCard from "./FeatureCard.astro";
+
+const features = [
+  {
+    icon: "📡",
+    title: "Monitoring",
+    description: "Deep, agentless protocol probing for HTTP, API endpoints, SSL, DNS records, and custom TCP ports."
+  },
+  {
+    icon: "🔔",
+    title: "Alerts",
+    description: "Instant notifications across Slack, Discord, webhooks, and email, with persistent recovery confirmations."
+  },
+  {
+    icon: "📊",
+    title: "Analytics",
+    description: "Detailed latency monitoring, packet loss analysis, and historic uptime reports to diagnose trends."
+  },
+  {
+    icon: "🔌",
+    title: "Integrations",
+    description: "API-first architecture for pipeline registration, custom health heartbeats, and external developer integrations."
+  }
+];
+---
+<section class="homepage-section" id="features">
+  <div class="container">
+    <h2 class="section-title">Everything under control</h2>
+    <p class="section-subtitle">Real-time visibility into all core infrastructure assets without agents or extra configuration.</p>
+    
+    <div class="features-grid">
+      {features.map((feat) => (
+        <FeatureCard icon={feat.icon} title={feat.title} description={feat.description} />
+      ))}
+    </div>
+  </div>
+</section>

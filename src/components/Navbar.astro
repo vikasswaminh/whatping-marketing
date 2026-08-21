@@ -1,0 +1,51 @@
+---
+import { APP_URL } from "../lib/site";
+---
+
+<nav class="home-nav">
+  <div class="container home-nav__inner">
+    <a href="/" class="home-nav__logo">
+      <span class="home-nav__logo-dot"></span>
+      WHATPING
+    </a>
+
+    <button class="home-nav__toggle" aria-label="Toggle menu" data-home-nav-toggle>
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="home-nav__links" id="home-nav-links">
+      <a href="/features/" class="home-nav__link">Features</a>
+      <a href="/how-it-works/" class="home-nav__link">How it works</a>
+      <a href="/pricing/" class="home-nav__link">Pricing</a>
+      <a href="/docs/" class="home-nav__link">Docs</a>
+      <a href="/vs/uptime-kuma/" class="home-nav__link">Compare</a>
+    </div>
+
+    <div class="home-nav__actions" id="home-nav-actions">
+      <a href={`${APP_URL}/login`} class="home-nav__login">Log in</a>
+      <a href={APP_URL} class="btn btn--primary">Start Monitoring Free</a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  const toggle = document.querySelector('[data-home-nav-toggle]');
+  const links = document.getElementById('home-nav-links');
+  const actions = document.getElementById('home-nav-actions');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = links?.getAttribute('data-open') === 'true';
+    links?.setAttribute('data-open', String(!isOpen));
+    if (actions) {
+      actions.style.display = isOpen ? 'none' : 'flex';
+      if (!isOpen) {
+        actions.style.flexDirection = 'column';
+        actions.style.width = '100%';
+        actions.style.alignItems = 'center';
+        actions.style.paddingBottom = '16px';
+      }
+    }
+  });
+</script>

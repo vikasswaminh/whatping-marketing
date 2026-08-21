@@ -1,0 +1,243 @@
+---
+---
+<div class="globe-container">
+  <div class="globe-radial"></div>
+  <canvas id="globe-canvas" class="globe-canvas-el"></canvas>
+</div>
+
+<style>
+  .globe-container {
+    position: absolute;
+    bottom: -450px; /* Shift the center down to align it as a rising half-earth */
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(100vw, 900px);
+    height: min(100vw, 900px);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+  .globe-radial {
+    position: absolute;
+    inset: 0;
+    /* Create a glowing radial halo focused at the top curve of the half-globe */
+    background: radial-gradient(circle at 50% 45%, rgba(249, 185, 0, 0.35) 0%, transparent 60%);
+  }
+  .globe-canvas-el {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('globe-canvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      // Handle high DPI displays
+      const resize = () => {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.resetTransform();
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      };
+      
+      resize();
+      window.addEventListener('resize', resize);
+
+      let width = canvas.width / window.devicePixelRatio;
+      let height = canvas.height / window.devicePixelRatio;
+      let radius = Math.min(width, height) * 0.42; // Larger radius to match reference scale
+
+      // 1. Draw a simplified world map onto an offscreen canvas
+      const offscreen = document.createElement('canvas');
+      offscreen.width = 180;
+      offscreen.height = 90;
+      const oCtx = offscreen.getContext('2d');
+      if (oCtx) {
+        oCtx.fillStyle = '#000';
+        oCtx.fillRect(0, 0, 180, 90);
+        oCtx.fillStyle = '#fff';
+
+        const drawPoly = (pts: number[][]) => {
+          oCtx.beginPath();
+          oCtx.moveTo(pts[0][0], pts[0][1]);
+          for (let i = 1; i < pts.length; i++) {
+            oCtx.lineTo(pts[i][0], pts[i][1]);
+          }
+          oCtx.closePath();
+          oCtx.fill();
+        };
+
+        // Continent outlines on a 180x90 grid
+        drawPoly([[10, 15], [20, 12], [30, 15], [45, 20], [55, 30], [50, 40], [45, 42], [42, 50], [38, 52], [35, 45], [25, 42], [15, 35], [12, 25]]); // NA
+        drawPoly([[40, 50], [46, 52], [48, 62], [45, 78], [40, 82], [38, 70]]); // SA
+        drawPoly([[70, 20], [80, 18], [95, 15], [115, 10], [140, 12], [160, 20], [170, 35], [150, 48], [130, 45], [120, 50], [105, 50], [90, 40], [85, 42], [78, 30]]); // Eurasia
+        drawPoly([[80, 42], [90, 40], [96, 45], [104, 52], [108, 60], [98, 76], [92, 78], [88, 70], [80, 60], [76, 50]]); // Africa
+        drawPoly([[142, 60], [152, 62], [156, 70], [146, 72], [140, 66]]); // Australia
+        drawPoly([[38, 8], [48, 6], [44, 14]]); // Greenland
+
+        const imgData = oCtx.getImageData(0, 0, 180, 90).data;
+
+        // 2. Generate 3D dots for landmasses
+        const dots: { x: number; y: number; z: number }[] = [];
+        const latSegments = 80;
+        const lonSegments = 160;
+
+        for (let lat = 0; lat < latSegments; lat++) {
+          const theta = (lat / latSegments) * Math.PI;
+          const sinTheta = Math.sin(theta);
+          const cosTheta = Math.cos(theta);
+          const yVal = Math.floor((lat / latSegments) * 90);
+
+          for (let lon = 0; lon < lonSegments; lon++) {
+            const phi = (lon / lonSegments) * 2 * Math.PI;
+            const sinPhi = Math.sin(phi);
+            const cosPhi = Math.cos(phi);
+            const xVal = Math.floor((lon / lonSegments) * 180);
+
+            const pixelIndex = (yVal * 180 + xVal) * 4;
+            const isLand = imgData[pixelIndex] > 128;
+
+            if (isLand) {
+              const x = radius * sinTheta * cosPhi;
+              const y = radius * sinTheta * sinPhi;
+              const z = radius * cosTheta;
+              dots.push({ x, y, z });
+            }
+          }
+        }
+
+        // 3. Generate 3D grid line dots
+        const gridDots: { x: number; y: number; z: number }[] = [];
+        // Latitudes
+        for (let latVal = 10; latVal < 180; latVal += 15) {
+          const theta = (latVal * Math.PI) / 180;
+          const sinTheta = Math.sin(theta);
+          const cosTheta = Math.cos(theta);
+          for (let lonVal = 0; lonVal < 360; lonVal += 3) {
+            const phi = (lonVal * Math.PI) / 180;
+            gridDots.push({
+              x: radius * sinTheta * Math.cos(phi),
+              y: radius * sinTheta * Math.sin(phi),
+              z: radius * cosTheta
+            });
+          }
+        }
+        // Longitudes
+        for (let lonVal = 0; lonVal < 360; lonVal += 20) {
+          const phi = (lonVal * Math.PI) / 180;
+          for (let latVal = 0; latVal < 180; latVal += 3) {
+            const theta = (latVal * Math.PI) / 180;
+            gridDots.push({
+              x: radius * Math.sin(theta) * Math.cos(phi),
+              y: radius * Math.sin(theta) * Math.sin(phi),
+              z: radius * Math.cos(theta)
+            });
+          }
+        }
+
+        // 4. Animation loop
+        let rotationAngle = 0;
+        const tilt = 0.38; // Tilt globe forward by 22 degrees to show a curved hemisphere
+        const cosT = Math.cos(tilt);
+        const sinT = Math.sin(tilt);
+
+        const animate = () => {
+          width = canvas.width / window.devicePixelRatio;
+          height = canvas.height / window.devicePixelRatio;
+          radius = Math.min(width, height) * 0.42;
+
+          ctx.clearRect(0, 0, width, height);
+
+          const cosA = Math.cos(rotationAngle);
+          const sinA = Math.sin(rotationAngle);
+
+          // Draw grid lines
+          gridDots.forEach(dot => {
+            // Spin around vertical axis (Y-axis)
+            const x1 = dot.x * cosA - dot.z * sinA;
+            const z1 = dot.x * sinA + dot.z * cosA;
+            const y1 = dot.y;
+
+            // Tilt forward around horizontal axis (X-axis)
+            const rx = x1;
+            const ry = y1 * cosT - z1 * sinT;
+            const rz = y1 * sinT + z1 * cosT;
+
+            if (rz > -radius * 0.3) {
+              const scale = (rz + radius) / (2 * radius);
+              const alpha = (0.01 + scale * 0.035) * (rz > 0 ? 1 : 0.3);
+              ctx.fillStyle = `rgba(111, 108, 99, ${alpha})`;
+              ctx.fillRect(width / 2 + rx, height / 2 + ry, 1, 1);
+            }
+          });
+
+          // Draw landmass dots
+          dots.forEach(dot => {
+            // Spin around Y-axis
+            const x1 = dot.x * cosA - dot.z * sinA;
+            const z1 = dot.x * sinA + dot.z * cosA;
+            const y1 = dot.y;
+
+            // Tilt forward around X-axis
+            const rx = x1;
+            const ry = y1 * cosT - z1 * sinT;
+            const rz = y1 * sinT + z1 * cosT;
+
+            if (rz > 0) {
+              const scale = (rz + radius) / (2 * radius);
+              const size = 0.8 + scale * 1.5;
+              const alpha = 0.04 + scale * 0.35;
+
+              ctx.fillStyle = `rgba(249, 185, 0, ${alpha})`;
+              ctx.beginPath();
+              ctx.arc(width / 2 + rx, height / 2 + ry, size, 0, 2 * Math.PI);
+              ctx.fill();
+            }
+          });
+
+          // Pulsing active monitor probes
+          const pings = [
+            { x: radius * Math.sin(0.9) * Math.cos(1.0), y: radius * Math.sin(0.9) * Math.sin(1.0), z: radius * Math.cos(0.9), color: '249, 185, 0' },
+            { x: radius * Math.sin(1.1) * Math.cos(3.5), y: radius * Math.sin(1.1) * Math.sin(3.5), z: radius * Math.cos(1.1), color: '63, 143, 85' }
+          ];
+
+          pings.forEach(ping => {
+            const x1 = ping.x * cosA - ping.z * sinA;
+            const z1 = ping.x * sinA + ping.z * cosA;
+            const y1 = ping.y;
+
+            const rx = x1;
+            const ry = y1 * cosT - z1 * sinT;
+            const rz = y1 * sinT + z1 * cosT;
+
+            if (rz > 0) {
+              const scale = (rz + radius) / (2 * radius);
+              const pulseSize = 2 + (Date.now() / 150) % 8;
+              const pulseAlpha = 0.7 - (pulseSize - 2) / 8;
+
+              ctx.fillStyle = `rgba(${ping.color}, ${0.8 * scale})`;
+              ctx.beginPath();
+              ctx.arc(width / 2 + rx, height / 2 + ry, 3, 0, 2 * Math.PI);
+              ctx.fill();
+
+              ctx.strokeStyle = `rgba(${ping.color}, ${pulseAlpha * scale})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.arc(width / 2 + rx, height / 2 + ry, pulseSize, 0, 2 * Math.PI);
+              ctx.stroke();
+            }
+          });
+
+          rotationAngle += 0.0016; // smooth rotation speed
+          requestAnimationFrame(animate);
+        };
+
+        animate();
+      }
+    }
+  }
+</script>

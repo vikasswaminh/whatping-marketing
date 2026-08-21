@@ -1,6 +1,6 @@
 ---
 import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
+import Navbar from "../components/Navbar.astro";
 import { SITE_URL } from "../lib/site";
 import "../styles/global.css";
 
@@ -9,16 +9,12 @@ interface Props {
   description: string;
   /** Overrides the default JSON-LD block. */
   jsonLd?: Record<string, unknown>;
-  /**
-   * The scroll rail runs down the left margin of the console. Docs turn it off:
-   * the manual is a paper surface inset into the machine, and a live instrument
-   * marker running alongside it reads as chrome that escaped its own layer.
-   */
-  rail?: boolean;
+  isHome?: boolean;
 }
 
-const { title, description, jsonLd, rail = true } = Astro.props;
+const { title, description, jsonLd, isHome = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+const bodyClass = "theme-homepage";
 ---
 
 <!doctype html>
@@ -66,14 +62,19 @@ const canonical = new URL(Astro.url.pathname, SITE_URL).href;
         />
       )
     }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body>
+  <body class={bodyClass}>
     <a class="skip" href="#main">Skip to content</a>
-    {rail && <div class="rail" aria-hidden="true" />}
-    <Header />
+    <Navbar />
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    <Footer isHome={true} />
   </body>
 </html>

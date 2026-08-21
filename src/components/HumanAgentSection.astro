@@ -1,0 +1,38 @@
+---
+---
+<section class="homepage-section" id="developer-experience">
+  <div class="container">
+    <h2 class="section-title">Designed for humans and AI agents</h2>
+    <p class="section-subtitle">Whether you prefer interactive dashboards or headless pipelines, WhatPing adapts to your operational style.</p>
+    
+    <div class="human-agent-grid">
+      <div class="human-agent-card">
+        <h3 class="human-agent-card__h">Dashboard Experience</h3>
+        <ul class="human-agent-list">
+          <li><strong>Clean, clutter-free layouts</strong> for quick diagnostics</li>
+          <li><strong>Interactive latency charts</strong> with timezone support</li>
+          <li><strong>One-click status page</strong> setups for customer transparency</li>
+          <li><strong>Slack, Discord, and Telegram</strong> notifications in minutes</li>
+          <li><strong>Easy team invite sharing</strong> for shared operations monitoring</li>
+        </ul>
+      </div>
+
+      <div class="human-agent-card">
+        <h3 class="human-agent-card__h">AI Agent & API Experience</h3>
+        <ul class="human-agent-list" style="margin-bottom: 24px;">
+          <li><strong>Stateless API endpoints</strong> for check registrations</li>
+          <li><strong>JSON-LD schemas</strong> for structured machine parsing</li>
+          <li><strong>Secure webhooks</strong> with SHA256 validation headers</li>
+        </ul>
+        
+        <pre class="human-agent-code"><code>{`POST /api/v1/monitors
+{
+  "name": "production-api",
+  "url": "https://api.whatping.com/health",
+  "interval_seconds": 60,
+  "regions": ["us-east", "eu-central"]
+}`}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>

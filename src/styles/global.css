@@ -4,6 +4,8 @@
 @import "@fontsource-variable/ibm-plex-sans";
 @import "@fontsource-variable/geist-mono";
 @import "./tokens.css";
+@import "./homepage.css";
+
 
 /* ==========================================================================
    No colour is stated in this file. Everything comes from tokens.css.

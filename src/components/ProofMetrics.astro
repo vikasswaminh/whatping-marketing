@@ -1,0 +1,19 @@
+---
+const proofItems = [
+  { val: "10M+", label: "Checks/day" },
+  { val: "99.999%", label: "Uptime SLA" },
+  { val: "100+", label: "Geolocations" },
+  { val: "<1.5s", label: "Alert Dispatch" },
+  { val: "5K+", label: "Monitors Saved" }
+];
+---
+<section class="proof-bar">
+  <div class="container proof-grid">
+    {proofItems.map((item) => (
+      <div class="proof-item">
+        <span class="proof-val">{item.val}</span>
+        <div class="proof-lbl">{item.label}</div>
+      </div>
+    ))}
+  </div>
+</section>

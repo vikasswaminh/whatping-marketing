@@ -1,0 +1,21 @@
+---
+import StatusTable from "./StatusTable.astro";
+import { APP_URL } from "../lib/site";
+---
+<section class="homepage-section" id="live-monitoring">
+  <div class="container">
+    <h2 class="section-title">Live system monitoring</h2>
+    <p class="section-subtitle">A live feed of checking operations, latencies, and reachability across our global edge nodes.</p>
+    
+    <div class="live-grid">
+      <StatusTable />
+      
+      <div class="live-status-card">
+        <div class="live-status-card__badge">✓</div>
+        <h3 class="live-status-card__h">ALL SYSTEMS OPERATIONAL</h3>
+        <p class="live-status-card__p">WhatPing probers are checking all endpoints with 100% success rate.</p>
+        <a href="/roadmap/" class="btn btn--secondary btn--full">View Status Page</a>
+      </div>
+    </div>
+  </div>
+</section>

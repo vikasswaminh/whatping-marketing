@@ -1,0 +1,20 @@
+---
+interface Props {
+  stepNumber: string;
+  title: string;
+  icon: string;
+  description: string;
+  showArrow?: boolean;
+}
+
+const { stepNumber, title, icon, description, showArrow = false } = Astro.props;
+---
+<div class="process-item">
+  <span class="process-num">{stepNumber}</span>
+  <div class="process-card">
+    <span>{icon}</span>
+  </div>
+  <h3 class="process-title">{title}</h3>
+  <p class="process-desc">{description}</p>
+  {showArrow && <span class="process-arrow">➔</span>}
+</div>
