@@ -23,4 +23,8 @@ export const collections = {
     loader: glob({ pattern: "**/*.mdx", base: "./src/content/docs" }),
     schema: page,
   }),
+  blog: defineCollection({
+    loader: glob({ pattern: "**/*.mdx", base: "./src/content/blog" }),
+    schema: page,
+  }),
 };
