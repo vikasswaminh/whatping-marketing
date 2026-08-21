@@ -1,0 +1,33 @@
+---
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import Callout from "../../components/Callout.astro";
+import Marketing from "../../layouts/Marketing.astro";
+import { normalize } from "../../lib/site";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((entry) => {
+    // Extract everything after /blog/ from the route frontmatter.
+    // Astro routes are relative to the directory this file is in, so slug is just the rest.
+    const rest = normalize(entry.data.route)
+      .replace(/^\/blog\/?/, "")
+      .replace(/\/$/, "");
+    return {
+      params: { slug: rest === "" ? undefined : rest },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props as { entry: CollectionEntry<"blog"> };
+const { Content } = await render(entry);
+---
+
+<Marketing
+  title={entry.data.title}
+  description={entry.data.description}
+  h1={entry.data.h1}
+  eyebrow="Blog"
+>
+  <Content components={{ Callout }} />
+</Marketing>

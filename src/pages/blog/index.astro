@@ -1,0 +1,73 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import Marketing from "../../layouts/Marketing.astro";
+import { normalize } from "../../lib/site";
+
+// Get page meta from authoritative pages collection
+const pageEntry = await getEntry("pages", "blog");
+if (!pageEntry) {
+  throw new Error("Could not find blog page entry in pages collection");
+}
+
+// Get all blog posts
+const posts = await getCollection("blog");
+// Sort posts alphabetically/chronologically based on title (or date if needed)
+const sortedPosts = posts.sort((a, b) => b.data.title.localeCompare(a.data.title));
+---
+
+<Marketing
+  title={pageEntry.data.title}
+  description={pageEntry.data.description}
+  h1={pageEntry.data.h1}
+  eyebrow="Blog"
+>
+  <div class="blog-list">
+    {
+      sortedPosts.map((post) => (
+        <article class="blog-preview">
+          <h2>
+            <a href={normalize(post.data.route)}>{post.data.h1}</a>
+          </h2>
+          <p class="blog-desc">{post.data.description}</p>
+          <a class="read-more" href={normalize(post.data.route)}>Read post &rarr;</a>
+        </article>
+      ))
+    }
+  </div>
+</Marketing>
+
+<style>
+  .blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+  }
+  .blog-preview {
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .blog-preview:last-child {
+    border-bottom: 0;
+  }
+  .blog-preview h2 {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--size-display-md);
+  }
+  .blog-preview h2 a {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .blog-preview h2 a:hover {
+    color: var(--accent);
+  }
+  .blog-desc {
+    margin: 0 0 var(--space-sm);
+    color: var(--text-secondary);
+  }
+  .read-more {
+    font-family: var(--font-display);
+    font-size: var(--size-small);
+    color: var(--accent-text);
+  }
+</style>
