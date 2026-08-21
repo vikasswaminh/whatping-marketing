@@ -263,3 +263,66 @@
     --hairline-strong: #8d8371;
   }
 }
+
+/* --- Homepage Theme Override --- */
+.theme-homepage {
+  --charcoal: #171717;
+  --charcoal-soft: #292929;
+  --butter: #F9B900;
+  --butter-bright: #FFBD00;
+  --butter-soft: #FFF6D8;
+  --cream: #FFFCF5;
+  --white: #FFFFFF;
+  --border: #EDE8DA;
+  --muted: #6F6C63;
+  --success: #3F8F55;
+  --green-soft: #EAF5EA;
+  --orange-soft: #FFF0D6;
+
+  --surface-canvas: var(--cream);
+  --surface-raised: var(--white);
+  --surface-sunken: var(--cream);
+  --surface-overlay: var(--white);
+  --surface-hover: var(--butter-soft);
+
+  --text-primary: var(--charcoal);
+  --text-secondary: var(--charcoal-soft);
+  --text-tertiary: var(--muted);
+  --text-quaternary: var(--muted);
+
+  --hairline: var(--border);
+  --hairline-strong: var(--border);
+  --hairline-loud: var(--muted);
+
+  --status-up: var(--success);
+  --status-down: #E05243;
+  --status-warn: var(--butter);
+
+  --status-up-bg: var(--green-soft);
+  --status-down-bg: #FBEBE9;
+  --status-warn-bg: var(--butter-soft);
+
+  --accent: var(--butter);
+  --accent-text: var(--charcoal);
+  --accent-ink: var(--charcoal);
+  --accent-hover: var(--butter-bright);
+  --accent-active: var(--butter);
+  --accent-soft: var(--butter-soft);
+  --accent-line: var(--border);
+  --accent-glow: rgba(249, 185, 0, 0.12);
+
+  --font-display: "Outfit", "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Outfit", sans-serif;
+
+  --radius: 8px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+
+  background: var(--surface-canvas);
+  color: var(--text-secondary);
+}
+

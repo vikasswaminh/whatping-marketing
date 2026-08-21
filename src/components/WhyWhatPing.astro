@@ -1,0 +1,40 @@
+---
+const benefits = [
+  {
+    icon: "🌐",
+    title: "Global Network",
+    description: "Probes distributed across major clouds and geographies for neutral external verification."
+  },
+  {
+    icon: "⚡",
+    title: "Real-time Alerts",
+    description: "High-speed dispatching to Slack, Telegram, webhooks, and email before your clients notice."
+  },
+  {
+    icon: "🧠",
+    title: "Intelligent Monitoring",
+    description: "Built-in validation checks, automatic secondary confirmations, and AI-assisted troubleshooting."
+  },
+  {
+    icon: "📄",
+    title: "Reports & Insights",
+    description: "Automated analysis of availability ranges, certificate lifespans, and SPF record setups."
+  }
+];
+---
+<section class="homepage-section" id="why-whatping">
+  <div class="container">
+    <h2 class="section-title">Why WhatPing?</h2>
+    <p class="section-subtitle">A stateless, resilient infrastructure designed to give you precise signals without false positives.</p>
+    
+    <div class="why-grid">
+      {benefits.map((b) => (
+        <div class="card why-item">
+          <span class="why-icon">{b.icon}</span>
+          <h3 class="why-title">{b.title}</h3>
+          <p class="why-p">{b.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

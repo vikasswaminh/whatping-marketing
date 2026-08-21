@@ -1,0 +1,48 @@
+---
+import MonitoringTypeCard from "./MonitoringTypeCard.astro";
+
+const types = [
+  {
+    icon: "🌐",
+    title: "HTTP(s) Monitoring",
+    description: "Status ranges, keyword matching, and payload assertions."
+  },
+  {
+    icon: "🎯",
+    title: "API Endpoints",
+    description: "Verify JSON headers, authentication, and HTTP verbs."
+  },
+  {
+    icon: "📡",
+    title: "Ping Monitoring",
+    description: "Unprivileged ICMP checks for packet loss and median RTT."
+  },
+  {
+    icon: "🔒",
+    title: "SSL Certificates",
+    description: "Days until TLS expiry and validity alerts."
+  },
+  {
+    icon: "🔎",
+    title: "DNS Monitoring",
+    description: "Assert A, AAAA, MX, TXT, and CNAME records."
+  },
+  {
+    icon: "🚪",
+    title: "Port Monitoring",
+    description: "Test direct TCP connections on custom ports."
+  }
+];
+---
+<section class="homepage-section" id="monitoring-types">
+  <div class="container">
+    <h2 class="section-title">What can you monitor?</h2>
+    <p class="section-subtitle">We support a wide array of checks spanning multiple protocols, layers, and service types.</p>
+    
+    <div class="types-grid">
+      {types.map((t) => (
+        <MonitoringTypeCard icon={t.icon} title={t.title} description={t.description} />
+      ))}
+    </div>
+  </div>
+</section>

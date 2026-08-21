@@ -1,0 +1,35 @@
+---
+const services = [
+  { name: "API Service", status: "UP", latency: "98ms", location: "Mumbai", time: "Just now" },
+  { name: "User Dashboard", status: "UP", latency: "110ms", location: "Singapore", time: "Just now" },
+  { name: "Marketing Site", status: "UP", latency: "95ms", location: "Frankfurt", time: "Just now" },
+  { name: "Auth Provider", status: "UP", latency: "120ms", location: "Seattle", time: "Just now" }
+];
+---
+<div class="live-table-wrapper">
+  <table class="live-table">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Status</th>
+        <th>Response</th>
+        <th>Location</th>
+      </tr>
+    </thead>
+    <tbody>
+      {services.map((s) => (
+        <tr>
+          <td><strong>{s.name}</strong></td>
+          <td>
+            <span class="live-status">
+              <span class="live-status-dot live-status-dot--pulse"></span>
+              {s.status}
+            </span>
+          </td>
+          <td>{s.latency}</td>
+          <td>{s.location}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

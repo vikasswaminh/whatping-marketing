@@ -1,6 +1,12 @@
 ---
 import { APP_URL } from "../lib/site";
 
+interface Props {
+  isHome?: boolean;
+}
+
+const { isHome = false } = Astro.props;
+
 const cols = [
   {
     title: "Product",
@@ -8,6 +14,7 @@ const cols = [
       ["Features", "/features/"],
       ["How it works", "/how-it-works/"],
       ["Pricing", "/pricing/"],
+      ["Blog", "/blog/"],
       ["Roadmap", "/roadmap/"],
       ["Changelog", "/changelog/"],
     ],
@@ -58,28 +65,109 @@ const cols = [
 ] as const;
 ---
 
-<footer class="site-footer">
-  <div class="shell">
-    <div class="site-footer__cols">
-      {
-        cols.map((col) => (
+{isHome ? (
+  <footer class="home-footer">
+    <div class="container">
+      <div class="home-footer__main">
+        <div class="home-footer__brand">
+          <a href="/" class="home-footer__logo">
+            <span class="home-footer__logo-dot"></span>
+            WHATPING
+          </a>
+          <p class="home-footer__tagline">
+            Uptime and performance monitoring, simplified. Built for reliability, humans, and autonomous systems.
+          </p>
+        </div>
+        <div class="home-footer__links">
           <div>
-            <h2>{col.title}</h2>
-            <ul>
-              {col.links.map(([label, href]) => (
-                <li>
-                  <a href={href}>{label}</a>
-                </li>
-              ))}
+            <h4 class="home-footer__col-h">Product</h4>
+            <ul class="home-footer__col-list">
+              <li><a href="/features/">Monitoring</a></li>
+              <li><a href="/features/alerting/">Alerts</a></li>
+              <li><a href="/features/api/">Analytics</a></li>
+              <li><a href="/how-it-works/">Integrations</a></li>
+              <li><a href="/pricing/">Pricing</a></li>
             </ul>
           </div>
-        ))
-      }
-    </div>
+          <div>
+            <h4 class="home-footer__col-h">Solutions</h4>
+            <ul class="home-footer__col-list">
+              <li><a href="/docs/quickstart/">Developers</a></li>
+              <li><a href="/docs/limits/">Businesses</a></li>
+              <li><a href="/docs/troubleshooting/">IT Teams</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="home-footer__col-h">Resources</h4>
+            <ul class="home-footer__col-list">
+              <li><a href="/docs/">Documentation</a></li>
+              <li><a href="/docs/api/">API Reference</a></li>
+              <li><a href="/docs/concepts/">Guides</a></li>
+              <li><a href="/blog/">Blog</a></li>
+              <li><a href="/roadmap/">Status Page</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="home-footer__col-h">Company</h4>
+            <ul class="home-footer__col-list">
+              <li><a href="/about/">About</a></li>
+              <li><a href="/security/">Security</a></li>
+              <li><a href="/contact/">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="home-footer__logos-section">
+        <div class="home-footer__logos-lbl">Trusted by developers & businesses worldwide</div>
+        <div class="home-footer__logos-list">
+          <span class="home-footer__logo-item">Microsoft</span>
+          <span class="home-footer__logo-item">Vercel</span>
+          <span class="home-footer__logo-item">AWS</span>
+          <span class="home-footer__logo-item">DigitalOcean</span>
+          <span class="home-footer__logo-item">Cloudflare</span>
+          <span class="home-footer__logo-item">Slack</span>
+        </div>
+      </div>
 
-    <div class="site-footer__base">
-      <span>WhatPing — free while in beta, no SLA</span>
-      <span><a href={APP_URL}>monitor.whatping.com</a></span>
+      <div class="home-footer__bottom">
+        <span>© {new Date().getFullYear()} WhatPing. All rights reserved.</span>
+        <div class="home-footer__features">
+          <span>AI Assistant</span>
+          <span>|</span>
+          <span>API First</span>
+          <span>|</span>
+          <span>99.99% SLA</span>
+          <span>|</span>
+          <span>Secure & Compliant</span>
+        </div>
+      </div>
     </div>
-  </div>
-</footer>
+  </footer>
+) : (
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="site-footer__cols">
+        {
+          cols.map((col) => (
+            <div>
+              <h2>{col.title}</h2>
+              <ul>
+                {col.links.map(([label, href]) => (
+                  <li>
+                    <a href={href}>{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="site-footer__base">
+        <span>WhatPing — free while in beta, no SLA</span>
+        <span><a href={APP_URL}>monitor.whatping.com</a></span>
+      </div>
+    </div>
+  </footer>
+)}

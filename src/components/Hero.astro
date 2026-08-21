@@ -1,0 +1,41 @@
+---
+import { APP_URL } from "../lib/site";
+import HeroBackground from "./HeroBackground.astro";
+---
+
+<section class="hero-wrapper homepage-section--first">
+  <HeroBackground />
+  <div class="container hero-copy">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Free while in beta · no card
+    </div>
+
+    <h1 class="hero-h1">
+      Uptime & performance monitoring, <span class="accent-text">simplified.</span>
+    </h1>
+
+    <p class="hero-lede">
+      WhatPing monitors your websites, APIs, and services 24/7<br />
+      from multiple locations and alerts you instantly<br />
+      when something goes wrong.
+    </p>
+
+    <div class="hero-ctas">
+      <a href={APP_URL} class="btn btn--primary">Start Monitoring Free</a>
+      <a href="#live-monitoring" class="btn btn--secondary">View Live Status</a>
+    </div>
+
+    <div class="hero-features">
+      <div class="hero-feature-item">
+        <span class="hero-feature-check">✓</span> Easy setup
+      </div>
+      <div class="hero-feature-item">
+        <span class="hero-feature-check">✓</span> No credit card required
+      </div>
+      <div class="hero-feature-item">
+        <span class="hero-feature-check">✓</span> Cancel anytime
+      </div>
+    </div>
+  </div>
+</section>
