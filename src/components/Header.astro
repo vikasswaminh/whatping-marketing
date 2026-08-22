@@ -228,61 +228,9 @@ curl -X POST monitor-api.whatping.com/v1/monitors \
   </div>
 </header>
 
-<script>
-  const header = document.querySelector<HTMLElement>("[data-header]");
-  const drawerToggle = document.querySelector<HTMLButtonElement>("[data-drawer-toggle]");
-  const groups = Array.from(document.querySelectorAll<HTMLElement>("[data-group]"));
-  const mq = window.matchMedia("(max-width: 56rem)");
-
-  const setGroup = (group: HTMLElement, open: boolean) => {
-    group.dataset.open = String(open);
-    group.querySelector<HTMLElement>("[data-trigger]")?.setAttribute("aria-expanded", String(open));
-  };
-  const closeGroups = (except?: HTMLElement) => {
-    for (const g of groups) if (g !== except) setGroup(g, false);
-  };
-
-  // Trigger click pins a panel open (and works on touch + keyboard). Hover/focus still
-  // peek it open via CSS on desktop; a pin survives mouseleave until Esc / click-away.
-  for (const group of groups) {
-    const trigger = group.querySelector<HTMLElement>("[data-trigger]");
-    trigger?.addEventListener("click", (e) => {
-      e.preventDefault();
-      const open = group.dataset.open === "true";
-      closeGroups(group);
-      setGroup(group, !open);
-    });
-  }
-
-  document.addEventListener("click", (e) => {
-    if (!(e.target as HTMLElement).closest("[data-group]")) closeGroups();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    closeGroups();
-    if (header?.dataset.drawer === "open") toggleDrawer(false);
-  });
-
-  const toggleDrawer = (open: boolean) => {
-    if (!header) return;
-    header.dataset.drawer = open ? "open" : "closed";
-    drawerToggle?.setAttribute("aria-expanded", String(open));
-    if (drawerToggle) drawerToggle.textContent = open ? "Close" : "Menu";
-    document.body.style.overflow = open ? "hidden" : "";
-  };
-  drawerToggle?.addEventListener("click", () =>
-    toggleDrawer(header?.dataset.drawer !== "open"),
-  );
-
-  // Leaving mobile width resets the drawer so desktop never inherits a stuck state.
-  mq.addEventListener("change", (e) => {
-    if (!e.matches) {
-      toggleDrawer(false);
-      closeGroups();
-    }
-  });
-</script>
+<!-- Served from /public so it satisfies the site's `script-src 'self'` CSP; an
+     Astro-inlined component <script> is unsafe-inline and would be blocked. -->
+<script src="/scripts/nav.js" defer></script>
 
 <style>
   /* The bar keeps the established sticky + backdrop shell (global .site-header); this
