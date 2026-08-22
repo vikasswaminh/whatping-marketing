@@ -1,62 +1,700 @@
 ---
+import Heartbeat from "./Heartbeat.astro";
 import { APP_URL } from "../lib/site";
 
 const path = Astro.url.pathname;
-const isActive = (href: string) =>
-  href === "/" ? path === "/" : path.startsWith(href);
+const under = (...prefixes: string[]) =>
+  prefixes.some((p) => (p === "/" ? path === "/" : path.startsWith(p)));
 
-const links = [
-  ["Features", "/features/"],
-  ["How it works", "/how-it-works/"],
-  ["Pricing", "/pricing/"],
-  ["Docs", "/docs/"],
-  ["Compare", "/vs/uptime-kuma/"],
-] as const;
+// Monitor types — same feature routes the homepage bento links to, so the nav and the
+// page agree on where a type lives. The three differentiators are pulled out as the rail.
+const monitorTypes = [
+  { tag: "HTTP", desc: "Status ranges + keyword", href: "/features/uptime-monitoring/" },
+  { tag: "TCP", desc: "Port accepts a connection", href: "/features/uptime-monitoring/" },
+  { tag: "Heartbeat", desc: "Cron pings on success", href: "/features/heartbeat-monitoring/" },
+  { tag: "Certificate", desc: "Days until TLS expiry", href: "/features/certificate-monitoring/" },
+  { tag: "DNS", desc: "A record still says X", href: "/features/dns-monitoring/" },
+  { tag: "ICMP", desc: "Packet loss + median RTT", href: "/features/ping-monitoring/" },
+  { tag: "UDP", desc: "A request, a required reply", href: "/features/udp-monitoring/" },
+  { tag: "gRPC", desc: "Health must say SERVING", href: "/features/grpc-monitoring/" },
+  { tag: "SMTP · IMAP", desc: "Greeting + STARTTLS", href: "/features/smtp-imap-monitoring/" },
+];
+const monitorEdge = [
+  { tag: "Domain", title: "Registration expiry", href: "/features/domain-expiry-monitoring/" },
+  { tag: "Email auth", title: "SPF + DMARC, daily", href: "/features/email-auth-monitoring/" },
+  { tag: "API", title: "Create from your pipeline", href: "/features/api/" },
+];
+
+const devCols = [
+  {
+    head: "Reference",
+    items: [
+      { label: "Docs overview", href: "/docs/" },
+      { label: "Quickstart", href: "/docs/quickstart/" },
+      { label: "Concepts", href: "/docs/concepts/" },
+      { label: "API reference", href: "/docs/api/" },
+      { label: "Webhook payload", href: "/docs/webhook-payload/" },
+    ],
+  },
+  {
+    head: "Operate",
+    items: [
+      { label: "How it works", href: "/how-it-works/" },
+      { label: "Heartbeat ping", href: "/docs/heartbeat-api/" },
+      { label: "Security model", href: "/docs/security/" },
+      { label: "Limits", href: "/docs/limits/" },
+      { label: "FAQ", href: "/docs/faq/" },
+    ],
+  },
+];
+
+const compareItems = [
+  { label: "vs Uptime Kuma", desc: "What a self-host misses", href: "/vs/uptime-kuma/" },
+  { label: "vs Better Stack", desc: "The parts you actually pay for", href: "/vs/better-stack/" },
+];
 ---
 
-<header class="site-header">
+<header class="site-header" data-header>
   <div class="shell site-header__inner">
-    <a class="wordmark" href="/">
-      <span class="dot" aria-hidden="true"></span>WhatPing
+    <a class="brand" href="/" aria-label="WhatPing — home">
+      <span class="brand__mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <rect
+            x="1"
+            y="1"
+            width="24"
+            height="24"
+            rx="2"
+            fill="var(--surface-sunken)"
+            stroke="var(--hairline-strong)"></rect>
+          <path
+            d="M3 14 H9 L11 6 L13.5 20 L15.5 14 H23"
+            stroke="var(--accent)"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+            stroke-linecap="round"></path>
+          <circle class="brand__blip" cx="23" cy="14" r="1.7" fill="var(--accent)"
+          ></circle>
+        </svg>
+      </span>
+      <span class="brand__word">WhatPing</span>
+      <span class="brand__tag" aria-hidden="true">uptime + everything around it</span>
     </a>
 
     <button
       class="nav-toggle"
       type="button"
       aria-expanded="false"
-      aria-controls="site-nav"
-      data-nav-toggle
+      aria-controls="primary-nav"
+      data-drawer-toggle
     >
       Menu
     </button>
 
-    <nav class="site-nav" id="site-nav" aria-label="Primary">
-      {
-        links.map(([label, href]) => (
-          <a
-            href={href}
-            aria-current={
-              isActive(href === "/vs/uptime-kuma/" ? "/vs" : href.replace(/\/$/, ""))
-                ? "page"
-                : undefined
-            }
+    <nav class="primary-nav" id="primary-nav" aria-label="Primary">
+      <div class="nav-groups">
+        <!-- Monitors -->
+        <div class="nav-group" data-group>
+          <button
+            class="nav-trigger"
+            type="button"
+            aria-expanded="false"
+            aria-controls="mega-monitors"
+            data-trigger
           >
-            {label}
-          </a>
-        ))
-      }
-      <a class="btn btn--primary" href={APP_URL}>Start free</a>
+            Monitors <span class="caret" aria-hidden="true"></span>
+          </button>
+          <div class="mega mega--monitors" id="mega-monitors" data-mega>
+            <div class="shell mega__inner">
+              <div class="mega__main">
+                <p class="eyebrow">Monitor types</p>
+                <div class="m-grid">
+                  {
+                    monitorTypes.map((m) => (
+                      <a class="m-item" href={m.href}>
+                        <span class="m-item__tag">{m.tag}</span>
+                        <span class="m-item__desc">{m.desc}</span>
+                      </a>
+                    ))
+                  }
+                  <a class="m-item m-item--all" href="/features/">
+                    <span class="m-item__tag">All eleven</span>
+                    <span class="m-item__desc">Every type, side by side →</span>
+                  </a>
+                </div>
+              </div>
+              <aside class="mega__rail">
+                <p class="eyebrow">The edge</p>
+                <div class="edge">
+                  {
+                    monitorEdge.map((e) => (
+                      <a class="edge__row" href={e.href}>
+                        <span class="edge__tag">{e.tag}</span>
+                        <span class="edge__title">{e.title}</span>
+                        <span class="edge__arrow" aria-hidden="true">→</span>
+                      </a>
+                    ))
+                  }
+                </div>
+                <Heartbeat count={40} down={[31]} warn={[12]} height="1.9rem" class="edge__pulse" />
+                <a class="btn btn--primary edge__cta" href={APP_URL}>Start free</a>
+              </aside>
+            </div>
+          </div>
+        </div>
+
+        <!-- Developers -->
+        <div class="nav-group" data-group>
+          <button
+            class="nav-trigger"
+            type="button"
+            aria-expanded="false"
+            aria-controls="mega-dev"
+            data-trigger
+          >
+            Developers <span class="caret" aria-hidden="true"></span>
+          </button>
+          <div class="mega mega--dev" id="mega-dev" data-mega>
+            <div class="shell mega__inner">
+              <div class="mega__cols">
+                {
+                  devCols.map((col) => (
+                    <div class="dev-col">
+                      <p class="eyebrow">{col.head}</p>
+                      <ul>
+                        {col.items.map((it) => (
+                          <li>
+                            <a href={it.href}>{it.label}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))
+                }
+              </div>
+              <aside class="mega__rail">
+                <p class="eyebrow">From your pipeline</p>
+                <figure class="dev-snippet">
+                  <pre><code><span class="c-dim"># create a monitor from CI</span>
+curl -X POST monitor-api.whatping.com/v1/monitors \
+  -H "Authorization: Bearer $WP_KEY" \
+  -H "Idempotency-Key: $RUN_ID"</code></pre>
+                </figure>
+                <a class="btn btn--secondary edge__cta" href="/docs/api/">Read the API docs</a>
+              </aside>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compare -->
+        <div class="nav-group" data-group>
+          <button
+            class="nav-trigger"
+            type="button"
+            aria-expanded="false"
+            aria-controls="mega-compare"
+            data-trigger
+          >
+            Compare <span class="caret" aria-hidden="true"></span>
+          </button>
+          <div class="mega mega--compare" id="mega-compare" data-mega>
+            <div class="shell mega__inner">
+              <div class="cmp">
+                {
+                  compareItems.map((c) => (
+                    <a class="cmp__row" href={c.href}>
+                      <span class="cmp__label">{c.label}</span>
+                      <span class="cmp__desc">{c.desc}</span>
+                    </a>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a
+          class="nav-link"
+          href="/pricing/"
+          aria-current={under("/pricing") ? "page" : undefined}>Pricing</a
+        >
+      </div>
+
+      <div class="header-cta">
+        <a class="nav-login" href={APP_URL}>Log in</a>
+        <a class="btn btn--primary" href={APP_URL}>Start free</a>
+      </div>
     </nav>
   </div>
 </header>
 
 <script>
-  const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
-  const nav = document.getElementById("site-nav");
-  toggle?.addEventListener("click", () => {
-    const open = nav?.dataset.open === "true";
-    if (nav) nav.dataset.open = String(!open);
-    toggle.setAttribute("aria-expanded", String(!open));
-    toggle.textContent = open ? "Menu" : "Close";
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  const drawerToggle = document.querySelector<HTMLButtonElement>("[data-drawer-toggle]");
+  const groups = Array.from(document.querySelectorAll<HTMLElement>("[data-group]"));
+  const mq = window.matchMedia("(max-width: 56rem)");
+
+  const setGroup = (group: HTMLElement, open: boolean) => {
+    group.dataset.open = String(open);
+    group.querySelector<HTMLElement>("[data-trigger]")?.setAttribute("aria-expanded", String(open));
+  };
+  const closeGroups = (except?: HTMLElement) => {
+    for (const g of groups) if (g !== except) setGroup(g, false);
+  };
+
+  // Trigger click pins a panel open (and works on touch + keyboard). Hover/focus still
+  // peek it open via CSS on desktop; a pin survives mouseleave until Esc / click-away.
+  for (const group of groups) {
+    const trigger = group.querySelector<HTMLElement>("[data-trigger]");
+    trigger?.addEventListener("click", (e) => {
+      e.preventDefault();
+      const open = group.dataset.open === "true";
+      closeGroups(group);
+      setGroup(group, !open);
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!(e.target as HTMLElement).closest("[data-group]")) closeGroups();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    closeGroups();
+    if (header?.dataset.drawer === "open") toggleDrawer(false);
+  });
+
+  const toggleDrawer = (open: boolean) => {
+    if (!header) return;
+    header.dataset.drawer = open ? "open" : "closed";
+    drawerToggle?.setAttribute("aria-expanded", String(open));
+    if (drawerToggle) drawerToggle.textContent = open ? "Close" : "Menu";
+    document.body.style.overflow = open ? "hidden" : "";
+  };
+  drawerToggle?.addEventListener("click", () =>
+    toggleDrawer(header?.dataset.drawer !== "open"),
+  );
+
+  // Leaving mobile width resets the drawer so desktop never inherits a stuck state.
+  mq.addEventListener("change", (e) => {
+    if (!e.matches) {
+      toggleDrawer(false);
+      closeGroups();
+    }
   });
 </script>
+
+<style>
+  /* The bar keeps the established sticky + backdrop shell (global .site-header); this
+     component adds the brand mark, the grouped nav and the full-width mega panels. */
+  .site-header__inner {
+    gap: var(--space-lg);
+  }
+
+  /* --- brand ---------------------------------------------------------------- */
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+  .brand__mark {
+    display: inline-flex;
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+  }
+  .brand__blip {
+    animation: blip 2.8s var(--ease) infinite;
+  }
+  @keyframes blip {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.28; }
+  }
+  .brand__word {
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-small);
+    font-weight: var(--weight-strong);
+    letter-spacing: 0.02em;
+  }
+  .brand__tag {
+    padding-left: 0.7rem;
+    margin-left: 0.15rem;
+    border-left: 1px solid var(--hairline-strong);
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    letter-spacing: 0.01em;
+    color: var(--text-quaternary);
+  }
+  @media (max-width: 78rem) {
+    .brand__tag { display: none; }
+  }
+
+  /* --- primary nav ---------------------------------------------------------- */
+  .primary-nav {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    margin-left: var(--space-sm);
+  }
+  .nav-groups {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+  }
+  .header-cta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-left: auto;
+  }
+
+  .nav-trigger,
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.6rem;
+    border: 0;
+    background: transparent;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-eyebrow);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      color var(--duration-fast) var(--ease),
+      background var(--duration-fast) var(--ease);
+  }
+  .nav-trigger:hover,
+  .nav-link:hover,
+  .nav-group:hover .nav-trigger,
+  .nav-group:focus-within .nav-trigger {
+    color: var(--text-primary);
+    background: var(--surface-raised);
+  }
+  .nav-link[aria-current="page"] {
+    color: var(--text-primary);
+    box-shadow: inset 0 -1px 0 0 var(--accent-indicator);
+  }
+  .nav-login {
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-eyebrow);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease);
+  }
+  .nav-login:hover { color: var(--text-primary); }
+
+  .caret {
+    width: 0.42em;
+    height: 0.42em;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    rotate: 45deg;
+    translate: 0 -0.12em;
+    opacity: 0.7;
+    transition: rotate var(--duration) var(--ease);
+  }
+  .nav-group[data-open="true"] .caret { rotate: 225deg; }
+
+  /* --- mega panels: full-bleed, contained inner ----------------------------- */
+  .mega {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface-overlay);
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline-strong);
+    box-shadow: 0 32px 64px -32px #000c;
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 -8px;
+    transition:
+      opacity var(--duration) var(--ease),
+      translate var(--duration) var(--ease),
+      visibility 0s linear var(--duration);
+  }
+  .nav-group:hover .mega,
+  .nav-group:focus-within .mega,
+  .nav-group[data-open="true"] .mega {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition-delay: 0s;
+  }
+  .mega__inner {
+    display: grid;
+    gap: var(--space-xl);
+    padding-block: var(--space-xl);
+  }
+  .mega--monitors .mega__inner,
+  .mega--dev .mega__inner {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  }
+
+  /* Monitor-types grid: hairline bays, same idea as the homepage bento. */
+  .m-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: var(--space-sm);
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+  }
+  .m-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--surface-canvas);
+    text-decoration: none;
+    transition:
+      background var(--duration-fast) var(--ease),
+      box-shadow var(--duration-fast) var(--ease);
+  }
+  .m-item:hover {
+    background: var(--surface-raised);
+    box-shadow: inset 0 2px 0 0 var(--accent-indicator);
+  }
+  .m-item__tag {
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-small);
+    font-weight: var(--weight-strong);
+    letter-spacing: var(--track-title);
+    color: var(--text-primary);
+  }
+  .m-item__desc {
+    font-size: var(--size-eyebrow);
+    color: var(--text-tertiary);
+  }
+  .m-item--all .m-item__desc { color: var(--accent-text); }
+
+  /* Rail shared by Monitors + Developers. */
+  .mega__rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-left: var(--space-xl);
+    border-left: 1px solid var(--hairline);
+  }
+  .edge {
+    display: grid;
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+  }
+  .edge__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--space-2xs);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--surface-canvas);
+    text-decoration: none;
+    box-shadow: inset 0 2px 0 0 var(--accent-line);
+    transition: background var(--duration-fast) var(--ease);
+  }
+  .edge__row:hover { background: var(--surface-raised); }
+  .edge__tag {
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-eyebrow);
+    letter-spacing: var(--track-eyebrow);
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  .edge__title {
+    font-size: var(--size-small);
+    color: var(--text-primary);
+  }
+  .edge__arrow { color: var(--hairline-loud); }
+  .edge__row:hover .edge__arrow { color: var(--accent-text); }
+  .edge__pulse { margin-top: var(--space-2xs); opacity: 0.8; }
+  .edge__cta { justify-content: center; margin-top: auto; }
+
+  /* Developers columns. */
+  .mega__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+  .dev-col ul {
+    list-style: none;
+    margin: var(--space-sm) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.1rem;
+  }
+  .dev-col a {
+    display: block;
+    padding: 0.4rem 0;
+    font-size: var(--size-small);
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color var(--duration-fast) var(--ease);
+  }
+  .dev-col a:hover { color: var(--accent-text); }
+  .dev-snippet {
+    margin: 0;
+    border: 1px solid var(--hairline-strong);
+    background: var(--surface-sunken);
+    overflow: hidden;
+  }
+  .dev-snippet pre {
+    margin: 0;
+    padding: var(--space-sm);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: var(--size-eyebrow);
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+  .c-dim { color: var(--text-quaternary); }
+
+  /* Compare — a small two-row panel, not a full band. */
+  .mega--compare .mega__inner { padding-block: var(--space-md); }
+  .cmp { display: grid; gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); max-width: 30rem; }
+  .cmp__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--surface-canvas);
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--ease);
+  }
+  .cmp__row:hover { background: var(--surface-raised); }
+  .cmp__label {
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-small);
+    font-weight: var(--weight-strong);
+    color: var(--text-primary);
+  }
+  .cmp__desc { font-size: var(--size-eyebrow); color: var(--text-tertiary); }
+
+  /* --- mobile drawer -------------------------------------------------------- */
+  .nav-toggle { display: none; }
+
+  @media (max-width: 56rem) {
+    .site-header__inner { gap: var(--space-sm); }
+    .nav-toggle {
+      display: inline-flex;
+      margin-left: auto;
+      align-items: center;
+      padding: 0.4rem 0.7rem;
+      background: transparent;
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      font-stretch: var(--width-ui);
+      font-size: var(--size-eyebrow);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .primary-nav {
+      /* .site-header's backdrop-filter is the containing block for this fixed child,
+         so `bottom:0` would resolve against the 56px bar — height is set explicitly. */
+      position: fixed;
+      top: 3.5rem;
+      left: 0;
+      right: 0;
+      height: calc(100dvh - 3.5rem);
+      flex-direction: column;
+      align-items: stretch;
+      margin: 0;
+      padding: var(--space-md) var(--gutter) var(--space-2xl);
+      overflow-y: auto;
+      background: var(--surface-canvas);
+      border-top: 1px solid var(--hairline-strong);
+      translate: 0 -0.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity var(--duration) var(--ease),
+        translate var(--duration) var(--ease),
+        visibility 0s linear var(--duration);
+    }
+    [data-header][data-drawer="open"] .primary-nav {
+      opacity: 1;
+      visibility: visible;
+      translate: 0 0;
+      transition-delay: 0s;
+    }
+
+    .nav-groups { flex-direction: column; align-items: stretch; gap: 0; }
+    .nav-group { border-bottom: 1px solid var(--hairline); }
+    .nav-trigger {
+      width: 100%;
+      justify-content: space-between;
+      padding: var(--space-sm) 0;
+      font-size: var(--size-small);
+    }
+    .nav-link {
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--hairline);
+      font-size: var(--size-small);
+    }
+
+    /* On mobile the mega expands inline under its trigger instead of overlaying. */
+    .mega {
+      position: static;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+      display: none;
+      opacity: 1;
+      visibility: visible;
+      translate: 0;
+    }
+    .nav-group[data-open="true"] .mega { display: block; }
+    .nav-group:hover .mega,
+    .nav-group:focus-within .mega:not([data-open]) { /* no hover-open on touch */ }
+    .mega__inner,
+    .mega--monitors .mega__inner,
+    .mega--dev .mega__inner {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-md);
+      padding-block: 0 var(--space-md);
+    }
+    .m-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mega__rail { padding-left: 0; border-left: 0; border-top: 1px solid var(--hairline); padding-top: var(--space-md); }
+    .mega__cols { grid-template-columns: minmax(0, 1fr); gap: var(--space-md); }
+    .dev-snippet { display: none; }
+
+    .header-cta {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-sm);
+      margin: var(--space-lg) 0 0;
+    }
+    .header-cta .btn { justify-content: center; }
+    .nav-login {
+      padding: var(--space-sm) 0;
+      text-align: center;
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand__blip { animation: none; }
+    .mega, .primary-nav, .caret { transition: none; }
+  }
+</style>

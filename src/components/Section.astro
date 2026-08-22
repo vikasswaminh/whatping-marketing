@@ -1,0 +1,58 @@
+---
+/**
+ * The one full-width section primitive. A full-bleed <section> (so the tone reads
+ * edge-to-edge) with a contained `.shell` inner and one eyebrow → title → lede rhythm.
+ * The band/tone/eyebrow/shell/ruled classes are all global (global.css + tokens); this
+ * component is the single place the homepage and every content page compose from, so the
+ * section rhythm can never drift between pages.
+ */
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  lede?: string;
+  id?: string;
+  /** Surface swap: default canvas, or a machined step up/down / an accent-lit band. */
+  tone?: "canvas" | "sunken" | "raised" | "accent";
+  ruled?: boolean;
+  last?: boolean;
+  /** Drop the top padding — e.g. a header band sitting straight under the bar. */
+  flush?: boolean;
+  /** Widen the inner past the default shell for edge-bleed panels (hero-style). */
+  bleed?: boolean;
+  class?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  lede,
+  id,
+  tone = "canvas",
+  ruled = true,
+  last = false,
+  flush = false,
+  bleed = false,
+  class: extra,
+} = Astro.props;
+
+const toneClass = tone !== "canvas" ? ` band--${tone}` : "";
+const cls = [
+  "band",
+  ruled ? "ruled" : "",
+  last ? "band--last" : "",
+  flush ? "band--flush" : "",
+  toneClass.trim(),
+  extra ?? "",
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<section class={cls} id={id}>
+  <div class={bleed ? "shell shell--bleed" : "shell"}>
+    {eyebrow && <p class="eyebrow eyebrow--bleed reveal">{eyebrow}</p>}
+    {title && <h2 class="band__h reveal" set:html={title} />}
+    {lede && <p class="lede band__lede reveal">{lede}</p>}
+    <slot />
+  </div>
+</section>

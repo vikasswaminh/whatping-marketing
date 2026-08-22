@@ -133,6 +133,52 @@ main {
   pointer-events: none;
 }
 
+/* --- sections / bands ----------------------------------------------------
+   Promoted out of index.astro so every page composes from ONE full-width
+   section primitive (Section.astro): a full-bleed <section> + a contained
+   .shell inner. Tone variants swap only the surface. */
+.band {
+  padding: var(--space-section) 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.band--last {
+  border-bottom: 0;
+  padding-bottom: var(--space-2xl);
+}
+.band--flush {
+  padding-top: 0;
+}
+.band__h {
+  max-width: 24ch;
+  margin: 0 0 var(--space-lg);
+}
+.band__lede {
+  margin: calc(-1 * var(--space-2xs)) 0 var(--space-lg);
+  max-width: 54ch;
+}
+.band__link {
+  margin-top: var(--space-md);
+  font-size: var(--size-small);
+}
+.band p {
+  color: var(--text-tertiary);
+}
+
+/* Full-bleed surface swaps. The section spans the viewport, so the tone reads
+   edge-to-edge while content stays on the shell. */
+.band--sunken {
+  background: var(--surface-sunken);
+}
+.band--raised {
+  background: var(--surface-raised);
+}
+.band--accent {
+  box-shadow: inset 0 1px 0 0 var(--accent-line);
+  background:
+    radial-gradient(64rem 28rem at 50% -12%, var(--accent-glow), transparent 60%),
+    var(--surface-canvas);
+}
+
 /* Scroll position as an instrument readout: a hairline down the left margin
    with an amber segment tracking progress. Scroll-driven, so no listener. */
 .rail {
@@ -669,119 +715,9 @@ a.btn--secondary,
   }
 }
 
-.wordmark {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  font-family: var(--font-display);
-  font-stretch: var(--width-ui);
-  font-size: var(--size-small);
-  font-weight: var(--weight-strong);
-  letter-spacing: 0.02em;
-  color: var(--text-primary);
-  text-decoration: none;
-}
-/* A panel LED, not a dot: square, and it actually pulses. */
-.wordmark .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-xs);
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-  animation: pulse 2.8s var(--ease) infinite;
-}
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.35;
-  }
-}
-
-.site-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3xs);
-  margin-left: auto;
-  font-family: var(--font-display);
-  font-stretch: var(--width-ui);
-  font-size: var(--size-eyebrow);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.site-nav a:not(.btn) {
-  padding: 0.4rem 0.6rem;
-  border-radius: var(--radius-xs);
-  color: var(--text-tertiary);
-  text-decoration: none;
-  transition:
-    color var(--duration-fast) var(--ease),
-    background var(--duration-fast) var(--ease);
-}
-.site-nav a:not(.btn):hover {
-  color: var(--text-primary);
-  background: var(--surface-raised);
-}
-.site-nav a[aria-current="page"] {
-  color: var(--text-primary);
-  box-shadow: inset 0 -1px 0 0 var(--accent-indicator);
-}
-.site-nav .btn {
-  margin-left: var(--space-2xs);
-  padding-block: 0.45rem;
-}
-
-.nav-toggle {
-  display: none;
-  margin-left: auto;
-  padding: 0.4rem 0.7rem;
-  background: transparent;
-  border: 1px solid var(--hairline-strong);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-family: var(--font-display);
-  font-stretch: var(--width-ui);
-  font-size: var(--size-eyebrow);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-@media (max-width: 56rem) {
-  .nav-toggle {
-    display: block;
-  }
-  .site-nav {
-    display: none;
-    position: absolute;
-    inset: 3.5rem 0 auto;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    padding: var(--space-2xs) var(--gutter) var(--space-md);
-    background: var(--surface-canvas);
-    border-bottom: 1px solid var(--hairline-strong);
-  }
-  .site-nav[data-open="true"] {
-    display: flex;
-  }
-  .site-nav a {
-    padding: 0.75rem 0;
-    border-radius: 0;
-    border-bottom: 1px solid var(--hairline);
-  }
-  .site-nav a[aria-current="page"] {
-    box-shadow: none;
-    color: var(--accent-text);
-  }
-  .site-nav .btn {
-    margin: var(--space-sm) 0 0;
-    justify-content: center;
-  }
-}
+/* Brand mark, grouped nav and the full-width mega panels live in Header.astro's
+   scoped styles — the bar shell (.site-header / __inner / scroll-settle) stays here
+   because it is the one piece the sticky layout depends on. */
 
 /* --- footer --------------------------------------------------------------- */
 
@@ -1054,7 +990,6 @@ a.btn--secondary,
     scroll-behavior: auto;
   }
   .heartbeat span,
-  .wordmark .dot,
   .rail::after {
     animation: none;
   }

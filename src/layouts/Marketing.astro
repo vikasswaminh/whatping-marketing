@@ -6,21 +6,56 @@ interface Props {
   description: string;
   h1: string;
   eyebrow?: string;
+  lede?: string;
   jsonLd?: Record<string, unknown>;
 }
 
-const { title, description, h1, eyebrow = "WhatPing", jsonLd } = Astro.props;
+const {
+  title,
+  description,
+  h1,
+  eyebrow = "WhatPing",
+  lede,
+  jsonLd,
+} = Astro.props;
+// Every content page opens with the same header band the homepage uses; the meta
+// description is a sensible default subhead until a page supplies its own `lede`.
+const sub = lede ?? description;
 ---
 
 <Base title={title} description={description} jsonLd={jsonLd}>
-  <div class="shell">
-    <div class="page-head">
-      <p class="eyebrow">{eyebrow}</p>
-      <h1>{h1}</h1>
+  <section class="ruled page-header">
+    <div class="shell">
+      <p class="eyebrow eyebrow--bleed">{eyebrow}</p>
+      <h1 class="page-header__h">{h1}</h1>
+      {sub && <p class="lede page-header__lede">{sub}</p>}
     </div>
+  </section>
 
-    <article class="prose">
-      <slot />
-    </article>
-  </div>
+  <section class="ruled page-body">
+    <div class="shell">
+      <article class="prose">
+        <slot />
+      </article>
+    </div>
+  </section>
 </Base>
+
+<style>
+  /* The page header is the content-page counterpart of a homepage band: full-width,
+     ruled, one eyebrow → h1 → lede rhythm, closed with a hairline. Not a .band, so the
+     `.band p` tertiary rule never reaches the lede or the prose below. */
+  .page-header {
+    padding-block: clamp(2.5rem, 6vw, 4rem) var(--space-xl);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .page-header__h {
+    max-width: 26ch;
+  }
+  .page-header__lede {
+    margin-top: var(--space-md);
+  }
+  .page-body {
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+</style>

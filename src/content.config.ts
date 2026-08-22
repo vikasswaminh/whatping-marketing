@@ -12,6 +12,9 @@ const page = z.object({
   title: z.string(),
   description: z.string(),
   h1: z.string(),
+  /** Optional subhead + kicker for the page header band; both default sensibly. */
+  lede: z.string().optional(),
+  eyebrow: z.string().optional(),
 });
 
 export const collections = {

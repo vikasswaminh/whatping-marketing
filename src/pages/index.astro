@@ -1,5 +1,6 @@
 ---
 import Bento from "../components/Bento.astro";
+import Section from "../components/Section.astro";
 import StatusCard from "../components/StatusCard.astro";
 import Base from "../layouts/Base.astro";
 import { APP_URL, SITE_URL } from "../lib/site";
@@ -196,46 +197,35 @@ const jsonLd = {
   </section>
 
   <!-- The gap -->
-  <section class="band ruled">
-    <div class="shell">
-      <p class="eyebrow eyebrow--bleed reveal">01 — The gap</p>
-      <h2 class="band__h reveal">
-        Four outages your health check will never predict
-      </h2>
-
-      <div class="gaps">
-        {
-          gaps.map((g, i) => (
-            <article class="gap reveal" style={`--i:${i}`}>
-              <span class="pill pill--down gap__tag">{g.tag}</span>
-              <h3 class="gap__h">{g.h}</h3>
-              <p class="gap__p">{g.p}</p>
-              <p class="gap__foot">A health check would have returned 200 the whole time.</p>
-            </article>
-          ))
-        }
-      </div>
+  <Section
+    eyebrow="01 — The gap"
+    title="Four outages your health check will never predict"
+  >
+    <div class="gaps">
+      {
+        gaps.map((g, i) => (
+          <article class="gap reveal" style={`--i:${i}`}>
+            <span class="pill pill--down gap__tag">{g.tag}</span>
+            <h3 class="gap__h">{g.h}</h3>
+            <p class="gap__p">{g.p}</p>
+            <p class="gap__foot">A health check would have returned 200 the whole time.</p>
+          </article>
+        ))
+      }
     </div>
-  </section>
+  </Section>
 
   <!-- Monitor types, bento -->
-  <section class="band ruled">
-    <div class="shell">
-      <p class="eyebrow eyebrow--bleed reveal">02 — Monitor types</p>
-      <h2 class="band__h reveal">Everything worth watching</h2>
-      <Bento cells={monitorCells} />
-    </div>
-  </section>
+  <Section eyebrow="02 — Monitor types" title="Everything worth watching">
+    <Bento cells={monitorCells} />
+  </Section>
 
   <!-- Alerting -->
-  <section class="band ruled">
-    <div class="shell">
-      <p class="eyebrow eyebrow--bleed reveal">03 — Alerting</p>
-      <h2 class="band__h reveal">
-        Alerts that keep working when the first one doesn&rsquo;t
-      </h2>
-
-      <div class="split">
+  <Section
+    eyebrow="03 — Alerting"
+    title="Alerts that keep working when the first one doesn&rsquo;t"
+  >
+    <div class="split">
         <div class="reveal">
           <p>
             Email, webhook, ntfy and Telegram. The webhook payload carries
@@ -269,16 +259,11 @@ connect failed: Connection refused (os error 111)
 <span class="t-up">🟢 RECOVERED</span> — api after 5820s</code></pre>
         </figure>
       </div>
-    </div>
-  </section>
+  </Section>
 
   <!-- How it works -->
-  <section class="band ruled">
-    <div class="shell">
-      <p class="eyebrow eyebrow--bleed reveal">04 — How it works</p>
-      <h2 class="band__h reveal">Three moving parts</h2>
-
-      <ol class="steps">
+  <Section eyebrow="04 — How it works" title="Three moving parts">
+    <ol class="steps">
         <li class="reveal" style="--i:0">
           <span>01</span>
           <div>
@@ -305,17 +290,15 @@ connect failed: Connection refused (os error 111)
         </li>
       </ol>
 
-      <p class="band__link"><a href="/how-it-works/">The architecture in detail →</a></p>
-    </div>
-  </section>
+    <p class="band__link"><a href="/how-it-works/">The architecture in detail →</a></p>
+  </Section>
 
   <!-- Proof -->
-  <section class="band ruled">
-    <div class="shell">
-      <p class="eyebrow eyebrow--bleed reveal">05 — Proof</p>
-      <h2 class="band__h reveal">No testimonials. Here is what you can check instead.</h2>
-
-      <div class="proof">
+  <Section
+    eyebrow="05 — Proof"
+    title="No testimonials. Here is what you can check instead."
+  >
+    <div class="proof">
         {
           proof.map((item, i) => (
             <div class="proof__item reveal" style={`--i:${i}`}>
@@ -328,25 +311,22 @@ connect failed: Connection refused (os error 111)
           ))
         }
       </div>
-    </div>
-  </section>
+  </Section>
 
   <!-- Final CTA -->
-  <section class="band band--last ruled">
-    <div class="shell">
-      <div class="final reveal">
-        <h2 class="final__h">Start with the one you keep forgetting</h2>
-        <p class="final__p">
-          Add a domain expiry monitor. Thirty seconds, no cost, and it covers the
-          failure that no amount of health checking will ever warn you about.
-        </p>
-        <p class="hero__cta">
-          <a class="btn btn--primary" href={APP_URL}>Start monitoring — free</a>
-          <a class="btn btn--secondary" href="/docs/">Read the docs</a>
-        </p>
-      </div>
+  <Section last>
+    <div class="final reveal">
+      <h2 class="final__h">Start with the one you keep forgetting</h2>
+      <p class="final__p">
+        Add a domain expiry monitor. Thirty seconds, no cost, and it covers the
+        failure that no amount of health checking will ever warn you about.
+      </p>
+      <p class="hero__cta">
+        <a class="btn btn--primary" href={APP_URL}>Start monitoring — free</a>
+        <a class="btn btn--secondary" href="/docs/">Read the docs</a>
+      </p>
     </div>
-  </section>
+  </Section>
 </Base>
 
 <style>
@@ -494,26 +474,7 @@ connect failed: Connection refused (os error 111)
     }
   }
 
-  /* --- bands --- */
-  .band {
-    padding: var(--space-section) 0;
-    border-bottom: 1px solid var(--hairline);
-  }
-  .band--last {
-    border-bottom: 0;
-    padding-bottom: var(--space-2xl);
-  }
-  .band__h {
-    max-width: 24ch;
-    margin-bottom: var(--space-lg);
-  }
-  .band__link {
-    margin-top: var(--space-md);
-    font-size: var(--size-small);
-  }
-  .band p {
-    color: var(--text-tertiary);
-  }
+  /* Section/band styling now lives in global.css (promoted for reuse). */
 
   /* --- the gap --- */
   /* Bays again: shared rules over a hairline ground, same as the monitor grid. */
