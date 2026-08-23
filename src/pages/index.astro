@@ -28,37 +28,34 @@ const gaps = [
   },
 ];
 
-// Wide cells are the things nothing else in this category does, plus the API — which is the
-// one cell that is not a monitor type and earns its width by being the reason a team adopts
-// this rather than clicking around a dashboard.
-//
-// The grid is four columns and every cell must land on it. Cell ORDER is load-bearing, not
-// just the count: the wide API cell goes last so the rows stay flush at *both* breakpoints —
-// 4-col ends `SMTP + All eleven + API(2)`, and 2-col ends `SMTP | All eleven` then API on its
-// own full-width row. With API in the middle, the 2-column layout stranded SMTP beside a gap.
-//
-// This also retires a combined "ICMP · UDP · gRPC · Mail" cell: a cell is a single anchor, so
-// four capabilities shared one vague link to /docs/.
+// A uniform 3×4 field: the three differentiators lead as an accented top row, then
+// nine standard types below. Every cell is the same size — the grid is symmetric and
+// the editorial weight comes from the accent edge, not from cell size.
 const monitorCells = [
   {
     tag: "Domain",
-    title: "Registration expiry, read from the registry",
-    body: "An expired domain takes down every service on it at once — including the email that would have warned you. Uptime Kuma has no equivalent.",
+    title: "Registration expiry",
+    body: "An expired domain takes every service down at once. Uptime Kuma has no equivalent.",
     href: "/features/domain-expiry-monitoring/",
-    wide: true,
     accent: true,
   },
   {
     tag: "Email auth",
-    title: "SPF and DMARC, checked daily",
-    body: "Break SPF and your mail lands in spam — including your own alerts. Nothing else in this category watches the path your alerts travel down.",
+    title: "SPF and DMARC, daily",
+    body: "Break SPF and your mail — including your own alerts — lands in spam.",
     href: "/features/email-auth-monitoring/",
-    wide: true,
+    accent: true,
+  },
+  {
+    tag: "API",
+    title: "Create from your pipeline",
+    body: "Bearer keys, scopes, idempotency. Same validator as the dashboard.",
+    href: "/features/api/",
     accent: true,
   },
   {
     tag: "HTTP",
-    title: "Status ranges and keyword assertions",
+    title: "Status ranges + keyword",
     body: "For when 200 is a lie.",
     href: "/features/uptime-monitoring/",
   },
@@ -70,7 +67,7 @@ const monitorCells = [
   },
   {
     tag: "Heartbeat",
-    title: "Your cron job pings on success",
+    title: "Your cron pings on success",
     body: "We alert when it stops arriving.",
     href: "/features/heartbeat-monitoring/",
   },
@@ -88,19 +85,19 @@ const monitorCells = [
   },
   {
     tag: "ICMP",
-    title: "Packet loss and median RTT",
+    title: "Packet loss + median RTT",
     body: "Unprivileged. No root, no CAP_NET_RAW.",
     href: "/features/ping-monitoring/",
   },
   {
     tag: "UDP",
-    title: "A real request, a required reply",
+    title: "A request, a required reply",
     body: "DNS, NTP, STUN. No port-open guessing.",
     href: "/features/udp-monitoring/",
   },
   {
     tag: "gRPC",
-    title: "Health check must say SERVING",
+    title: "Health must say SERVING",
     body: "A bound port is not a ready service.",
     href: "/features/grpc-monitoring/",
   },
@@ -110,31 +107,35 @@ const monitorCells = [
     body: "Where an expired cert on 587 shows up.",
     href: "/features/smtp-imap-monitoring/",
   },
+];
+
+const steps = [
   {
-    tag: "All eleven",
-    title: "Every type, side by side",
-    body: "With what each one cannot tell you.",
-    href: "/features/",
+    n: "01",
+    h: "A stateless Rust prober",
+    p: "runs the checks. It holds no state, so it can be restarted mid-outage without losing or duplicating anything.",
   },
   {
-    tag: "API",
-    title: "Create monitors from your pipeline",
-    body: "Bearer keys, read/write scopes, cursor pagination and Idempotency-Key so a rerun does not duplicate. Writes run the same validator as the dashboard, so the API accepts exactly what the interface accepts.",
-    href: "/features/api/",
-    wide: true,
-    accent: true,
+    n: "02",
+    h: "A backend owns every decision",
+    p: "The prober reports raw observations; whether that means “down” is decided in one place, against your threshold.",
+  },
+  {
+    n: "03",
+    h: "Intelligence runs daily",
+    p: "Certificate, domain, DNS and email checks run once a day — a certificate does not stop being valid between one minute and the next.",
   },
 ];
 
 const proof = [
   {
     h: "It monitors its own prober",
-    p: "A heartbeat monitor watches the probe worker, so if the worker dies the system tells you rather than going quiet. Not theoretical — it caught a parsing bug that froze the worker on a stale configuration, and it was the only signal anything was wrong.",
+    p: "A heartbeat watches the probe worker, so if the worker dies the system tells you rather than going quiet. It once caught a parsing bug that froze the worker on a stale config.",
     href: "/docs/monitors/heartbeat/",
   },
   {
     h: "A broken channel cannot corrupt monitoring",
-    p: "Delivery is attempted after state is already committed, and every attempt is recorded. A webhook returning 500 forever will never make a monitor look up or down.",
+    p: "Delivery is attempted after state is committed, and every attempt is recorded. A webhook returning 500 forever never makes a monitor look up or down.",
     href: "/docs/alerting/channels/",
   },
   {
@@ -157,38 +158,36 @@ const jsonLd = {
 ---
 
 <Base title={title} description={description} jsonLd={jsonLd}>
-  <!-- Hero -->
+  <!-- Hero — centred on the axis -->
   <section class="hero ruled">
-    <div class="shell hero__grid">
-      <div class="hero__copy">
-        <p class="hero__badge">
-          <span class="hero__badge-dot" aria-hidden="true"></span>
-          Free while in beta · no card
-        </p>
+    <div class="shell hero__inner">
+      <p class="hero__badge">
+        <span class="hero__badge-dot" aria-hidden="true"></span>
+        Free while in beta · no card
+      </p>
 
-        <h1 class="hero__h1">
-          The outage that returns <span class="readout"
-            ><span class="readout__label" aria-hidden="true">HTTP</span><span
-              class="readout__value">200</span
-            ><span class="readout__caret" aria-hidden="true"></span></span
-          > right up until it doesn&rsquo;t
-        </h1>
+      <h1 class="hero__h1">
+        The outage that returns <span class="readout"
+          ><span class="readout__label" aria-hidden="true">HTTP</span><span
+            class="readout__value">200</span
+          ><span class="readout__caret" aria-hidden="true"></span></span
+        > right up until it doesn&rsquo;t
+      </h1>
 
-        <p class="lede hero__lede">
-          Your certificate expires. Your domain registration lapses. Someone edits
-          a DNS record. Your SPF breaks and your email stops arriving. A health
-          check sees none of it — and then everything is down at once.
-        </p>
+      <p class="lede hero__lede">
+        Your certificate expires. Your domain registration lapses. Someone edits a
+        DNS record. Your SPF breaks and your email stops arriving. A health check
+        sees none of it — and then everything is down at once.
+      </p>
 
-        <div class="hero__cta">
-          <a class="btn btn--primary" href={APP_URL}>Start monitoring — free</a>
-          <a class="btn btn--secondary" href="/how-it-works/">See how it works</a>
-        </div>
-
-        <p class="hero__meta">
-          20 monitors per workspace · checks from 20 seconds · one probe location
-        </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href={APP_URL}>Start monitoring — free</a>
+        <a class="btn btn--secondary" href="/how-it-works/">See how it works</a>
       </div>
+
+      <p class="hero__meta">
+        20 monitors per workspace · checks from 20 seconds · one probe location
+      </p>
 
       <div class="hero__visual">
         <StatusCard />
@@ -196,10 +195,11 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- The gap -->
+  <!-- 01 — The gap -->
   <Section
     eyebrow="01 — The gap"
     title="Four outages your health check will never predict"
+    align="center"
   >
     <div class="gaps">
       {
@@ -215,41 +215,44 @@ const jsonLd = {
     </div>
   </Section>
 
-  <!-- Monitor types, bento -->
-  <Section eyebrow="02 — Monitor types" title="Everything worth watching">
+  <!-- 02 — Monitor types -->
+  <Section
+    eyebrow="02 — Monitor types"
+    title="Everything worth watching"
+    align="center"
+  >
     <Bento cells={monitorCells} />
   </Section>
 
-  <!-- Alerting -->
+  <!-- 03 — Alerting -->
   <Section
     eyebrow="03 — Alerting"
     title="Alerts that keep working when the first one doesn&rsquo;t"
+    align="center"
   >
     <div class="split">
-        <div class="reveal">
-          <p>
-            Email, webhook, ntfy and Telegram. The webhook payload carries
-            <code>text</code> and <code>content</code> aliases, so one endpoint works
-            for Slack, Discord, Mattermost and plain automation receivers without
-            per-provider setup.
-          </p>
-          <p>
-            <strong>Reminders while you are still down.</strong> Most tools alert
-            once, on the transition. If that message fails to deliver, a six-hour
-            outage is indistinguishable from everything being fine.
-          </p>
-          <p>
-            <strong>A second opinion.</strong> When a check fails, WhatPing asks a
-            network that isn&rsquo;t ours whether it agrees, and says so in the alert.
-            &ldquo;The site is down&rdquo; and &ldquo;<em>we</em> can&rsquo;t reach
-            the site&rdquo; are different problems.
-          </p>
-          <p><a href="/features/alerting/">How alerting works →</a></p>
-        </div>
+      <div class="reveal">
+        <p>
+          Email, webhook, ntfy and Telegram. The webhook payload carries
+          <code>text</code> and <code>content</code> aliases, so one endpoint works
+          for Slack, Discord, Mattermost and plain automation receivers without
+          per-provider setup.
+        </p>
+        <p>
+          <strong>Reminders while you are still down.</strong> Most tools alert once,
+          on the transition. If that message fails to deliver, a six-hour outage is
+          indistinguishable from everything being fine.
+        </p>
+        <p>
+          <strong>A second opinion.</strong> When a check fails, WhatPing asks a
+          network that isn&rsquo;t ours whether it agrees, and says so in the alert.
+        </p>
+        <p><a href="/features/alerting/">How alerting works →</a></p>
+      </div>
 
-        <figure class="terminal reveal">
-          <figcaption>alert stream</figcaption>
-          <pre><code><span class="t-down">🔴 DOWN</span> — api (https://api.example.com):
+      <figure class="terminal reveal">
+        <figcaption>alert stream</figcaption>
+        <pre><code><span class="t-down">🔴 DOWN</span> — api (https://api.example.com):
 connect failed: Connection refused (os error 111)
 
 <span class="t-down">🔴 STILL DOWN (1h 35m)</span> — api:
@@ -257,60 +260,51 @@ connect failed: Connection refused (os error 111)
 <span class="t-dim">· confirmed unreachable from a second network</span>
 
 <span class="t-up">🟢 RECOVERED</span> — api after 5820s</code></pre>
-        </figure>
-      </div>
+      </figure>
+    </div>
   </Section>
 
-  <!-- How it works -->
-  <Section eyebrow="04 — How it works" title="Three moving parts">
+  <!-- 04 — How it works -->
+  <Section
+    eyebrow="04 — How it works"
+    title="Three moving parts"
+    align="center"
+  >
     <ol class="steps">
-        <li class="reveal" style="--i:0">
-          <span>01</span>
-          <div>
-            <strong>A stateless Rust prober</strong> runs the checks. It holds no
-            state of its own, so it can be restarted mid-outage without losing or
-            duplicating anything.
-          </div>
-        </li>
-        <li class="reveal" style="--i:1">
-          <span>02</span>
-          <div>
-            <strong>A backend that owns every decision.</strong> The prober reports
-            raw observations; whether that means &ldquo;down&rdquo; is decided in one
-            place, against your threshold.
-          </div>
-        </li>
-        <li class="reveal" style="--i:2">
-          <span>03</span>
-          <div>
-            <strong>Certificate, domain, DNS and email checks run daily</strong>,
-            because a certificate does not stop being valid between one minute and
-            the next.
-          </div>
-        </li>
-      </ol>
-
-    <p class="band__link"><a href="/how-it-works/">The architecture in detail →</a></p>
+      {
+        steps.map((s, i) => (
+          <li class="reveal" style={`--i:${i}`}>
+            <span class="steps__num">{s.n}</span>
+            <strong class="steps__h">{s.h}</strong>
+            <span class="steps__p">{s.p}</span>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="band__link band__link--center">
+      <a href="/how-it-works/">The architecture in detail →</a>
+    </p>
   </Section>
 
-  <!-- Proof -->
+  <!-- 05 — Proof -->
   <Section
     eyebrow="05 — Proof"
     title="No testimonials. Here is what you can check instead."
+    align="center"
   >
     <div class="proof">
-        {
-          proof.map((item, i) => (
-            <div class="proof__item reveal" style={`--i:${i}`}>
-              <h3 class="proof__h">{item.h}</h3>
-              <p class="proof__p">{item.p}</p>
-              <p>
-                <a href={item.href}>Read the docs →</a>
-              </p>
-            </div>
-          ))
-        }
-      </div>
+      {
+        proof.map((item, i) => (
+          <div class="proof__item reveal" style={`--i:${i}`}>
+            <h3 class="proof__h">{item.h}</h3>
+            <p class="proof__p">{item.p}</p>
+            <p>
+              <a href={item.href}>Read the docs →</a>
+            </p>
+          </div>
+        ))
+      }
+    </div>
   </Section>
 
   <!-- Final CTA -->
@@ -330,40 +324,29 @@ connect failed: Connection refused (os error 111)
 </Base>
 
 <style>
-  /* --- hero --- */
+  /* Section/band styling is global (global.css). Everything below is homepage-local.
+     The page is composed on a single vertical axis: every section header is centred
+     and every content field is a symmetric, equal-column grid. */
+
+  /* --- hero: centred --- */
   .hero {
     padding: clamp(3rem, 7vw, 5.5rem) 0 var(--space-section);
     border-bottom: 1px solid var(--hairline);
+    text-align: center;
     background:
-      radial-gradient(58rem 30rem at 18% -20%, var(--accent-glow), transparent 62%),
+      radial-gradient(60rem 32rem at 50% -20%, var(--accent-glow), transparent 62%),
       var(--surface-canvas);
   }
-
-  /* Twelve columns, asymmetric. The copy takes half and the panel takes the rest
-     plus some — see .hero__visual. */
-  .hero__grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: clamp(2rem, 4vw, 3.5rem);
+  .hero__inner {
+    display: flex;
+    flex-direction: column;
     align-items: center;
   }
-  .hero__copy {
-    grid-column: 1 / 7;
-  }
-  /* The panel runs past the right column rule. An instrument that fits neatly
-     inside the frame looks like a screenshot; one that overruns it looks like
-     there is more of it than the page can show. `main` clips, so this costs no
-     horizontal scrollbar. */
-  .hero__visual {
-    grid-column: 7 / -1;
-    margin-right: calc(-1 * clamp(2rem, 7vw, 8rem));
-  }
-
   .hero__badge {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    margin: 0 0 var(--space-md);
+    margin: 0 0 var(--space-lg);
     padding: 0.3rem 0.7rem;
     border: 1px solid var(--hairline-strong);
     border-radius: var(--radius-sm);
@@ -378,22 +361,14 @@ connect failed: Connection refused (os error 111)
     height: 5px;
     background: var(--accent);
   }
-
   .hero__h1 {
+    max-width: 20ch;
+    margin-inline: auto;
     font-size: var(--size-display-xl);
     letter-spacing: var(--track-display);
     line-height: 1.12;
-    max-width: 18ch;
-    /* `balance` is wrong here. It optimises for even line lengths, and with the
-       readout boxed inline that produced a line reading `[HTTP 200]   right`
-       with the gap opened up to match the line above. `pretty` only guards the
-       last line, which is the behaviour this headline actually wants. */
-    text-wrap: pretty;
+    text-wrap: balance;
   }
-
-  /* The readout. The whole argument of the page is that this number is a liar,
-     so it is set as what it actually is: a value on an instrument, boxed and
-     labelled, with a caret still blinking after it. */
   .readout {
     display: inline-flex;
     align-items: center;
@@ -426,77 +401,63 @@ connect failed: Connection refused (os error 111)
     animation: caret 1.15s steps(1) infinite;
   }
   @keyframes caret {
-    50% {
-      opacity: 0;
-    }
+    50% { opacity: 0; }
   }
-
   .hero__lede {
-    margin: var(--space-md) 0 0;
+    margin: var(--space-md) auto 0;
+    text-align: center;
   }
-
   .hero__cta {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-2xs);
     margin: var(--space-lg) 0 0;
   }
-
   .hero__meta {
     margin: var(--space-sm) 0 0;
     font-family: var(--font-mono);
     font-size: var(--size-eyebrow);
     color: var(--text-quaternary);
   }
-
-  /* Below the two-column breakpoint the hero stacks, so its vertical rhythm — tuned at
-     1440 where the copy and the panel sit side by side — becomes 1.3 viewports of scrolling
-     before the first section. Trimmed here rather than globally. */
+  /* The instrument sits centred below the copy — framed by the shell, not bled past it. */
+  .hero__visual {
+    width: 100%;
+    max-width: 64rem;
+    margin: var(--space-2xl) auto 0;
+  }
   @media (max-width: 62rem) {
     .hero {
       padding-top: clamp(2rem, 5vw, 3.5rem);
       padding-bottom: clamp(2.5rem, 6vw, 4rem);
     }
-    .hero__grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: clamp(1.75rem, 4vw, 2.5rem);
-    }
-    .hero__copy,
-    .hero__visual {
-      grid-column: 1 / -1;
-    }
     .hero__h1 {
-      max-width: 20ch;
+      max-width: 18ch;
       font-size: clamp(1.85rem, 0.9rem + 4.2vw, 2.75rem);
     }
-    .hero__cta {
-      margin-top: var(--space-md);
+    .hero__visual {
+      margin-top: var(--space-xl);
     }
   }
 
-  /* Section/band styling now lives in global.css (promoted for reuse). */
-
-  /* --- the gap --- */
-  /* Bays again: shared rules over a hairline ground, same as the monitor grid. */
+  /* --- 01 the gap: three equal, centred bays --- */
   .gaps {
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1px;
     background: var(--hairline);
     border: 1px solid var(--hairline);
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
   .gap {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    padding: var(--space-md);
+    align-items: center;
+    text-align: center;
+    padding: var(--space-lg) var(--space-md);
     background: var(--surface-canvas);
   }
-  .gap__tag {
-    align-self: flex-start;
-  }
   .gap__h {
-    margin: var(--space-xs) 0 var(--space-2xs);
+    margin: var(--space-sm) 0 var(--space-2xs);
     font-size: var(--size-body-lg);
     font-weight: var(--weight-strong);
     letter-spacing: var(--track-title);
@@ -509,19 +470,26 @@ connect failed: Connection refused (os error 111)
   }
   .gap__foot {
     width: 100%;
-    margin: auto 0 0;
+    margin: var(--space-md) 0 0;
     padding-top: var(--space-sm);
+    border-top: 1px solid var(--hairline);
     font-family: var(--font-mono);
     font-size: var(--size-eyebrow);
     color: var(--text-quaternary) !important;
   }
+  @media (max-width: 52rem) {
+    .gaps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 
-  /* --- alerting --- */
+  /* --- 03 alerting: two equal halves --- */
   .split {
     display: grid;
     gap: clamp(1.5rem, 4vw, 3rem);
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    align-items: start;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    text-align: left;
   }
   .split p + p {
     margin-top: var(--space-sm);
@@ -531,10 +499,6 @@ connect failed: Connection refused (os error 111)
       grid-template-columns: minmax(0, 1fr);
     }
   }
-
-  /* The alert stream is literally terminal output, so it is set as terminal
-     output. On a console page it no longer needs its own inverted surface — it
-     just needs to sit one step down from the page. */
   .terminal {
     margin: 0;
     border: 1px solid var(--hairline-strong);
@@ -562,70 +526,94 @@ connect failed: Connection refused (os error 111)
     line-height: 1.8;
     color: var(--text-tertiary);
   }
-  .t-down {
-    color: var(--status-down);
-  }
-  .t-up {
-    color: var(--status-up);
-  }
-  .t-dim {
-    color: var(--text-quaternary);
-  }
+  .t-down { color: var(--status-down); }
+  .t-up { color: var(--status-up); }
+  .t-dim { color: var(--text-quaternary); }
 
-  /* --- steps --- */
+  /* --- 04 how it works: three equal, centred steps --- */
   .steps {
     list-style: none;
     margin: 0;
     padding: 0;
-    border-top: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
   }
   .steps li {
-    display: grid;
-    grid-template-columns: 3.5rem minmax(0, var(--measure));
-    gap: var(--space-sm);
-    padding: var(--space-md) 0;
-    border-bottom: 1px solid var(--hairline);
-    color: var(--text-tertiary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-2xs);
+    padding: var(--space-xl) var(--space-md);
+    background: var(--surface-canvas);
   }
-  .steps span {
+  .steps__num {
     font-family: var(--font-mono);
-    font-size: var(--size-small);
+    font-size: var(--size-display-md);
+    line-height: 1;
     color: var(--accent-text);
     font-variant-numeric: tabular-nums;
   }
-  @media (max-width: 40rem) {
-    .steps li {
+  .steps__h {
+    margin-top: var(--space-2xs);
+    font-size: var(--size-body-lg);
+    font-weight: var(--weight-strong);
+    letter-spacing: var(--track-title);
+    color: var(--text-primary);
+  }
+  .steps__p {
+    font-size: var(--size-small);
+    color: var(--text-tertiary);
+    max-width: 34ch;
+  }
+  .band__link--center {
+    text-align: center;
+  }
+  @media (max-width: 52rem) {
+    .steps {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-3xs);
     }
   }
 
-  /* --- proof --- */
+  /* --- 05 proof: three equal, centred --- */
   .proof {
     display: grid;
-    gap: var(--space-lg);
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .proof__item {
-    padding-top: var(--space-sm);
-    border-top: 2px solid var(--hairline-strong);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-lg) var(--space-md);
+    background: var(--surface-canvas);
   }
   .proof__h {
     margin-bottom: var(--space-2xs);
     font-size: var(--size-body);
     font-weight: var(--weight-strong);
-    letter-spacing: var(--track-body);
     color: var(--text-primary);
   }
   .proof__p {
-    margin: 0 0 var(--space-2xs);
+    margin: 0 0 var(--space-sm);
     font-size: var(--size-small);
   }
   .proof a {
     font-size: var(--size-small);
   }
+  @media (max-width: 52rem) {
+    .proof {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 
-  /* --- final --- */
+  /* --- final CTA --- */
   .final {
     padding: clamp(2.5rem, 6vw, 4rem) var(--space-md);
     text-align: center;
@@ -646,16 +634,13 @@ connect failed: Connection refused (os error 111)
   }
   .final .hero__cta {
     justify-content: center;
+    margin-top: var(--space-lg);
   }
 
-  /* Stagger reveals within a group. */
   .reveal {
     animation-delay: calc(var(--i, 0) * 60ms);
   }
-
   @media (prefers-reduced-motion: reduce) {
-    .readout__caret {
-      animation: none;
-    }
+    .readout__caret { animation: none; }
   }
 </style>

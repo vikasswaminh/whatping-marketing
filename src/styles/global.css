@@ -353,6 +353,34 @@ samp {
   margin-right: calc((100% - 100vw) / 2);
 }
 
+/* Centered section header: the label sits on the axis, flanked by symmetric rules,
+   with the h2 and lede centred under it. This is the "absolute symmetry" treatment. */
+.band__head {
+  margin: 0;
+}
+.band__head--center {
+  text-align: center;
+}
+.band__head--center .band__h,
+.band__head--center .band__lede {
+  margin-inline: auto;
+}
+.eyebrow--center {
+  display: grid;
+  grid-template-columns: minmax(var(--space-lg), 1fr) auto minmax(var(--space-lg), 1fr);
+  align-items: center;
+  gap: var(--space-md);
+  max-width: 46rem;
+  margin-inline: auto;
+}
+.eyebrow--center::before,
+.eyebrow--center::after {
+  content: "";
+  width: auto;
+  height: 1px;
+  background: var(--hairline-strong);
+}
+
 .lede {
   color: var(--text-secondary);
   font-size: var(--size-body-lg);

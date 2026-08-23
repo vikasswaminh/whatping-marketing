@@ -13,6 +13,8 @@ interface Props {
   id?: string;
   /** Surface swap: default canvas, or a machined step up/down / an accent-lit band. */
   tone?: "canvas" | "sunken" | "raised" | "accent";
+  /** Header alignment. `center` gives the symmetric label-between-rules treatment. */
+  align?: "start" | "center";
   ruled?: boolean;
   last?: boolean;
   /** Drop the top padding — e.g. a header band sitting straight under the bar. */
@@ -28,12 +30,19 @@ const {
   lede,
   id,
   tone = "canvas",
+  align = "start",
   ruled = true,
   last = false,
   flush = false,
   bleed = false,
   class: extra,
 } = Astro.props;
+
+const centered = align === "center";
+const headClass = centered ? "band__head band__head--center" : "band__head";
+const eyebrowClass = centered
+  ? "eyebrow eyebrow--center reveal"
+  : "eyebrow eyebrow--bleed reveal";
 
 const toneClass = tone !== "canvas" ? ` band--${tone}` : "";
 const cls = [
@@ -50,9 +59,15 @@ const cls = [
 
 <section class={cls} id={id}>
   <div class={bleed ? "shell shell--bleed" : "shell"}>
-    {eyebrow && <p class="eyebrow eyebrow--bleed reveal">{eyebrow}</p>}
-    {title && <h2 class="band__h reveal" set:html={title} />}
-    {lede && <p class="lede band__lede reveal">{lede}</p>}
+    {
+      (eyebrow || title || lede) && (
+        <header class={headClass}>
+          {eyebrow && <p class={eyebrowClass}>{eyebrow}</p>}
+          {title && <h2 class="band__h reveal" set:html={title} />}
+          {lede && <p class="lede band__lede reveal">{lede}</p>}
+        </header>
+      )
+    }
     <slot />
   </div>
 </section>
