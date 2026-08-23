@@ -15,9 +15,10 @@ export default defineConfig({
   integrations: [mdx(), sitemap({ filter: (page) => !page.includes("/og/") })],
   markdown: {
     shikiConfig: {
-      // Code sits on a near-white surface now, so the highlighter has to be light too.
-      // The block background is overridden in CSS; only token colours come from here.
-      theme: "github-light",
+      // Code blocks are a dark console inset on every surface (dark pages AND the paper
+      // docs — see `.prose pre` in global.css, which pins them to --console-bay), so the
+      // highlighter is dark-themed. github-light on the dark inset was black-on-black.
+      theme: "github-dark-default",
       wrap: true,
     },
   },

@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props as { entry: CollectionEntry<"pages"> };
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 
 // Comparison pages are the ones people find through search; give them article markup.
 const isComparison = entry.data.route.startsWith("/vs/");
@@ -36,6 +36,7 @@ const jsonLd = isComparison
   h1={entry.data.h1}
   lede={entry.data.lede}
   eyebrow={entry.data.eyebrow}
+  headings={headings}
   jsonLd={jsonLd}
 >
   <Content components={{ Callout }} />

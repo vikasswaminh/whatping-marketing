@@ -1,5 +1,12 @@
 ---
 import Base from "./Base.astro";
+import { APP_URL } from "../lib/site";
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
 
 interface Props {
   title: string;
@@ -7,6 +14,7 @@ interface Props {
   h1: string;
   eyebrow?: string;
   lede?: string;
+  headings?: Heading[];
   jsonLd?: Record<string, unknown>;
 }
 
@@ -16,46 +24,189 @@ const {
   h1,
   eyebrow = "WhatPing",
   lede,
+  headings = [],
   jsonLd,
 } = Astro.props;
-// Every content page opens with the same header band the homepage uses; the meta
+// Every content page opens with the homepage's centred header band; the meta
 // description is a sensible default subhead until a page supplies its own `lede`.
 const sub = lede ?? description;
+// Only h2s — an "on this page" rail that mirrors every level stops being a map.
+const toc = headings.filter((h) => h.depth === 2);
 ---
 
 <Base title={title} description={description} jsonLd={jsonLd}>
   <section class="ruled page-header">
     <div class="shell">
-      <p class="eyebrow eyebrow--bleed">{eyebrow}</p>
-      <h1 class="page-header__h">{h1}</h1>
-      {sub && <p class="lede page-header__lede">{sub}</p>}
+      <div class="page-header__head">
+        <p class="eyebrow eyebrow--center">{eyebrow}</p>
+        <h1 class="page-header__h">{h1}</h1>
+        {sub && <p class="lede page-header__lede">{sub}</p>}
+      </div>
     </div>
   </section>
 
   <section class="ruled page-body">
-    <div class="shell">
+    <div class="shell page-grid">
       <article class="prose">
         <slot />
       </article>
+
+      <aside class="page-aside">
+        {
+          toc.length > 1 && (
+            <nav class="page-toc" aria-label="On this page">
+              <p class="page-toc__label">On this page</p>
+              <ul>
+                {toc.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )
+        }
+
+        <div class="aside-cta">
+          <p class="aside-cta__eyebrow">Free while in beta</p>
+          <p class="aside-cta__h">Start monitoring in 30 seconds</p>
+          <p class="aside-cta__p">
+            No card. 20 monitors per workspace, every type, all alert channels.
+          </p>
+          <a class="btn btn--primary aside-cta__btn" href={APP_URL}>Start free</a>
+        </div>
+      </aside>
     </div>
   </section>
 </Base>
 
 <style>
-  /* The page header is the content-page counterpart of a homepage band: full-width,
-     ruled, one eyebrow → h1 → lede rhythm, closed with a hairline. Not a .band, so the
-     `.band p` tertiary rule never reaches the lede or the prose below. */
+  /* Centred header band — the content-page counterpart of a homepage section header. */
   .page-header {
-    padding-block: clamp(2.5rem, 6vw, 4rem) var(--space-xl);
+    padding-block: clamp(2.5rem, 6vw, 4rem) var(--space-lg);
     border-bottom: 1px solid var(--hairline);
+  }
+  .page-header__head {
+    text-align: center;
   }
   .page-header__h {
     max-width: 26ch;
+    margin-inline: auto;
   }
   .page-header__lede {
-    margin-top: var(--space-md);
+    margin: var(--space-md) auto 0;
   }
+
+  /* Two-column reading layout: a comfortable measure + a sticky utility rail, the whole
+     block centred in the shell so no half of the page is dead space. */
   .page-body {
     padding-block: var(--space-xl) var(--space-2xl);
+  }
+  .page-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 42rem) 15rem;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    justify-content: center;
+    align-items: start;
+  }
+  /* The grid column governs the measure now, so drop the intrinsic prose cap. */
+  .page-grid > .prose {
+    max-width: none;
+  }
+
+  .page-aside {
+    position: sticky;
+    top: 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .page-toc {
+    padding-left: var(--space-md);
+    border-left: 1px solid var(--hairline-strong);
+  }
+  .page-toc__label {
+    margin: 0 0 var(--space-sm);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-eyebrow);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--track-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-quaternary);
+  }
+  .page-toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .page-toc a {
+    font-size: var(--size-small);
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease);
+  }
+  .page-toc a:hover {
+    color: var(--accent-text);
+  }
+
+  .aside-cta {
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 2px 0 0 var(--accent-line);
+    background: var(--surface-raised);
+    padding: var(--space-md);
+  }
+  .aside-cta__eyebrow {
+    margin: 0 0 var(--space-2xs);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-eyebrow);
+    letter-spacing: var(--track-eyebrow);
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  .aside-cta__h {
+    margin: 0 0 var(--space-2xs);
+    font-family: var(--font-display);
+    font-stretch: var(--width-ui);
+    font-size: var(--size-body-lg);
+    font-weight: var(--weight-strong);
+    letter-spacing: var(--track-title);
+    color: var(--text-primary);
+  }
+  .aside-cta__p {
+    margin: 0 0 var(--space-md);
+    font-size: var(--size-small);
+    color: var(--text-tertiary);
+  }
+  .aside-cta__btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Stack under the reading breakpoint: prose full-width at its measure, rail below with
+     only the CTA (the TOC is redundant once the page is a single scrolling column). */
+  @media (max-width: 60rem) {
+    .page-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xl);
+    }
+    .page-grid > .prose {
+      max-width: var(--measure);
+      margin-inline: auto;
+    }
+    .page-aside {
+      position: static;
+      max-width: var(--measure);
+      margin-inline: auto;
+      width: 100%;
+    }
+    .page-toc {
+      display: none;
+    }
   }
 </style>
