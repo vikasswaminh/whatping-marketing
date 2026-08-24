@@ -8,19 +8,14 @@ const types = [
     description: "Status ranges, keyword matching, and payload assertions."
   },
   {
-    icon: "🎯",
-    title: "API Endpoints",
-    description: "Verify JSON headers, authentication, and HTTP verbs."
+    icon: "🔒",
+    title: "SSL Certificates",
+    description: "Days until TLS expiry and validity alerts."
   },
   {
     icon: "📡",
     title: "Ping Monitoring",
     description: "Unprivileged ICMP checks for packet loss and median RTT."
-  },
-  {
-    icon: "🔒",
-    title: "SSL Certificates",
-    description: "Days until TLS expiry and validity alerts."
   },
   {
     icon: "🔎",
@@ -31,6 +26,36 @@ const types = [
     icon: "🚪",
     title: "Port Monitoring",
     description: "Test direct TCP connections on custom ports."
+  },
+  {
+    icon: "🚀",
+    title: "UDP Monitoring",
+    description: "Send custom payloads over UDP and require valid responses."
+  },
+  {
+    icon: "📅",
+    title: "Domain Expiry",
+    description: "Check registration status and days remaining against registries."
+  },
+  {
+    icon: "🛡️",
+    title: "Email Auth (SPF/DMARC)",
+    description: "Verify daily that SPF and DMARC records remain published."
+  },
+  {
+    icon: "⚡",
+    title: "gRPC Monitoring",
+    description: "Call standard grpc.health.v1.Health/Check for serving status."
+  },
+  {
+    icon: "💓",
+    title: "Heartbeat Monitoring",
+    description: "Monitor cron jobs and pipelines by having them ping a URL."
+  },
+  {
+    icon: "📨",
+    title: "Mail Monitoring",
+    description: "Read mail server greetings and complete STARTTLS handshakes."
   }
 ];
 ---
