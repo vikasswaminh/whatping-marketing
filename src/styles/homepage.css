@@ -573,9 +573,14 @@
 
 /* Monitoring Types */
 .types-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 12px;
+}
+.types-grid > * {
+  flex: 0 1 calc((100% - 5 * 12px) / 6);
+  min-width: 140px;
 }
 .type-card {
   background: var(--white);
@@ -608,18 +613,18 @@
 }
 
 @media (max-width: 900px) {
-  .types-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .types-grid > * {
+    flex: 0 1 calc((100% - 2 * 12px) / 3);
   }
 }
 @media (max-width: 520px) {
-  .types-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .types-grid > * {
+    flex: 0 1 calc((100% - 12px) / 2);
   }
 }
 @media (max-width: 380px) {
-  .types-grid {
-    grid-template-columns: 1fr;
+  .types-grid > * {
+    flex: 0 1 100%;
   }
 }
 
