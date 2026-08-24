@@ -3,12 +3,13 @@ interface Props {
   icon: string;
   title: string;
   description: string;
+  href: string;
 }
 
-const { icon, title, description } = Astro.props;
+const { icon, title, description, href } = Astro.props;
 ---
-<div class="type-card">
+<a class="type-card" href={href}>
   <span class="type-card__icon">{icon}</span>
   <h3 class="type-card__h">{title}</h3>
   <p class="type-card__p">{description}</p>
-</div>
+</a>

@@ -5,57 +5,68 @@ const types = [
   {
     icon: "🌐",
     title: "HTTP(s) Monitoring",
-    description: "Status ranges, keyword matching, and payload assertions."
+    description: "Status ranges, keyword matching, and payload assertions.",
+    href: "/features/uptime-monitoring/"
   },
   {
     icon: "🔒",
     title: "SSL Certificates",
-    description: "Days until TLS expiry and validity alerts."
+    description: "Days until TLS expiry and validity alerts.",
+    href: "/features/certificate-monitoring/"
   },
   {
     icon: "📡",
     title: "Ping Monitoring",
-    description: "Unprivileged ICMP checks for packet loss and median RTT."
+    description: "Unprivileged ICMP checks for packet loss and median RTT.",
+    href: "/features/ping-monitoring/"
   },
   {
     icon: "🔎",
     title: "DNS Monitoring",
-    description: "Assert A, AAAA, MX, TXT, and CNAME records."
+    description: "Assert A, AAAA, MX, TXT, and CNAME records.",
+    href: "/features/dns-monitoring/"
   },
   {
     icon: "🚪",
     title: "Port Monitoring",
-    description: "Test direct TCP connections on custom ports."
+    description: "Test direct TCP connections on custom ports.",
+    href: "/features/uptime-monitoring/"
   },
   {
     icon: "🚀",
     title: "UDP Monitoring",
-    description: "Send custom payloads over UDP and require valid responses."
+    description: "Send custom payloads over UDP and require valid responses.",
+    href: "/features/udp-monitoring/"
   },
   {
     icon: "📅",
     title: "Domain Expiry",
-    description: "Check registration status and days remaining against registries."
+    description: "Check registration status and days remaining against registries.",
+    href: "/features/domain-expiry-monitoring/"
   },
   {
     icon: "🛡️",
     title: "Email Auth (SPF/DMARC)",
-    description: "Verify daily that SPF and DMARC records remain published."
+    description: "Verify daily that SPF and DMARC records remain published.",
+    href: "/features/email-auth-monitoring/"
   },
   {
     icon: "⚡",
     title: "gRPC Monitoring",
-    description: "Call standard grpc.health.v1.Health/Check for serving status."
+    description: "Call standard grpc.health.v1.Health/Check for serving status.",
+    href: "/features/grpc-monitoring/"
   },
   {
     icon: "💓",
     title: "Heartbeat Monitoring",
-    description: "Monitor cron jobs and pipelines by having them ping a URL."
+    description: "Monitor cron jobs and pipelines by having them ping a URL.",
+    href: "/features/heartbeat-monitoring/"
   },
   {
     icon: "📨",
     title: "Mail Monitoring",
-    description: "Read mail server greetings and complete STARTTLS handshakes."
+    description: "Read mail server greetings and complete STARTTLS handshakes.",
+    href: "/features/smtp-imap-monitoring/"
   }
 ];
 ---
@@ -66,7 +77,7 @@ const types = [
     
     <div class="types-grid">
       {types.map((t) => (
-        <MonitoringTypeCard icon={t.icon} title={t.title} description={t.description} />
+        <MonitoringTypeCard icon={t.icon} title={t.title} description={t.description} href={t.href} />
       ))}
     </div>
   </div>

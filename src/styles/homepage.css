@@ -583,11 +583,14 @@
   min-width: 140px;
 }
 .type-card {
+  display: block;
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 16px;
   text-align: center;
+  text-decoration: none;
+  cursor: pointer;
   transition: transform var(--duration) var(--ease), border-color var(--duration) var(--ease);
 }
 .type-card:hover {
