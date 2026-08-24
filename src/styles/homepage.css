@@ -10,7 +10,8 @@
 
 /* Sections */
 .homepage-section {
-  padding-block: 80px;
+  padding-top: 80px;
+  padding-bottom: 0px;
 }
 .homepage-section--first {
   padding-top: 40px;
@@ -19,12 +20,6 @@
 .homepage-section--last {
   padding-top: 80px;
   padding-bottom: 120px;
-}
-#features {
-  padding-bottom: 32px;
-}
-#live-monitoring {
-  padding-top: 32px;
 }
 
 /* Headers & Typography */
