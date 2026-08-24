@@ -3,6 +3,8 @@
 @import "@fontsource-variable/martian-mono/wdth.css";
 @import "@fontsource-variable/ibm-plex-sans";
 @import "@fontsource-variable/geist-mono";
+@import "@fontsource-variable/outfit";
+@import "@fontsource/plus-jakarta-sans";
 @import "./tokens.css";
 @import "./homepage.css";
 
