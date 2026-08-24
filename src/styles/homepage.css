@@ -20,6 +20,12 @@
   padding-top: 80px;
   padding-bottom: 120px;
 }
+#features {
+  padding-bottom: 32px;
+}
+#live-monitoring {
+  padding-top: 32px;
+}
 
 /* Headers & Typography */
 .theme-homepage h1.hero-h1 {
