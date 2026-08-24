@@ -21,6 +21,9 @@
   padding-top: 96px;
   padding-bottom: 120px;
 }
+#how-it-works {
+  padding-bottom: 64px;
+}
 
 /* Headers & Typography */
 .theme-homepage h1.hero-h1 {
