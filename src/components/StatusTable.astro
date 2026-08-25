@@ -18,15 +18,17 @@ const services = [
     </thead>
     <tbody>
       {services.map((s) => (
-        <tr>
+        <tr class="live-table-row">
           <td><strong>{s.name}</strong></td>
           <td>
-            <span class="live-status">
-              <span class="live-status-dot live-status-dot--pulse"></span>
-              {s.status}
-            </span>
+            <div class="live-status">
+              <span class="live-status-pill live-status-pill--up">
+                <span class="live-status-dot live-status-dot--pulse"></span>
+                {s.status}
+              </span>
+            </div>
           </td>
-          <td>{s.latency}</td>
+          <td class="latency-cell">{s.latency}</td>
           <td>{s.location}</td>
         </tr>
       ))}

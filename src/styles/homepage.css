@@ -439,6 +439,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 .live-table {
   width: 100%;
@@ -446,16 +447,23 @@
   text-align: left;
 }
 .live-table th {
-  background: var(--surface-hover);
-  padding: 14px 18px;
-  font-size: 12px;
-  font-weight: 600;
+  background: #fcfcfc;
+  padding: 16px 20px;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-tertiary);
   border-bottom: 1px solid var(--border);
 }
+.live-table-row {
+  transition: background-color var(--duration) var(--ease);
+}
+.live-table-row:hover {
+  background-color: var(--surface-hover);
+}
 .live-table td {
-  padding: 16px 18px;
+  padding: 16px 20px;
   font-size: 14px;
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border);
@@ -463,35 +471,52 @@
 .live-table tr:last-child td {
   border-bottom: none;
 }
+.latency-cell {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
 .live-status {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  font-size: 12px;
+}
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.live-status-pill--up {
+  background: var(--green-soft);
+  color: var(--success);
 }
 .live-status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--success);
+  background: currentColor;
   position: relative;
 }
 .live-status-dot--pulse::after {
   content: "";
   position: absolute;
-  inset: -3px;
+  inset: -4px;
   border-radius: 50%;
-  border: 1px solid var(--success);
+  border: 1px solid currentColor;
   animation: pulse-ring 1.8s ease-in-out infinite;
 }
 @keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 0.8; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
 }
 
 .live-status-card {
-  background: var(--white);
+  background: linear-gradient(180deg, var(--white) 0%, #fcfcfc 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 32px 24px;
@@ -500,10 +525,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+.live-status-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--success);
 }
 .live-status-card__badge {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   background: var(--green-soft);
   color: var(--success);
@@ -511,19 +548,22 @@
   align-items: center;
   justify-content: center;
   font-size: 32px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(35, 197, 94, 0.15);
 }
 .live-status-card__h {
   font-family: var(--font-sans);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 8px;
+  letter-spacing: -0.01em;
 }
 .live-status-card__p {
   font-size: 14px;
-  color: var(--text-tertiary);
-  margin-bottom: 24px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+  line-height: 1.6;
 }
 
 @media (max-width: 860px) {
