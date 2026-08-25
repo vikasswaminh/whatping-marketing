@@ -4,18 +4,71 @@ import { APP_URL } from "../lib/site";
 ---
 <section class="homepage-section" id="live-monitoring">
   <div class="container">
-    <h2 class="section-title">Live system monitoring</h2>
-    <p class="section-subtitle">A live feed of checking operations, latencies, and reachability across our global edge nodes.</p>
+    <div class="live-header">
+      <h2 class="section-title">Live <span style="color: var(--accent)">system</span> monitoring</h2>
+      <p class="section-subtitle">A live feed of checking operations, latencies, and reachability across our global edge nodes.</p>
+    </div>
     
     <div class="live-grid">
-      <StatusTable />
-      
-      <div class="live-status-card">
-        <div class="live-status-card__badge">✓</div>
-        <h3 class="live-status-card__h">ALL SYSTEMS OPERATIONAL</h3>
-        <p class="live-status-card__p">WhatPing probers are checking all endpoints with 100% success rate.</p>
-        <a href="/roadmap/" class="btn btn--secondary btn--full">View Status Page</a>
+      <!-- Left: Orb -->
+      <div class="live-orb-wrapper">
+        <div class="live-orb">
+          <div class="orb-ring orb-ring-1"></div>
+          <div class="orb-ring orb-ring-2"></div>
+          <div class="orb-ring orb-ring-3"></div>
+          
+          <div class="live-orb-inner">
+            <svg class="orb-icon" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 32px;">
+              <path d="M 4 12 L 16 12 L 20 4 L 26 20 L 30 12 L 44 12" />
+            </svg>
+            <h3 class="orb-title">ALL SYSTEMS<br/><span class="orb-title-accent">OPERATIONAL</span></h3>
+            <div class="orb-success">
+              <span class="live-status-dot live-status-dot--pulse"></span>
+              100% success rate
+            </div>
+          </div>
+        </div>
+        <a href="/roadmap/" class="orb-cta">
+          <span style="transform: translateY(-1px);">View Status Page</span>
+          <svg style="transform: translateY(-1px);" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Center: Connectors (SVG will be handled in CSS/absolute positioning) -->
+      <div class="live-connectors-wrapper">
+        <svg class="live-connectors-svg" viewBox="0 0 100 400" preserveAspectRatio="none">
+          <!-- Connectors will be drawn here -->
+          <!-- Top Card -->
+          <path class="connector-line" d="M 0,200 C 50,200 50,50 100,50" />
+          <circle class="connector-node" cx="100" cy="50" r="4" />
+          <!-- Mid-Top Card -->
+          <path class="connector-line" d="M 0,200 C 50,200 50,150 100,150" />
+          <circle class="connector-node" cx="100" cy="150" r="4" />
+          <!-- Mid-Bottom Card -->
+          <path class="connector-line" d="M 0,200 C 50,200 50,250 100,250" />
+          <circle class="connector-node" cx="100" cy="250" r="4" />
+          <!-- Bottom Card -->
+          <path class="connector-line" d="M 0,200 C 50,200 50,350 100,350" />
+          <circle class="connector-node" cx="100" cy="350" r="4" />
+          
+          <!-- Origin Node on Orb -->
+          <circle class="connector-node" cx="0" cy="200" r="4" />
+        </svg>
+      </div>
+
+      <!-- Right: Status Cards -->
+      <div class="live-status-list">
+        <div class="live-list-header">
+          <span></span>
+          <span>STATUS</span>
+          <span>RESPONSE</span>
+          <span>LOCATION</span>
+        </div>
+        <StatusTable />
       </div>
     </div>
   </div>
 </section>
+

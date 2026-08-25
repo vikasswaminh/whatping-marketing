@@ -46,3 +46,27 @@ const steps = [
     </div>
   </div>
 </section>
+
+<script>
+  // Loop through process steps sequentially
+  const steps = document.querySelectorAll('.process-item');
+  if (steps.length > 0) {
+    let currentStep = 0;
+    const stepDuration = 2500; // Matches the 2.5s total animation duration
+
+    const updateSteps = () => {
+      // Remove loading class from all
+      steps.forEach(step => step.classList.remove('is-loading'));
+      
+      // Add loading class to current
+      steps[currentStep].classList.add('is-loading');
+
+      // Move to next step
+      currentStep = (currentStep + 1) % steps.length;
+    };
+
+    // Start immediately, then loop
+    updateSteps();
+    setInterval(updateSteps, stepDuration);
+  }
+</script>

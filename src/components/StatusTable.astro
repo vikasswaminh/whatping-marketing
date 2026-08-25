@@ -1,37 +1,70 @@
 ---
 const services = [
-  { name: "API Service", status: "UP", latency: "98ms", location: "Mumbai", time: "Just now" },
-  { name: "User Dashboard", status: "UP", latency: "110ms", location: "Singapore", time: "Just now" },
-  { name: "Marketing Site", status: "UP", latency: "95ms", location: "Frankfurt", time: "Just now" },
-  { name: "Auth Provider", status: "UP", latency: "120ms", location: "Seattle", time: "Just now" }
+  { 
+    name: "API Service", 
+    domain: "api.whatping.com",
+    status: "UP", 
+    latency: "98ms", 
+    location: "Mumbai", 
+    flag: `<svg viewBox="0 0 36 36"><path fill="#F98000" d="M0 9h36v6H0z"/><path fill="#FFF" d="M0 15h36v6H0z"/><path fill="#128807" d="M0 21h36v6H0z"/><circle fill="#000088" cx="18" cy="18" r="2.5"/><circle fill="none" stroke="#000088" stroke-width=".2" cx="18" cy="18" r="2"/></svg>`,
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 17l10 5 10-5M2 12l10 5 10-5M12 2L2 7l10 5 10-5-10-5z"/></svg>`
+  },
+  { 
+    name: "User Dashboard", 
+    domain: "dashboard.whatping.com",
+    status: "UP", 
+    latency: "110ms", 
+    location: "Singapore", 
+    flag: `<svg viewBox="0 0 36 36"><path fill="#ED2939" d="M0 9h36v9H0z"/><path fill="#FFF" d="M0 18h36v9H0z"/><path fill="#FFF" d="M7 12a4 4 0 104-3 5 5 0 11-4 3z"/><circle fill="#FFF" cx="10" cy="11.5" r="1"/><circle fill="#FFF" cx="12" cy="11" r="1"/><circle fill="#FFF" cx="13" cy="13" r="1"/><circle fill="#FFF" cx="11" cy="14" r="1"/><circle fill="#FFF" cx="9" cy="13" r="1"/></svg>`,
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>`
+  },
+  { 
+    name: "Marketing Site", 
+    domain: "whatping.com",
+    status: "UP", 
+    latency: "95ms", 
+    location: "Frankfurt", 
+    flag: `<svg viewBox="0 0 36 36"><path fill="#000" d="M0 9h36v6H0z"/><path fill="#D00" d="M0 15h36v6H0z"/><path fill="#FFCE00" d="M0 21h36v6H0z"/></svg>`,
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>`
+  },
+  { 
+    name: "Auth Provider", 
+    domain: "auth.whatping.com",
+    status: "UP", 
+    latency: "120ms", 
+    location: "Seattle", 
+    flag: `<svg viewBox="0 0 36 36"><path fill="#FFF" d="M0 9h36v18H0z"/><path fill="#BF0A30" d="M0 10.5h36v1.5H0zM0 13.5h36v1.5H0zM0 16.5h36v1.5H0zM0 19.5h36v1.5H0zM0 22.5h36v1.5H0zM0 25.5h36v1.5H0z"/><path fill="#002868" d="M0 9h16v9H0z"/><circle fill="#FFF" cx="2" cy="10" r="0.5"/><circle fill="#FFF" cx="4" cy="10" r="0.5"/><circle fill="#FFF" cx="6" cy="10" r="0.5"/></svg>`,
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>`
+  }
 ];
 ---
-<div class="live-table-wrapper">
-  <table class="live-table">
-    <thead>
-      <tr>
-        <th>Service</th>
-        <th>Status</th>
-        <th>Response</th>
-        <th>Location</th>
-      </tr>
-    </thead>
-    <tbody>
-      {services.map((s) => (
-        <tr class="live-table-row">
-          <td><strong>{s.name}</strong></td>
-          <td>
-            <div class="live-status">
-              <span class="live-status-pill live-status-pill--up">
-                <span class="live-status-dot live-status-dot--pulse"></span>
-                {s.status}
-              </span>
-            </div>
-          </td>
-          <td class="latency-cell">{s.latency}</td>
-          <td>{s.location}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
+<div class="live-cards-container">
+  {services.map((s) => (
+    <div class="live-card">
+      <div class="live-card-service">
+        <div class="live-card-icon" set:html={s.icon}></div>
+        <div class="live-card-text">
+          <div class="live-card-name">{s.name}</div>
+          <div class="live-card-domain">{s.domain}</div>
+        </div>
+      </div>
+      
+      <div class="live-card-status">
+        <span class="live-status-pill live-status-pill--up">
+          <span class="live-status-dot live-status-dot--pulse"></span>
+          {s.status}
+        </span>
+      </div>
+      
+      <div class="live-card-latency">
+        {s.latency}
+      </div>
+      
+      <div class="live-card-location">
+        <span class="live-card-flag" set:html={s.flag}></span>
+        {s.location}
+      </div>
+    </div>
+  ))}
 </div>
+

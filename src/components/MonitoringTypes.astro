@@ -75,10 +75,20 @@ const types = [
     <h2 class="section-title">What can you monitor?</h2>
     <p class="section-subtitle">We support a wide array of checks spanning multiple protocols, layers, and service types.</p>
     
-    <div class="types-grid">
-      {types.map((t) => (
-        <MonitoringTypeCard icon={t.icon} title={t.title} description={t.description} href={t.href} />
-      ))}
+    <div class="arc-wrapper">
+      <div class="arc-dial">
+        {types.map((t, index) => (
+          <a 
+             href={t.href}
+             class="arc-item" 
+             style={`--index: ${index};`} 
+          >
+            <span class="type-card__icon">{t.icon}</span>
+            <h3 class="type-card__h">{t.title}</h3>
+            <p class="type-card__p">{t.description}</p>
+          </a>
+        ))}
+      </div>
     </div>
   </div>
 </section>

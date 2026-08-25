@@ -1,14 +1,14 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import Callout from "../../components/Callout.astro";
-import Marketing from "../../layouts/Marketing.astro";
+import Base from "../../layouts/Base.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
 import { normalize } from "../../lib/site";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
   return posts.map((entry) => {
-    // Extract everything after /blog/ from the route frontmatter.
-    // Astro routes are relative to the directory this file is in, so slug is just the rest.
     const rest = normalize(entry.data.route)
       .replace(/^\/blog\/?/, "")
       .replace(/\/$/, "");
@@ -20,14 +20,298 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props as { entry: CollectionEntry<"blog"> };
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+
+// Format date if it exists (using a mock date for now if not present)
+const postDate = "August 2026";
 ---
 
-<Marketing
+<Base
   title={entry.data.title}
   description={entry.data.description}
-  h1={entry.data.h1}
-  eyebrow="Blog"
 >
-  <Content components={{ Callout }} />
-</Marketing>
+  <main class="blog-post-container">
+    
+    <!-- HEADER SECTION -->
+    <header class="blog-post-header">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> <span>/</span> <a href="/blog">Blog</a> <span>/</span> <span>{entry.data.title}</span>
+      </div>
+      
+      <div class="post-category-tag">Monitoring</div>
+      
+      <h1 class="post-title">{entry.data.title}</h1>
+      {entry.data.description && <p class="post-subtitle">{entry.data.description}</p>}
+      
+      <div class="post-author-meta">
+        <div class="author-info">
+          <div class="author-avatar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div class="author-details">
+            <span class="author-name">WhatPing Team</span>
+            <span class="post-date">{postDate} &bull; 8 min read</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2-COLUMN LAYOUT -->
+    <div class="blog-post-content-area">
+      
+      <!-- LEFT: TOC -->
+      <aside class="post-sidebar">
+        <div class="toc-container">
+          <h3 class="toc-title">Table of Contents</h3>
+          <ul class="toc-list" id="toc-list">
+            {headings.filter(h => h.depth === 2).map((heading) => (
+              <li class={`toc-item depth-${heading.depth}`}>
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+
+      <!-- RIGHT: ARTICLE BODY -->
+      <article class="post-body">
+        <Content components={{ Callout }} />
+      </article>
+
+    </div>
+  </main>
+</Base>
+
+<script>
+  // Simple intersection observer to highlight active TOC item
+  document.addEventListener("DOMContentLoaded", () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          // Remove active class from all
+          document.querySelectorAll('.toc-list a').forEach(a => a.classList.remove('active'));
+          // Add active class to current
+          const activeLink = document.querySelector(`.toc-list a[href="#${id}"]`);
+          if (activeLink) activeLink.classList.add('active');
+        }
+      });
+    }, { rootMargin: "0px 0px -80% 0px" });
+
+    // Observe all headings
+    document.querySelectorAll('.post-body h1, .post-body h2, .post-body h3, .post-body h4').forEach((heading) => {
+      observer.observe(heading);
+    });
+  });
+</script>
+
+<style>
+  .blog-post-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 80px 24px;
+  }
+
+  /* Header Styles */
+  .blog-post-header {
+    max-width: 800px;
+    margin: 0 auto 60px auto;
+    text-align: center;
+  }
+  .breadcrumbs {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .breadcrumbs a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .breadcrumbs a:hover {
+    color: var(--text-primary);
+  }
+  .post-category-tag {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #FFF4D9;
+    color: #92400E;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+  }
+  .post-title {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+  }
+  .post-subtitle {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 0 40px 0;
+  }
+  .post-author-meta {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+  }
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .author-avatar {
+    width: 48px;
+    height: 48px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+  }
+  .author-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .author-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .post-date {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* 2-Column Layout */
+  .blog-post-content-area {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 60px;
+  }
+
+  /* Sidebar TOC */
+  .post-sidebar {
+    border-right: 1px solid var(--border);
+    padding-right: 30px;
+  }
+  .toc-container {
+    position: sticky;
+    top: 100px;
+  }
+  .toc-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin: 0 0 16px 0;
+    letter-spacing: 0.05em;
+  }
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .toc-item a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.4;
+    transition: all 0.2s;
+    display: block;
+    padding-left: 12px;
+    border-left: 2px solid transparent;
+  }
+  .toc-item a:hover {
+    color: var(--text-primary);
+  }
+  .toc-item a.active {
+    color: #E85D04;
+    font-weight: 600;
+    border-left-color: #E85D04;
+  }
+  .toc-item.depth-3 a { padding-left: 24px; font-size: 13px; }
+  .toc-item.depth-4 a { padding-left: 36px; font-size: 13px; }
+
+  /* Article Body */
+  .post-body {
+    max-width: 760px;
+    font-size: 19px;
+    line-height: 1.8;
+    color: var(--text-primary);
+  }
+  
+  /* Basic markdown styling for the body */
+  .post-body :global(h2) {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 64px 0 32px 0;
+    line-height: 1.3;
+  }
+  .post-body :global(h3) {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 40px 0 20px 0;
+  }
+  .post-body :global(p) {
+    margin: 0 0 28px 0;
+  }
+  .post-body :global(ul), .post-body :global(ol) {
+    margin: 0 0 28px 0;
+    padding-left: 28px;
+  }
+  .post-body :global(li) {
+    margin-bottom: 16px;
+  }
+  .post-body :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 32px 0;
+  }
+  .post-body :global(pre) {
+    background: #111;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 32px 0;
+    font-size: 14px;
+  }
+
+  @media (max-width: 992px) {
+    .blog-post-content-area {
+      grid-template-columns: 1fr;
+    }
+    .post-sidebar {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding-right: 0;
+      padding-bottom: 30px;
+      margin-bottom: 30px;
+    }
+    .toc-container {
+      position: static;
+    }
+    .post-title {
+      font-size: 32px;
+    }
+  }
+</style>
