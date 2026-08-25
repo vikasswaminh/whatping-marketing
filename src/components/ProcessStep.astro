@@ -13,8 +13,17 @@ const { stepNumber, title, icon, description, showArrow = false } = Astro.props;
   <span class="process-num">{stepNumber}</span>
   <div class="process-card">
     <span>{icon}</span>
+    <svg class="process-border-svg" width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 63,32 L 63,56 A 7,7 0 0,1 56,63 L 8,63 A 7,7 0 0,1 1,56 L 1,8 A 7,7 0 0,1 8,1 L 56,1 A 7,7 0 0,1 63,8 Z" />
+    </svg>
   </div>
   <h3 class="process-title">{title}</h3>
   <p class="process-desc">{description}</p>
-  {showArrow && <span class="process-arrow">➔</span>}
+  {showArrow && (
+    <div class="process-connector">
+      <div class="connector-line"></div>
+      <div class="connector-fill"></div>
+      <span class="connector-arrow">➔</span>
+    </div>
+  )}
 </div>

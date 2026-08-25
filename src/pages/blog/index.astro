@@ -1,73 +1,357 @@
 ---
 import { getCollection, getEntry } from "astro:content";
-import Marketing from "../../layouts/Marketing.astro";
+import Base from "../../layouts/Base.astro";
+import Navbar from "../../components/Navbar.astro";
+import Footer from "../../components/Footer.astro";
 import { normalize } from "../../lib/site";
 
-// Get page meta from authoritative pages collection
 const pageEntry = await getEntry("pages", "blog");
 if (!pageEntry) {
   throw new Error("Could not find blog page entry in pages collection");
 }
 
-// Get all blog posts
 const posts = await getCollection("blog");
-// Sort posts alphabetically/chronologically based on title (or date if needed)
+// Sort by title to get a consistent order
 const sortedPosts = posts.sort((a, b) => b.data.title.localeCompare(a.data.title));
+
+// For the sake of filling the dense layout with only 6 posts, we will reuse them:
+const featuredPost = sortedPosts[0];
+const gridPosts = sortedPosts.slice(1);
+const leftSidebarPosts = sortedPosts.slice(0, 5);
+const rightSidebarPosts = sortedPosts.slice(1, 6);
 ---
 
-<Marketing
+<Base
   title={pageEntry.data.title}
   description={pageEntry.data.description}
-  h1={pageEntry.data.h1}
-  eyebrow="Blog"
 >
-  <div class="blog-list">
-    {
-      sortedPosts.map((post) => (
-        <article class="blog-preview">
-          <h2>
-            <a href={normalize(post.data.route)}>{post.data.h1}</a>
-          </h2>
-          <p class="blog-desc">{post.data.description}</p>
-          <a class="read-more" href={normalize(post.data.route)}>Read post &rarr;</a>
-        </article>
-      ))
-    }
-  </div>
-</Marketing>
+  <main class="blog-main-container">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="blog-sidebar blog-sidebar--left">
+      <div class="sidebar-badge sidebar-badge--orange">FOUNDER SPECIAL</div>
+      <ul class="sidebar-list">
+        {leftSidebarPosts.map((post) => (
+          <li><a href={normalize(post.data.route)}>{post.data.title}</a></li>
+        ))}
+      </ul>
+      <a href="#" class="sidebar-view-all sidebar-view-all--orange">View All &rarr;</a>
+    </aside>
+
+    <!-- CENTER FEED -->
+    <section class="blog-center-feed">
+      <div class="feed-header">
+        <h1>Uptime Monitoring & Reliability Blog</h1>
+        <p>Expert articles on server uptime, distributed systems, & performance monitoring</p>
+      </div>
+
+      <div class="feed-section-title">
+        <span class="badge badge--orange">🔥 NEWEST ARTICLES</span>
+        <span class="feed-section-subtitle">Latest from our experts</span>
+      </div>
+
+      <!-- FEATURED POST -->
+      {featuredPost && (
+        <a href={normalize(featuredPost.data.route)} class="featured-post-card">
+          <div class="featured-image">
+            <div style="width:100%; height:100%; min-height:250px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:#64748b; font-weight:600;">Featured Image</div>
+          </div>
+          <div class="featured-content">
+            <div class="featured-meta-top">
+              <span class="cat-pill cat-pill--orange">Monitoring</span>
+              <span class="new-pill">🔥 NEW</span>
+            </div>
+            <h2>{featuredPost.data.title}</h2>
+            <p class="clamp-3">{featuredPost.data.description}</p>
+            <div class="featured-meta-bottom">
+              10 min read &bull; <span class="read-article">Read article &rarr;</span>
+            </div>
+          </div>
+        </a>
+      )}
+
+      <!-- GRID POSTS -->
+      <div class="blog-grid">
+        {gridPosts.map((post) => (
+          <a href={normalize(post.data.route)} class="grid-card">
+            <span class="cat-pill cat-pill--yellow">Setup Guide</span>
+            <h3>{post.data.title}</h3>
+            <p class="clamp-4">{post.data.description}</p>
+            <div class="grid-meta">
+              8 min read
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="blog-sidebar blog-sidebar--right">
+      <div class="sidebar-badge sidebar-badge--purple">PERFORMANCE SPECIAL</div>
+      <ul class="sidebar-list">
+        {rightSidebarPosts.map((post) => (
+          <li><a href={normalize(post.data.route)}>{post.data.title}</a></li>
+        ))}
+      </ul>
+      <a href="#" class="sidebar-view-all sidebar-view-all--purple">View All Specials &rarr;</a>
+    </aside>
+
+  </main>
+</Base>
 
 <style>
-  .blog-list {
+  .blog-main-container {
+    max-width: 1440px;
+    margin: 40px auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 260px 1fr 260px;
+    gap: 40px;
+  }
+
+  /* Sidebars */
+  .blog-sidebar {
+    position: sticky;
+    top: 100px;
+    height: max-content;
+  }
+  .sidebar-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+  }
+  .sidebar-badge--orange { background: #E85D04; }
+  .sidebar-badge--purple { background: #8338EC; }
+
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-xl);
-    margin-top: var(--space-lg);
+    gap: 20px;
   }
-  .blog-preview {
-    padding-bottom: var(--space-lg);
-    border-bottom: 1px solid var(--hairline);
+  .sidebar-list li a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    transition: color 0.2s;
+    display: block;
   }
-  .blog-preview:last-child {
-    border-bottom: 0;
-  }
-  .blog-preview h2 {
-    margin: 0 0 var(--space-xs);
-    font-size: var(--size-display-md);
-  }
-  .blog-preview h2 a {
+  .sidebar-list li a:hover {
     color: var(--text-primary);
+  }
+
+  .sidebar-view-all {
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
   }
-  .blog-preview h2 a:hover {
-    color: var(--accent);
+  .sidebar-view-all--orange { color: #E85D04; }
+  .sidebar-view-all--purple { color: #8338EC; }
+
+  /* Center Feed */
+  .blog-center-feed {
+    display: flex;
+    flex-direction: column;
   }
-  .blog-desc {
-    margin: 0 0 var(--space-sm);
+  .feed-header {
+    margin-bottom: 40px;
+  }
+  .feed-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+  }
+  .feed-header p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .feed-section-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .badge--orange { background: #E85D04; }
+  .feed-section-subtitle {
+    font-size: 14px;
     color: var(--text-secondary);
   }
-  .read-more {
-    font-family: var(--font-display);
-    font-size: var(--size-small);
-    color: var(--accent-text);
+
+  /* Featured Post */
+  .featured-post-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #FFF9EB; /* Soft yellow bg */
+    border: 1px solid #FDE68A;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 32px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .featured-post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+  }
+  .featured-image {
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+  }
+  .featured-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .featured-content {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .featured-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .cat-pill {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .cat-pill--orange { background: #E85D04; color: #fff; }
+  .cat-pill--yellow { background: #FDE68A; color: #92400E; }
+  .new-pill {
+    background: #E85D04;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .featured-content h2 {
+    font-size: 24px;
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+    color: var(--text-primary);
+  }
+  .featured-content p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+  }
+  .featured-meta-bottom {
+    font-size: 13px;
+    color: var(--text-tertiary);
+  }
+  .read-article {
+    color: #E85D04;
+    font-weight: 600;
+  }
+
+  /* Grid Posts */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .grid-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .grid-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+    border-color: #FDE68A;
+  }
+  .grid-card .cat-pill {
+    align-self: flex-start;
+    margin-bottom: 16px;
+  }
+  .grid-card h3 {
+    font-size: 18px;
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+    color: var(--text-primary);
+  }
+  .grid-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+    flex-grow: 1;
+  }
+  .grid-meta {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  @media (max-width: 1100px) {
+    .blog-main-container {
+      grid-template-columns: 1fr;
+    }
+    .blog-sidebar {
+      position: static;
+      margin-bottom: 40px;
+    }
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .featured-post-card {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 768px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Utility classes */
+  .clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 </style>
