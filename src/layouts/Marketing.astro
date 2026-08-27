@@ -15,7 +15,10 @@ const { title, description, h1, eyebrow = "WhatPing", jsonLd } = Astro.props;
 <Base title={title} description={description} jsonLd={jsonLd}>
   <div class="shell">
     <div class="page-head">
-      <p class="eyebrow">{eyebrow}</p>
+      <div class="hero-eyebrow">
+        <span class="square-dot"></span> {eyebrow}
+        <span class="eyebrow-line"></span>
+      </div>
       <h1>{h1}</h1>
     </div>
 

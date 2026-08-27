@@ -15,6 +15,8 @@ const page = z.object({
   /** Optional subhead + kicker for the page header band; both default sensibly. */
   lede: z.string().optional(),
   eyebrow: z.string().optional(),
+  image: z.string().optional(),
+  pubDate: z.coerce.date().optional(),
 });
 
 export const collections = {

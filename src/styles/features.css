@@ -1,0 +1,44 @@
+/* Break out of the prose max-width for the Features grid */
+.prose:has(.features-page-wrapper) {
+  max-width: none !important;
+}
+
+.features-page-wrapper {
+  max-width: 100%;
+  margin: 0 auto;
+  padding-top: clamp(1rem, 3vw, 2rem);
+}
+.section-header-block {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.section-header-block h2:first-of-type {
+  font-family: var(--font-display);
+  font-size: var(--size-eyebrow);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-xs);
+  font-weight: var(--weight-strong);
+}
+
+.section-header-block h2:nth-of-type(2) {
+  font-family: var(--font-display);
+  font-size: var(--size-display-md);
+  letter-spacing: var(--track-display);
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.section-header-block p,
+.section-header-block a {
+  font-family: var(--font-sans);
+  font-size: var(--size-body-lg);
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.section-header-block a:hover {
+  color: var(--accent);
+}

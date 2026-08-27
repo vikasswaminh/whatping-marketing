@@ -1,0 +1,85 @@
+---
+// FeatureCard.astro
+export interface Props {
+  fullWidth?: boolean;
+}
+
+const { fullWidth = false } = Astro.props;
+---
+<div class={`feature-card ${fullWidth ? 'full-width' : ''}`}>
+  <div class="card-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .feature-card {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    transition: transform var(--duration) var(--ease), border-color var(--duration) var(--ease);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  /* Style the markdown content passed into the slot */
+  .card-content :global(p:first-of-type strong) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-size: var(--size-headline);
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  /* The link inside the strong tag becomes the Learn More arrow */
+  .card-content :global(p:first-of-type strong a) {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .card-content :global(p:first-of-type strong a::after) {
+    content: "→";
+    color: var(--accent);
+    font-size: var(--size-body-lg);
+    transition: transform var(--duration) var(--ease);
+  }
+
+  .feature-card:hover .card-content :global(p:first-of-type strong a::after) {
+    transform: translateX(4px);
+  }
+
+  .card-content :global(p:not(:first-of-type)) {
+    font-family: var(--font-sans);
+    font-size: var(--size-body);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .card-content :global(code) {
+    background: var(--surface-sunken);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--text-primary);
+  }
+
+  @media (min-width: 768px) {
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

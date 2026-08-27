@@ -1,0 +1,93 @@
+---
+// HorizontalCTA.astro
+export interface Props {
+  buttonLabel?: string;
+  buttonHref?: string;
+}
+
+const { buttonLabel, buttonHref } = Astro.props;
+---
+<div class="horizontal-cta">
+  <div class="cta-layout">
+    <div class="cta-text">
+      <slot />
+    </div>
+    {buttonLabel && buttonHref && (
+      <a href={buttonHref} class="cta-button">{buttonLabel}</a>
+    )}
+  </div>
+</div>
+
+<style>
+  .horizontal-cta {
+    margin-bottom: var(--space-xl);
+  }
+
+  .cta-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .cta-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .cta-text :global(h2) {
+    font-family: var(--font-display);
+    font-size: var(--size-headline);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .cta-text :global(p) {
+    font-family: var(--font-sans);
+    font-size: var(--size-body-lg);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .cta-text :global(p a:not(.btn)) {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    font-weight: var(--weight-strong);
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: var(--weight-strong);
+    transition: background var(--duration) var(--ease), transform var(--duration) var(--ease);
+    align-self: flex-start;
+    white-space: nowrap;
+  }
+
+  .cta-button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+
+  @media (min-width: 768px) {
+    .cta-layout {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2xl);
+    }
+    
+    .cta-button {
+      align-self: center;
+    }
+  }
+</style>

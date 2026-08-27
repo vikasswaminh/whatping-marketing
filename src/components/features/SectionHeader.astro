@@ -1,0 +1,80 @@
+---
+// SectionHeader.astro
+export interface Props {
+  iconHtml?: string;
+}
+
+const { iconHtml } = Astro.props;
+---
+<div class="section-header-block">
+  <div class="header-icon-wrapper">
+    {iconHtml && (
+      <div class="header-icon" set:html={iconHtml} />
+    )}
+  </div>
+  <div class="header-text">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .section-header-block {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+    margin-bottom: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  .header-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--surface-raised);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: -8px;
+  }
+
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .header-text :global(h2) {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    line-height: 1.2;
+  }
+
+  .header-text :global(h2:first-of-type) {
+    font-family: var(--font-display);
+    font-size: var(--size-headline);
+    color: var(--text-primary);
+    font-weight: var(--weight-strong);
+  }
+
+  .header-text :global(h2:nth-of-type(2)) {
+    font-family: var(--font-display);
+    font-size: var(--size-display-sm);
+    letter-spacing: var(--track-display);
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  .header-text :global(p),
+  .header-text :global(a) {
+    font-family: var(--font-sans);
+    font-size: var(--size-body-lg);
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+  
+</style>

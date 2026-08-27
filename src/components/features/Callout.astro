@@ -1,0 +1,66 @@
+---
+// Callout.astro
+export interface Props {
+  iconHtml?: string;
+}
+
+const { iconHtml } = Astro.props;
+---
+<div class="callout">
+  <div class="callout-inner">
+    {iconHtml && (
+      <div class="callout-icon" set:html={iconHtml} />
+    )}
+    <div class="callout-content">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .callout {
+    background: #FFFAF0; /* A very light soft yellow based on mockup */
+    border: 1px solid var(--accent-line); /* extremely subtle */
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    font-family: var(--font-sans);
+    font-size: var(--size-sm);
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-weight: var(--weight-strong);
+  }
+
+  .callout-inner {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-md);
+    align-items: flex-start;
+  }
+  
+  .callout-icon {
+    flex-shrink: 0;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+
+  /* Make links look like proper CTAs */
+  .callout-content :global(a) {
+    display: inline-flex;
+    align-items: center;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: var(--weight-strong);
+    margin-top: var(--space-sm);
+  }
+
+  .callout-content :global(a::after) {
+    content: "→";
+    margin-left: 6px;
+    font-size: 1.1em;
+    transition: transform var(--duration) var(--ease);
+  }
+
+  .callout-content :global(a:hover::after) {
+    transform: translateX(4px);
+  }
+</style>

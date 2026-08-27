@@ -1,0 +1,32 @@
+---
+// FeatureGrid.astro
+export interface Props {
+  columns?: 2 | 3 | 4;
+  className?: string;
+}
+
+const { columns = 2, className = "" } = Astro.props;
+---
+<div class={`feature-grid cols-${columns} ${className}`}>
+  <slot />
+</div>
+
+<style>
+  .feature-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl) var(--space-lg);
+    margin-bottom: 80px;
+    align-items: flex-start;
+  }
+
+  @media (min-width: 768px) {
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } /* 2 on tablet for 4-cols */
+  }
+
+  @media (min-width: 1024px) {
+    .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+</style>

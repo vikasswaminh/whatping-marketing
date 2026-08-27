@@ -1,0 +1,47 @@
+---
+// AlertingPanel.astro
+---
+<div class="alerting-panel">
+  <div class="panel-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .alerting-panel {
+    margin-bottom: 0;
+  }
+
+  /* Style the markdown list passed into the slot */
+  .panel-content :global(ul) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .panel-content :global(li) {
+    position: relative;
+    padding-left: var(--space-md);
+    font-family: var(--font-sans);
+    font-size: var(--size-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .panel-content :global(li::before) {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: bold;
+  }
+
+  /* Make inline bold text darker */
+  .panel-content :global(li strong) {
+    color: var(--text-primary);
+    font-weight: var(--weight-strong);
+  }
+</style>

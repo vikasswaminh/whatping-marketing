@@ -1,0 +1,17 @@
+---
+// CardBox.astro
+---
+<div class="card-box">
+  <slot />
+</div>
+
+<style>
+  .card-box {
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    height: 100%;
+    box-sizing: border-box;
+  }
+</style>

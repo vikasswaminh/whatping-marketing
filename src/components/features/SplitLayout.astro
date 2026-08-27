@@ -1,0 +1,83 @@
+---
+// SplitLayout.astro
+export interface Props {
+  reverse?: boolean; // If true, right side takes less space (e.g. Callout)
+}
+const { reverse = false } = Astro.props;
+---
+<div class={`split-layout ${reverse ? 'reverse' : ''}`}>
+  <div class="split-left">
+    <slot name="left" />
+  </div>
+  <div class="split-right">
+    <slot name="right" />
+  </div>
+</div>
+
+<style>
+  .split-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    margin-bottom: 80px;
+    align-items: flex-start;
+  }
+
+  .split-left :global(p) {
+    font-family: var(--font-sans);
+    font-size: var(--size-body-lg);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .split-right {
+    font-family: var(--font-sans);
+    font-size: var(--size-body);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  
+  /* Shared list styles */
+  .split-left :global(ul), .split-right :global(ul) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .split-left :global(li), .split-right :global(li) {
+    position: relative;
+    padding-left: var(--space-md);
+  }
+
+  .split-left :global(li::before), .split-right :global(li::before) {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    color: var(--accent);
+    font-weight: bold;
+  }
+
+  .split-left :global(li strong), .split-right :global(li strong) {
+    color: var(--text-primary);
+    font-weight: var(--weight-strong);
+  }
+
+  @media (min-width: 768px) {
+    .split-layout {
+      grid-template-columns: 2fr 1fr;
+      gap: var(--space-xl);
+    }
+    
+    .split-layout.reverse {
+      grid-template-columns: 3fr 2fr;
+    }
+    
+    .split-left :global(ul) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

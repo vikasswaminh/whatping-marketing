@@ -336,7 +336,7 @@
 .metrics-bar {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding-block: 24px;
+  padding-block: 12px;
   background: var(--white);
 }
 .metrics-grid {
@@ -788,8 +788,8 @@
   position: relative;
   width: 100%;
   max-width: 1000px;
-  height: 420px;
-  margin: 0 auto 0;
+  height: 460px;
+  margin: 24px auto 0;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -797,7 +797,7 @@
 
 .arc-dial {
   position: absolute;
-  top: 40px;
+  top: 100px;
   width: 1000px;
   height: 1000px;
   border-radius: 50%;

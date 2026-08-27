@@ -1,0 +1,116 @@
+---
+// FeatureItem.astro
+export interface Props {
+  iconHtml?: string;
+  fullWidth?: boolean;
+  linkHref?: string;
+}
+
+const { iconHtml, fullWidth = false, linkHref } = Astro.props;
+---
+<div class={`feature-item ${fullWidth ? 'full-width' : ''}`}>
+  {iconHtml && (
+    <div class="icon-container" set:html={iconHtml} />
+  )}
+  <div class="item-content">
+    <slot />
+  </div>
+  {linkHref && (
+    <div class="item-link">
+      <a href={linkHref}>Learn more &rarr;</a>
+    </div>
+  )}
+</div>
+
+<style>
+  .feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--surface-raised);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    height: 100%;
+    gap: var(--space-sm);
+    box-sizing: border-box;
+  }
+
+  .icon-container {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: #FFF9E6; /* Light yellow background */
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+  }
+
+  .item-content {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Style the markdown content passed into the slot */
+  .item-content :global(p:first-of-type strong) {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--size-lg);
+    font-weight: var(--weight-strong);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+  }
+
+  /* We will remove the links from the MDX titles, so they won't be styled here, but just in case */
+  .item-content :global(p:first-of-type strong a) {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .item-content :global(p:not(:first-of-type)) {
+    font-family: var(--font-sans);
+    font-size: var(--size-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .item-content :global(code) {
+    background: var(--surface-sunken);
+    padding: 2px 4px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--text-primary);
+  }
+
+  .item-link {
+    margin-top: auto;
+    padding-top: var(--space-md);
+  }
+  
+  .item-link a {
+    font-family: var(--font-sans);
+    font-size: var(--size-sm);
+    font-weight: var(--weight-strong);
+    color: var(--accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .item-link a:hover {
+    text-decoration: underline;
+  }
+
+  @media (min-width: 768px) {
+    .full-width {
+      grid-column: span 2; /* Span 2 columns instead of full width */
+      aspect-ratio: auto;
+    }
+  }
+</style>

@@ -843,15 +843,56 @@ a.btn--secondary,
 /* --- page head ------------------------------------------------------------ */
 
 .page-head {
-  padding: var(--space-2xl) 0 var(--space-lg);
-  margin-bottom: var(--space-lg);
-  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding-top: var(--space-sm);
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
+
+.page-head .hero-eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--size-sm);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+  font-weight: var(--weight-strong);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.page-head .square-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--accent);
+  display: inline-block;
+}
+
+.page-head .eyebrow-line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--accent-line);
+  margin-left: var(--space-xs);
+}
+
 .page-head h1 {
-  max-width: 20ch;
+  font-family: var(--font-display);
+  font-size: var(--size-display-lg);
+  line-height: var(--leading-display);
+  letter-spacing: var(--track-display);
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: var(--space-md);
+  max-width: 800px;
 }
+
 .page-head .lede {
-  margin: var(--space-sm) 0 0;
+  margin: 0;
 }
 
 /* --- docs ----------------------------------------------------------------- */
