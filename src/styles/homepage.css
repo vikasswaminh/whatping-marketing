@@ -436,19 +436,26 @@
   text-align: center;
   margin-bottom: 64px;
 }
+/* Two equal panels either side of the centre axis. */
 .live-grid {
   display: grid;
-  grid-template-columns: 360px 100px 1fr;
-  align-items: center;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: stretch;
   position: relative;
 }
 
-/* The Orb */
+/* The Orb — framed as the left panel, orb centred within it. */
 .live-orb-wrapper {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
 }
 .live-orb {
   position: relative;
@@ -483,7 +490,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateY(-48px);
 }
 .orb-icon {
   width: 42px;
@@ -522,10 +528,8 @@
 }
 
 .orb-cta {
-  position: absolute;
-  bottom: 54px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  margin-top: 28px;
   z-index: 10;
   background: var(--white);
   color: var(--text-primary);
@@ -543,7 +547,7 @@
   white-space: nowrap;
 }
 .orb-cta:hover {
-  transform: translate(-50%, -2px);
+  transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
@@ -606,60 +610,64 @@
   100% { transform: scale(2.4); opacity: 0; }
 }
 
-/* Service List */
+/* Service List — framed as the right panel, a clean divided table. */
 .live-status-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
 }
 .live-list-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  padding: 0 24px 0 80px;
+  padding: 0 12px 8px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border);
   margin-bottom: 4px;
 }
 .live-list-header span {
   text-align: left;
 }
-.live-list-header span:nth-child(2),
-.live-list-header span:nth-child(3) {
-  margin-left: -36px;
-}
 .live-cards-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 .live-card {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.5fr;
   align-items: center;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 40px;
-  padding: 12px 24px 12px 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease;
+}
+.live-cards-container .live-card:not(:last-child) {
+  border-bottom: 1px solid var(--border);
 }
 .live-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+  background: var(--surface-hover);
 }
 .live-card-service {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  min-width: 0;
+}
+.live-card-text {
+  min-width: 0;
 }
 .live-card-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: #FFF9E6;
   color: #D49000;
   display: flex;
@@ -668,17 +676,23 @@
   flex-shrink: 0;
 }
 .live-card-icon svg {
-  width: 24px; height: 24px;
+  width: 20px; height: 20px;
 }
 .live-card-name {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .live-card-domain {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .live-card-status {
   display: flex;
@@ -686,7 +700,7 @@
 }
 .live-card-latency {
   font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   text-align: left;
   color: var(--text-primary);
@@ -695,8 +709,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -717,24 +731,20 @@
 @media (max-width: 992px) {
   .live-grid {
     grid-template-columns: 1fr;
-    gap: 64px;
-  }
-  .live-connectors-wrapper {
-    display: none;
-  }
-  .orb-cta {
-    left: 50%;
-    transform: translateX(-50%);
+    gap: 32px;
   }
   .live-card {
     grid-template-columns: 1fr;
-    border-radius: 24px;
-    padding: 24px;
-    gap: 16px;
+    padding: 20px;
+    gap: 12px;
     text-align: center;
   }
   .live-card-service {
     flex-direction: column;
+  }
+  .live-card-name,
+  .live-card-domain {
+    white-space: normal;
   }
   .live-list-header {
     display: none;
@@ -753,7 +763,8 @@
 .why-item {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 }
 .why-icon {
   font-size: 24px;
@@ -783,60 +794,36 @@
   }
 }
 
-/* Monitoring Arc Dial */
-.arc-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 1000px;
-  height: 460px;
-  margin: 24px auto 0;
-  overflow: hidden;
+/* Monitoring Types — symmetric centred card grid.
+   Flexbox so the odd 11th card sits centred in its own last row (4/4/3),
+   rather than left-anchored the way a CSS grid would leave it. */
+.types-grid {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 16px;
+  max-width: 1000px;
+  margin: 24px auto 0;
 }
-
-.arc-dial {
-  position: absolute;
-  top: 100px;
-  width: 1000px;
-  height: 1000px;
-  border-radius: 50%;
-  animation: spin-dial 120s linear infinite;
-  transform-origin: center center;
-}
-.arc-wrapper:has(.arc-item:hover) .arc-dial,
-.arc-wrapper:has(.arc-item:hover) .arc-item {
-  animation-play-state: paused;
-}
-
-.arc-item {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 220px;
-  padding: 20px;
-  margin: -50px 0 0 -110px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+.type-card {
+  flex: 0 1 calc(25% - 12px);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  padding: 24px 20px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  cursor: pointer;
   text-decoration: none;
-  --angle: calc(var(--index) * (360deg / 11));
-  transform: rotate(var(--angle)) translateY(-500px) rotate(calc(var(--angle) * -1));
-  animation: counter-spin 120s linear infinite;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s, box-shadow 0.2s;
+  transition: transform var(--duration) var(--ease), border-color 0.2s, box-shadow 0.2s;
 }
-.arc-item:hover, .arc-item.active {
+.type-card:hover {
+  transform: translateY(-2px);
   border-color: var(--butter);
   box-shadow: 0 8px 24px rgba(255, 176, 0, 0.2);
-}
-.arc-item:hover {
-  transform: rotate(var(--angle)) translateY(-520px) rotate(calc(var(--angle) * -1));
 }
 
 .type-card__icon {
@@ -858,38 +845,20 @@
   margin: 0;
 }
 
-@keyframes spin-dial {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-@keyframes counter-spin {
-  0% { transform: rotate(var(--angle)) translateY(-500px) rotate(calc(var(--angle) * -1)) rotate(0deg); }
-  100% { transform: rotate(var(--angle)) translateY(-500px) rotate(calc(var(--angle) * -1)) rotate(-360deg); }
-}
-
 @media (max-width: 900px) {
-  .arc-wrapper {
-    height: 600px;
-  }
-  .arc-dial {
-    width: 800px;
-    height: 800px;
-    top: 150px;
-  }
-  .arc-item {
-    width: 220px;
-    margin: -60px 0 0 -110px;
-    --angle: calc(var(--index) * (360deg / 11));
-    transform: rotate(var(--angle)) translateY(-400px) rotate(calc(var(--angle) * -1));
-    animation: counter-spin-mobile 120s linear infinite;
-  }
-  .arc-item:hover {
-    transform: rotate(var(--angle)) translateY(-415px) rotate(calc(var(--angle) * -1));
+  .type-card {
+    flex-basis: calc(33.333% - 11px);
   }
 }
-@keyframes counter-spin-mobile {
-  0% { transform: rotate(var(--angle)) translateY(-400px) rotate(calc(var(--angle) * -1)) rotate(0deg); }
-  100% { transform: rotate(var(--angle)) translateY(-400px) rotate(calc(var(--angle) * -1)) rotate(-360deg); }
+@media (max-width: 620px) {
+  .type-card {
+    flex-basis: calc(50% - 8px);
+  }
+}
+@media (max-width: 400px) {
+  .type-card {
+    flex-basis: 100%;
+  }
 }
 /* How It Works */
 .process-grid {
@@ -1078,13 +1047,18 @@
 
 @media (max-width: 768px) {
   .proof-grid {
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
+  }
+  .proof-item {
+    flex: 0 1 calc(33.333% - 14px);
   }
 }
 @media (max-width: 480px) {
-  .proof-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .proof-item {
+    flex-basis: calc(50% - 10px);
   }
 }
 
@@ -1145,6 +1119,38 @@
   border: 1px solid #171717;
 }
 
+/* Left-card counterpart to the API code block — a light dashboard snippet so both
+   cards carry equal bottom-anchored mass and read as a balanced pair. */
+.human-agent-preview {
+  margin-top: auto;
+  background: var(--surface-canvas);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ha-preview-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+}
+.ha-preview-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ha-preview-latency {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
 @media (max-width: 768px) {
   .human-agent-grid {
     grid-template-columns: 1fr;
@@ -1155,16 +1161,18 @@
 .final-cta-bar {
   background: var(--butter);
   border-radius: var(--radius-lg);
-  padding: 32px 48px;
+  padding: 48px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  text-align: center;
+  gap: 20px;
 }
 .final-cta-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
 }
 .final-cta-h {
   font-family: var(--font-sans);
