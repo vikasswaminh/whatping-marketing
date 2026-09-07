@@ -5,12 +5,14 @@
     "": {
       "name": "whatping-marketing",
       "dependencies": {
-        "@astrojs/mdx": "^7.0.5",
+        "@astrojs/mdx": "~7.0.7",
         "@astrojs/sitemap": "^3.7.3",
         "@fontsource-variable/geist-mono": "^5.3.0",
         "@fontsource-variable/ibm-plex-sans": "^5.3.0",
         "@fontsource-variable/martian-mono": "^5.3.0",
-        "astro": "^7.1.6",
+        "@fontsource-variable/outfit": "^5.3.0",
+        "@fontsource/plus-jakarta-sans": "^5.3.0",
+        "astro": "~7.2.4",
         "cookie": "^2.0.1",
       },
     },
@@ -147,6 +149,10 @@
     "@fontsource-variable/ibm-plex-sans": ["@fontsource-variable/ibm-plex-sans@5.3.0", "", {}, "sha512-agG8tXFEo0hD9+J7npa4vbbWult52eMLVaQ6WQRlhs/iCAojrMAoejru85W9HTVXHfyUj96KM7gp/KGAS87XaQ=="],
 
     "@fontsource-variable/martian-mono": ["@fontsource-variable/martian-mono@5.3.0", "", {}, "sha512-0wVODx9ILwNnaYC4XCuSaFRYtj1Prd89MRVaSuv2ng6zLiQkS4SepaWEPefs7vqCZS8sbEOA8jb/4F5KNMnGdg=="],
+
+    "@fontsource-variable/outfit": ["@fontsource-variable/outfit@5.3.0", "", {}, "sha512-fPb5XnYK0k7SbR++HEmm4+ZqDszmLKQ+sPRUr8oQ/KNC0vy6r6hazJFe8iYozv4cqlHbvJ/JECkJWrfDodUMVQ=="],
+
+    "@fontsource/plus-jakarta-sans": ["@fontsource/plus-jakarta-sans@5.3.0", "", {}, "sha512-9WRw3G74Ve4cyPApAZSXLPY5DiLOZXDn7Q7dIBjFBpA0Pj56ljDItEdy2UUajjJxRuTg2HkMLO5C3K2nAQORWg=="],
 
     "@img/colour": ["@img/colour@1.1.0", "", {}, "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ=="],
 
