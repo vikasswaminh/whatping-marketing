@@ -4,25 +4,25 @@ import ProcessStep from "./ProcessStep.astro";
 const steps = [
   {
     stepNumber: "STEP 01",
-    icon: "📡",
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`,
     title: "Add Monitor",
     description: "Input your website url, API, or TCP socket address."
   },
   {
     stepNumber: "STEP 02",
-    icon: "🔍",
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
     title: "Probing",
     description: "Nodes check your services at your specified frequency."
   },
   {
     stepNumber: "STEP 03",
-    icon: "⚠️",
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
     title: "Detect",
     description: "Failures are instantly verified by adjacent nodes."
   },
   {
     stepNumber: "STEP 04",
-    icon: "📢",
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
     title: "Alert",
     description: "Receive high-priority alerts on chosen channels."
   }
@@ -30,7 +30,7 @@ const steps = [
 ---
 <section class="homepage-section" id="how-it-works">
   <div class="container">
-    <h2 class="section-title">How it works</h2>
+    <h2 class="section-title">How it <span class="accent-text">works</span></h2>
     <p class="section-subtitle">A simple, automated workflow that takes less than 3 minutes to set up.</p>
     
     <div class="process-grid">

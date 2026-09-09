@@ -1,16 +1,16 @@
-/* ==========================================================================
-   WhatPing design tokens — operator console
+﻿/* ==========================================================================
+   WhatPing design tokens â€” operator console
 
    Three tiers. Nothing outside this file states a colour.
 
-     1. Signal    — the eight exact brand values, as hex.
-     2. Surfaces  — dark-first, with a paper set scoped to .band--paper.
-     3. Semantic  — what components reference.
+     1. Signal    â€” the eight exact brand values, as hex.
+     2. Surfaces  â€” dark-first, with a paper set scoped to .band--paper.
+     3. Semantic  â€” what components reference.
 
    Dark-first is the point, not a preference. The product is an instrument that
    watches things; the site is typeset as the readout it sells rather than as a
    brochure about one. Docs invert to paper because long-form reference reading
-   is a different job from being sold to — same grid, same type, other material.
+   is a different job from being sold to â€” same grid, same type, other material.
 
    The previous palette was capacity.so's: a cream page with dark bands. It was
    competent and it was someone else's. This one is ours.
@@ -20,7 +20,7 @@
   /* --- 1. signal ------------------------------------------------------- */
 
   /* Amber phosphor. Chosen over the usual terminal green because green is
-     already spoken for here — it means UP — and an accent that collides with a
+     already spoken for here â€” it means UP â€” and an accent that collides with a
      status colour stops carrying information. */
   --signal-amber: #ffb000;
   --signal-amber-bright: #ffc94d;
@@ -59,7 +59,7 @@
   /* Amber is the accent *and* the warning, deliberately. On a monitoring
      product the brand colour being the attention colour is correct rather than
      confused. The mitigation is the rule in 01-BRAND.md: status is always a
-     labelled pill, never bare coloured text — DOWN does the work, the colour
+     labelled pill, never bare coloured text â€” DOWN does the work, the colour
      reinforces it. */
   --status-warn: var(--signal-amber);
   --status-idle: var(--text-quaternary);
@@ -72,7 +72,7 @@
 
   /* The old palette needed two accent forms because orange on cream was 2.2:1
      as text. Amber on #08090a is 10.87:1, so the fill and the text form are the
-     same value here and the split collapses. It does not disappear — it moves
+     same value here and the split collapses. It does not disappear â€” it moves
      to .band--paper, where it comes back for the same reason it existed. */
   --accent: var(--signal-amber);
   --accent-text: var(--signal-amber);
@@ -95,10 +95,10 @@
   /* Display and UI are set in a *monospace*. That is the whole typographic
      idea: headings, nav, buttons and section labels are instrument labelling,
      so they are set in the face that labels instruments. Long-form prose is
-     not — mono at length is tiring — so body copy drops to Plex Sans, and
+     not â€” mono at length is tiring â€” so body copy drops to Plex Sans, and
      numbers and code stay in a tighter mono than the display face.
 
-     Martian Mono ships a width axis (75%–112.5%). --width-display uses the top
+     Martian Mono ships a width axis (75%â€“112.5%). --width-display uses the top
      of it; if the axis is ever missing the type merely stops being wide. */
   --font-display: "Martian Mono Variable", ui-monospace, SFMono-Regular, monospace;
   --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
@@ -120,7 +120,7 @@
   --size-eyebrow: 0.6875rem;
   --size-mono: 0.8125rem;
 
-  /* Mono needs far less negative tracking than a serif — the sidebearings are
+  /* Mono needs far less negative tracking than a serif â€” the sidebearings are
      already even. The eyebrow tier goes strongly *positive* instead, which is
      what makes a label read as stencilled onto a panel. */
   --track-display: -0.03em;
@@ -148,7 +148,7 @@
   --space-section: clamp(3.5rem, 7vw, 6rem);
 
   /* Panels are machined, not rounded. The scale is kept so nothing breaks, but
-     it collapses to near-zero — a 10px radius reads as software, a 2px radius
+     it collapses to near-zero â€” a 10px radius reads as software, a 2px radius
      reads as a milled edge. The pill survives for status only. */
   --radius: 2px;
   --radius-xs: 0;
@@ -159,7 +159,7 @@
   --radius-2xl: 3px;
   --radius-pill: 999px;
 
-  /* Elevation on near-black is carried by the hairline, not by shadow — a drop
+  /* Elevation on near-black is carried by the hairline, not by shadow â€” a drop
      shadow under a black panel on a black page is invisible work. The tokens
      stay defined so components that ask for one get nothing rather than break.
      .band--paper turns them back on, because there they read. */
@@ -184,7 +184,7 @@
   --grid-line: color-mix(in oklch, var(--text-primary) 4.5%, transparent);
 
   /* Texture. Flat #08090a is a void; grain and a scan line give it a surface to
-     be. Both are deliberately near the threshold of noticing — the moment you
+     be. Both are deliberately near the threshold of noticing â€” the moment you
      can see the effect rather than the depth, it has gone too far. */
   --texture-grain: 0.038;
   --texture-scan: color-mix(in oklch, var(--text-primary) 3.5%, transparent);
@@ -195,7 +195,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Paper. The docs are a printed manual slipped into the console — same grid,
+   Paper. The docs are a printed manual slipped into the console â€” same grid,
    same type, other material. This remaps the same semantic names, so every
    component works inside it unchanged; it is a surface, not a second theme.
    -------------------------------------------------------------------------- */
@@ -211,7 +211,7 @@
   --text-secondary: #3a3f42;
   --text-tertiary: #575e61;
   /* 4.73:1 on paper. #6a7276 was the natural-looking value and it lands at
-     3.97:1 — verify-contrast.py refused it. */
+     3.97:1 â€” verify-contrast.py refused it. */
   --text-quaternary: #5f6669;
 
   --hairline: #cfcabe;
@@ -237,7 +237,7 @@
   --focus-ring: color-mix(in oklch, var(--signal-amber-deep) 70%, transparent);
   --selection: color-mix(in oklch, var(--signal-amber) 42%, transparent);
 
-  /* Shadow reads on paper, so it comes back — but hairline-first, still. */
+  /* Shadow reads on paper, so it comes back â€” but hairline-first, still. */
   --shadow-2xs: 0 1px 2px 0 #1618180d;
   --shadow-xs: 0 1px 2px 0 #16181812;
   --shadow-sm: 0 1px 2px 0 #16181814;
@@ -271,7 +271,7 @@
   --butter: #F9B900;
   --butter-bright: #FFBD00;
   --butter-soft: #FFF6D8;
-  --cream: #FFFCF5;
+  --cream: #FFFFFF;
   --white: #FFFFFF;
   --border: #EDE8DA;
   --muted: #6F6C63;
@@ -279,11 +279,15 @@
   --green-soft: #EAF5EA;
   --orange-soft: #FFF0D6;
 
-  --surface-canvas: var(--cream);
+  --surface-canvas: var(--white);
   --surface-raised: var(--white);
-  --surface-sunken: var(--cream);
+  --surface-sunken: var(--white);
   --surface-overlay: var(--white);
   --surface-hover: var(--butter-soft);
+
+  --texture-grain: 0;
+  --texture-scan: transparent;
+  --grid-line: transparent;
 
   --text-primary: var(--charcoal);
   --text-secondary: var(--charcoal-soft);
@@ -324,5 +328,16 @@
 
   background: var(--surface-canvas);
   color: var(--text-secondary);
+}
+
+
+:root, .band--paper {
+  --surface-canvas: var(--white);
+  --surface-raised: var(--white);
+  --surface-sunken: var(--white);
+  --surface-overlay: var(--white);
+  --surface-hover: var(--butter-soft);
+  --paper-stock: var(--white);
+  background: var(--white) !important;
 }
 

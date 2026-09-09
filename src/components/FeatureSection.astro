@@ -3,22 +3,22 @@ import FeatureCard from "./FeatureCard.astro";
 
 const features = [
   {
-    icon: "📡",
+    image: "/images/feature_monitoring.jpg",
     title: "Monitoring",
     description: "Deep, agentless protocol probing for HTTP, API endpoints, SSL, DNS records, and custom TCP ports."
   },
   {
-    icon: "🔔",
+    image: "/images/feature_alerts.jpg",
     title: "Alerts",
     description: "Instant notifications across Slack, Discord, webhooks, and email, with persistent recovery confirmations."
   },
   {
-    icon: "📊",
+    image: "/images/feature_analytics.jpg",
     title: "Analytics",
     description: "Detailed latency monitoring, packet loss analysis, and historic uptime reports to diagnose trends."
   },
   {
-    icon: "🔌",
+    image: "/images/feature_integrations.jpg",
     title: "Integrations",
     description: "API-first architecture for pipeline registration, custom health heartbeats, and external developer integrations."
   }
@@ -31,7 +31,7 @@ const features = [
     
     <div class="features-grid">
       {features.map((feat) => (
-        <FeatureCard icon={feat.icon} title={feat.title} description={feat.description} />
+        <FeatureCard image={feat.image} title={feat.title} description={feat.description} />
       ))}
     </div>
   </div>

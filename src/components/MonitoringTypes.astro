@@ -1,86 +1,347 @@
 ---
 const types = [
   {
-    icon: "🌐",
     title: "HTTP(s) Monitoring",
     description: "Status ranges, keyword matching, and payload assertions.",
     href: "/features/uptime-monitoring/"
   },
   {
-    icon: "🔒",
     title: "SSL Certificates",
     description: "Days until TLS expiry and validity alerts.",
     href: "/features/certificate-monitoring/"
   },
   {
-    icon: "📡",
     title: "Ping Monitoring",
     description: "Unprivileged ICMP checks for packet loss and median RTT.",
     href: "/features/ping-monitoring/"
   },
   {
-    icon: "🔎",
     title: "DNS Monitoring",
     description: "Assert A, AAAA, MX, TXT, and CNAME records.",
     href: "/features/dns-monitoring/"
   },
   {
-    icon: "🚪",
     title: "Port Monitoring",
     description: "Test direct TCP connections on custom ports.",
     href: "/features/uptime-monitoring/"
   },
   {
-    icon: "🚀",
     title: "UDP Monitoring",
     description: "Send custom payloads over UDP and require valid responses.",
     href: "/features/udp-monitoring/"
   },
   {
-    icon: "📅",
     title: "Domain Expiry",
     description: "Check registration status and days remaining against registries.",
     href: "/features/domain-expiry-monitoring/"
   },
   {
-    icon: "🛡️",
     title: "Email Auth (SPF/DMARC)",
     description: "Verify daily that SPF and DMARC records remain published.",
     href: "/features/email-auth-monitoring/"
   },
   {
-    icon: "⚡",
     title: "gRPC Monitoring",
     description: "Call standard grpc.health.v1.Health/Check for serving status.",
     href: "/features/grpc-monitoring/"
   },
   {
-    icon: "💓",
     title: "Heartbeat Monitoring",
     description: "Monitor cron jobs and pipelines by having them ping a URL.",
     href: "/features/heartbeat-monitoring/"
   },
   {
-    icon: "📨",
     title: "Mail Monitoring",
     description: "Read mail server greetings and complete STARTTLS handshakes.",
     href: "/features/smtp-imap-monitoring/"
   }
 ];
+
+const leftTypes = types.slice(0, 5);
+const rightTypes = types.slice(5, 10);
+const bottomTypes = types.slice(10, 11);
 ---
+
 <section class="homepage-section" id="monitoring-types">
-  <div class="container">
+  <div class="container" style="max-width: 1400px;">
+    
     <h2 class="section-title">What can you monitor?</h2>
     <p class="section-subtitle">We support a wide array of checks spanning multiple protocols, layers, and service types.</p>
     
-    <div class="types-grid">
-      {types.map((t) => (
-        <a href={t.href} class="type-card">
-          <span class="type-card__icon">{t.icon}</span>
-          <h3 class="type-card__h">{t.title}</h3>
-          <p class="type-card__p">{t.description}</p>
+    <div class="spider-wrapper">
+      <svg id="spider-lines" class="spider-lines"></svg>
+      
+      <div class="spider-layout">
+        
+        <!-- ROW 1 -->
+        <a href={types[0].href} class="spider-card spider-card--left" style="grid-row: 1; grid-column: 1;">
+          <h3 class="spider-card__h">{types[0].title}</h3>
+          <p class="spider-card__p">{types[0].description}</p>
         </a>
-      ))}
+        <a href={types[5].href} class="spider-card spider-card--right" style="grid-row: 1; grid-column: 3;">
+          <h3 class="spider-card__h">{types[5].title}</h3>
+          <p class="spider-card__p">{types[5].description}</p>
+        </a>
+        
+        <!-- ROW 2 -->
+        <a href={types[1].href} class="spider-card spider-card--left" style="grid-row: 2; grid-column: 1;">
+          <h3 class="spider-card__h">{types[1].title}</h3>
+          <p class="spider-card__p">{types[1].description}</p>
+        </a>
+        <a href={types[6].href} class="spider-card spider-card--right" style="grid-row: 2; grid-column: 3;">
+          <h3 class="spider-card__h">{types[6].title}</h3>
+          <p class="spider-card__p">{types[6].description}</p>
+        </a>
+
+        <!-- ROW 3 -->
+        <a href={types[2].href} class="spider-card spider-card--left" style="grid-row: 3; grid-column: 1;">
+          <h3 class="spider-card__h">{types[2].title}</h3>
+          <p class="spider-card__p">{types[2].description}</p>
+        </a>
+        
+        <!-- EYE CENTER -->
+        <div class="spider-eye-wrapper" id="spider-center-node" style="grid-row: 2 / 5; grid-column: 2; justify-self: center;">
+          <div class="spider-eye-ring spider-eye-ring--outer"></div>
+          <div class="spider-eye-ring spider-eye-ring--inner"></div>
+          <div class="spider-eye-core">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#F9B900"/>
+            </svg>
+          </div>
+        </div>
+        
+        <a href={types[7].href} class="spider-card spider-card--right" style="grid-row: 3; grid-column: 3;">
+          <h3 class="spider-card__h">{types[7].title}</h3>
+          <p class="spider-card__p">{types[7].description}</p>
+        </a>
+
+        <!-- ROW 4 -->
+        <a href={types[3].href} class="spider-card spider-card--left" style="grid-row: 4; grid-column: 1;">
+          <h3 class="spider-card__h">{types[3].title}</h3>
+          <p class="spider-card__p">{types[3].description}</p>
+        </a>
+        <a href={types[8].href} class="spider-card spider-card--right" style="grid-row: 4; grid-column: 3;">
+          <h3 class="spider-card__h">{types[8].title}</h3>
+          <p class="spider-card__p">{types[8].description}</p>
+        </a>
+
+        <!-- ROW 5 -->
+        <a href={types[4].href} class="spider-card spider-card--left" style="grid-row: 5; grid-column: 1;">
+          <h3 class="spider-card__h">{types[4].title}</h3>
+          <p class="spider-card__p">{types[4].description}</p>
+        </a>
+        <a href={types[10].href} class="spider-card spider-card--bottom" style="grid-row: 5; grid-column: 2; justify-self: center; margin: 0;">
+          <h3 class="spider-card__h">{types[10].title}</h3>
+          <p class="spider-card__p">{types[10].description}</p>
+        </a>
+        <a href={types[9].href} class="spider-card spider-card--right" style="grid-row: 5; grid-column: 3;">
+          <h3 class="spider-card__h">{types[9].title}</h3>
+          <p class="spider-card__p">{types[9].description}</p>
+        </a>
+
+      </div>
     </div>
+
   </div>
 </section>
+
+<style>
+  .spider-wrapper {
+    position: relative;
+    padding: 2rem 0;
+    margin-top: 2rem;
+  }
+  .spider-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .spider-layout {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-auto-rows: auto;
+    gap: 1.5rem 2rem;
+    position: relative;
+    z-index: 1;
+    align-items: center;
+  }
+  @media (max-width: 900px) {
+    .spider-layout {
+      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+    }
+    .spider-lines {
+      display: none;
+    }
+    .spider-eye-wrapper {
+      order: -1; /* Eye at the top on mobile */
+    }
+  }
+  
+  .spider-card {
+    background: var(--white);
+    border: 1px solid rgba(249, 185, 0, 0.5);
+    border-radius: 12px;
+    padding: 18px 24px;
+    text-decoration: none;
+    color: var(--text-primary);
+    box-shadow: 0 4px 20px rgba(249, 185, 0, 0.05);
+    transition: all 0.2s ease;
+    text-align: center;
+    max-width: 320px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .spider-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 153, 0, 0.15);
+    border-color: #FF9900;
+  }
+  .spider-card__h {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    transition: all 0.2s ease;
+  }
+  .spider-card:hover .spider-card__h {
+    color: #FF9900;
+    text-shadow: 0 0 12px rgba(255, 153, 0, 0.5);
+  }
+  .spider-card__p {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin: 0;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+  }
+  .spider-card:hover .spider-card__p {
+    color: var(--text-primary);
+  }
+
+  /* Center Eye Styling */
+  .spider-eye-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .spider-eye-ring {
+    position: absolute;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .spider-eye-ring--outer {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed rgba(249, 185, 0, 0.3);
+    animation: rotate 20s linear infinite;
+  }
+  .spider-eye-ring--inner {
+    width: 75%;
+    height: 75%;
+    border: 2px solid rgba(249, 185, 0, 0.1);
+    background: rgba(249, 185, 0, 0.05);
+  }
+  .spider-eye-core {
+    width: 50%;
+    height: 50%;
+    background: #FFF;
+    border-radius: 50%;
+    box-shadow: 0 0 30px rgba(249, 185, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .spider-eye-core svg {
+    width: 60%;
+    height: 60%;
+  }
+
+  @keyframes rotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+</style>
+
+<script>
+  function drawSpiderLines() {
+    const svg = document.getElementById('spider-lines');
+    if (!svg || window.getComputedStyle(svg).display === 'none') {
+      if (svg) svg.innerHTML = '';
+      return;
+    }
+    
+    const centerNode = document.getElementById('spider-center-node');
+    if (!centerNode) return;
+    
+    const svgRect = svg.getBoundingClientRect();
+    const centerRect = centerNode.getBoundingClientRect();
+    
+    const cx = centerRect.left - svgRect.left + centerRect.width / 2;
+    const cy = centerRect.top - svgRect.top + centerRect.height / 2;
+    
+    const cards = document.querySelectorAll('.spider-card');
+    let paths = '';
+    
+    cards.forEach(card => {
+      const cardRect = card.getBoundingClientRect();
+      const isLeft = card.classList.contains('spider-card--left');
+      const isRight = card.classList.contains('spider-card--right');
+      const isBottom = card.classList.contains('spider-card--bottom');
+      
+      let startX = 0, startY = 0;
+      
+      if (isLeft) {
+        startX = cardRect.right - svgRect.left;
+        startY = cardRect.top - svgRect.top + cardRect.height / 2;
+      } else if (isRight) {
+        startX = cardRect.left - svgRect.left;
+        startY = cardRect.top - svgRect.top + cardRect.height / 2;
+      } else if (isBottom) {
+        startX = cardRect.left - svgRect.left + cardRect.width / 2;
+        startY = cardRect.top - svgRect.top;
+      }
+      
+      const radius = centerRect.width / 2;
+      const angle = Math.atan2(startY - cy, startX - cx);
+      const circleX = cx + Math.cos(angle) * radius;
+      const circleY = cy + Math.sin(angle) * radius;
+      
+      let cp1X = startX, cp1Y = startY;
+      let cp2X = circleX, cp2Y = circleY;
+      
+      if (isLeft) {
+        cp1X = startX + 40;
+        cp2X = circleX - 40;
+      } else if (isRight) {
+        cp1X = startX - 40;
+        cp2X = circleX + 40;
+      } else if (isBottom) {
+        cp1Y = startY - 40;
+        cp2Y = circleY + 40;
+      }
+
+      paths += `<path d="M ${startX} ${startY} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${circleX} ${circleY}" fill="none" stroke="#F9B900" stroke-width="1.5" />`;
+      paths += `<circle cx="${circleX}" cy="${circleY}" r="4" fill="#F9B900" />`;
+      paths += `<circle cx="${startX}" cy="${startY}" r="3" fill="#F9B900" />`;
+    });
+    
+    svg.innerHTML = paths;
+  }
+
+  window.addEventListener('resize', drawSpiderLines);
+  document.addEventListener('DOMContentLoaded', drawSpiderLines);
+  drawSpiderLines();
+  setTimeout(drawSpiderLines, 100);
+</script>
