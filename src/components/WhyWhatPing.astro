@@ -1,22 +1,22 @@
 ---
 const benefits = [
   {
-    icon: "🌐",
+    image: "/images/why_global.jpg",
     title: "Global Network",
     description: "Probes distributed across major clouds and geographies for neutral external verification."
   },
   {
-    icon: "⚡",
+    image: "/images/why_alerts.jpg",
     title: "Real-time Alerts",
     description: "High-speed dispatching to Slack, Telegram, webhooks, and email before your clients notice."
   },
   {
-    icon: "🧠",
+    image: "/images/why_intelligent.jpg",
     title: "Intelligent Monitoring",
     description: "Built-in validation checks, automatic secondary confirmations, and AI-assisted troubleshooting."
   },
   {
-    icon: "📄",
+    image: "/images/why_reports.jpg",
     title: "Reports & Insights",
     description: "Automated analysis of availability ranges, certificate lifespans, and SPF record setups."
   }
@@ -29,10 +29,12 @@ const benefits = [
     
     <div class="why-grid">
       {benefits.map((b) => (
-        <div class="card why-item">
-          <span class="why-icon">{b.icon}</span>
-          <h3 class="why-title">{b.title}</h3>
-          <p class="why-p">{b.description}</p>
+        <div class="card feat-card why-item">
+          <div class="feat-card__img-wrap">
+            <img src={b.image} alt={b.title} class="feat-card__img" />
+          </div>
+          <h3 class="feat-card__h">{b.title}</h3>
+          <p class="feat-card__p">{b.description}</p>
         </div>
       ))}
     </div>

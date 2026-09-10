@@ -486,8 +486,8 @@
 /* Live Monitoring */
 #live-monitoring {
   background: #0D0D0D;
-  padding-top: 40px;
-  padding-bottom: 80px;
+  padding-top: 32px;
+  padding-bottom: 48px;
 }
 #live-monitoring .section-title {
   color: #FFFFFF;
@@ -497,20 +497,22 @@
 }
 .live-header {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: 40px;
 }
 .live-grid-new {
   display: grid;
   grid-template-columns: 1fr 1.6fr;
-  gap: 32px;
+  gap: 24px;
   align-items: flex-start;
+  max-width: 1040px;
+  margin: 0 auto;
 }
 .live-box {
   background: var(--white);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-  padding: 32px;
+  padding: 24px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -519,14 +521,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   background: #E8F5E9;
-  color: #128807;
+  color: #03A651;
   border-radius: 100px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   align-self: flex-start;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .live-status-dot-green {
   width: 8px; height: 8px;
@@ -536,17 +538,17 @@
 .live-status-dot-red {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: #E4002B;
+  background: #EF4444;
 }
 
 .live-orb-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 .live-orb-outer {
-  width: 320px;
-  height: 320px;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
   border: 1px solid rgba(3, 166, 81, 0.15);
   background: rgba(3, 166, 81, 0.03);
@@ -556,8 +558,8 @@
   justify-content: center;
 }
 .live-orb-middle {
-  width: 270px;
-  height: 270px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
   border: 2px solid #03A651;
   box-shadow: 0 0 30px rgba(3, 166, 81, 0.25), inset 0 0 30px rgba(3, 166, 81, 0.05);
@@ -572,28 +574,28 @@
   align-items: center;
 }
 .live-check-icon {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 .live-check-icon svg {
-  width: 48px; height: 48px;
+  width: 40px; height: 40px;
 }
 .live-orb-text1 {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #555;
   letter-spacing: 0.08em;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   text-transform: uppercase;
 }
 .live-orb-text2 {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 900;
   color: #111;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   letter-spacing: 0.02em;
 }
 .live-orb-text3 {
-  font-size: 14px;
+  font-size: 13px;
   color: #888;
   font-weight: 500;
 }
@@ -601,11 +603,11 @@
 .live-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 12px;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 24px 0;
-  margin-bottom: 24px;
+  padding: 16px 0;
+  margin-bottom: 20px;
 }
 .live-stat-item {
   display: flex;
@@ -646,14 +648,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 .live-right-title {
   font-size: 20px;
   font-weight: 800;
-  margin-bottom: 8px;
+  color: #111;
 }
 .live-right-title-line {
   height: 4px;
@@ -680,7 +680,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 13px;
@@ -695,7 +695,7 @@
   font-size: 11px;
   font-weight: 700;
   color: #888;
-  padding: 16px 24px;
+  padding: 12px 16px;
   background: #F9FAFB;
   border-radius: 8px;
   margin-bottom: 8px;
@@ -709,7 +709,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.5fr auto;
   align-items: center;
-  padding: 16px 24px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border);
 }
 .live-card:last-child {
@@ -1237,8 +1237,8 @@
 
 /* Homepage Footer Custom Layout */
 .home-footer {
-  background: var(--white);
-  border-top: 1px solid var(--border);
+  background: #FFF4E6;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-top: 64px;
   padding-bottom: 48px;
 }
@@ -1259,7 +1259,7 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 12px;
 }
 .home-footer__logo-img {
@@ -1305,7 +1305,7 @@
 }
 
 .home-footer__logos-section {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-block: 32px;
   text-align: center;
 }
@@ -1332,7 +1332,7 @@
 }
 
 .home-footer__bottom {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-top: 24px;
   display: flex;
   align-items: center;
@@ -1355,10 +1355,12 @@
     grid-template-columns: repeat(2, 1fr);
   }
   .home-footer__bottom {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     flex-direction: column;
     gap: 12px;
     text-align: center;
   }
 }
+
 
 
