@@ -214,6 +214,9 @@
 .home-nav__login:hover {
   color: var(--text-primary);
 }
+.home-nav__mobile-actions {
+  display: none;
+}
 
 /* Mobile Nav Toggle */
 .home-nav__toggle {
@@ -248,7 +251,7 @@
     flex-direction: column;
     padding: 24px;
     gap: 16px;
-    justify-self: auto;
+    align-items: flex-start;
   }
   .home-nav__links[data-open="true"] {
     display: flex;
@@ -257,13 +260,24 @@
     display: block;
   }
   .home-nav__actions {
-    display: none;
+    display: none !important;
   }
-  .home-nav__links[data-open="true"] ~ .home-nav__actions {
+  .home-nav__mobile-actions {
     display: flex;
     flex-direction: column;
     width: 100%;
+    gap: 16px;
     margin-top: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .home-nav__mobile-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+  .home-nav__logo-img {
+    height: 60px;
+    transform: none;
   }
 }
 
@@ -329,6 +343,25 @@
 .hero-feature-check {
   color: var(--success);
   font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .hero-ctas {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 300px;
+    margin-inline: auto;
+  }
+  .hero-ctas .btn {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .hero-features {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 /* Hero Background Globe Graphic */
@@ -499,12 +532,31 @@
   text-align: center;
   margin-bottom: 40px;
 }
+.live-grid-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+}
+.live-grid-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.live-grid-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+.live-grid-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
 .live-grid-new {
   display: grid;
   grid-template-columns: 1fr 1.6fr;
   gap: 24px;
   align-items: flex-start;
   max-width: 1040px;
+  min-width: 960px;
   margin: 0 auto;
 }
 .live-box {
@@ -689,9 +741,15 @@
   cursor: pointer;
 }
 
+
+
+
+
+
 .live-table-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.5fr auto;
+  min-width: 650px;
   font-size: 11px;
   font-weight: 700;
   color: #888;
@@ -704,6 +762,7 @@
 .live-cards-container {
   display: flex;
   flex-direction: column;
+  min-width: 650px;
 }
 .live-card {
   display: grid;
@@ -752,28 +811,14 @@
 .live-card-actions { display: flex; justify-content: flex-end; cursor: pointer; }
 
 @media (max-width: 992px) {
-  .live-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
+  .live-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
   }
-  .live-card {
-    grid-template-columns: 1fr;
-    padding: 20px;
-    gap: 12px;
-    text-align: center;
-  }
-  .live-card-service {
+  .live-right-header {
     flex-direction: column;
-  }
-  .live-card-name,
-  .live-card-domain {
-    white-space: normal;
-  }
-  .live-list-header {
-    display: none;
-  }
-  .live-card-location {
-    justify-content: center;
+    gap: 16px;
+    align-items: flex-start;
   }
 }
 
@@ -1361,6 +1406,7 @@
     text-align: center;
   }
 }
+
 
 
 

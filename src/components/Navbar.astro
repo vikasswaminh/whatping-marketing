@@ -21,6 +21,11 @@ import { APP_URL } from "../lib/site";
       <a href="/docs/" class="home-nav__link">Docs</a>
       <a href="/vs/uptime-kuma/" class="home-nav__link">Compare</a>
       <a href="/blog/" class="home-nav__link">Blog</a>
+      
+      <div class="home-nav__mobile-actions">
+        <a href={`${APP_URL}/login`} class="home-nav__login">Log in</a>
+        <a href={APP_URL} class="btn btn--primary">Start Monitoring Free</a>
+      </div>
     </div>
 
     <div class="home-nav__actions" id="home-nav-actions">
@@ -33,19 +38,9 @@ import { APP_URL } from "../lib/site";
 <script>
   const toggle = document.querySelector('[data-home-nav-toggle]');
   const links = document.getElementById('home-nav-links');
-  const actions = document.getElementById('home-nav-actions');
 
   toggle?.addEventListener('click', () => {
     const isOpen = links?.getAttribute('data-open') === 'true';
     links?.setAttribute('data-open', String(!isOpen));
-    if (actions) {
-      actions.style.display = isOpen ? 'none' : 'flex';
-      if (!isOpen) {
-        actions.style.flexDirection = 'column';
-        actions.style.width = '100%';
-        actions.style.alignItems = 'center';
-        actions.style.paddingBottom = '16px';
-      }
-    }
   });
 </script>
