@@ -1078,17 +1078,88 @@
 
 @media (max-width: 860px) {
   .process-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    grid-template-columns: 1fr;
+    gap: 48px;
   }
-  .process-arrow {
-    display: none;
+  .process-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 
+      "icon num"
+      "icon title"
+      "icon desc";
+    background: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: left;
+    align-items: center;
+    column-gap: 20px;
+    row-gap: 4px;
+  }
+  .process-card {
+    grid-area: icon;
+    margin: 0;
+  }
+  .process-num {
+    grid-area: num;
+    margin: 0;
+    justify-self: start;
+    font-size: 11px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .process-title {
+    grid-area: title;
+    margin: 0;
+    font-size: 16px;
+  }
+  .process-desc {
+    grid-area: desc;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .process-connector {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 48px;
+    flex-direction: column;
+  }
+  .connector-line {
+    width: 100%;
+    height: 100%;
+    background: var(--border);
+  }
+  .connector-fill {
+    width: 100%;
+    height: 100%;
+    transform-origin: top;
+    background: linear-gradient(180deg, #FF8C00 0%, #F9B900 100%);
+  }
+  .process-item.is-loading .connector-fill {
+    animation: fill-connector-mobile 0.5s linear 2s forwards;
+  }
+  .connector-arrow {
+    transform: rotate(90deg);
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    background: #0D0D0D;
   }
 }
-@media (max-width: 480px) {
-  .process-grid {
-    grid-template-columns: 1fr;
-  }
+@keyframes fill-connector-mobile {
+  0% { transform: scaleY(0); }
+  100% { transform: scaleY(1); }
 }
 
 /* Proof Metrics */
