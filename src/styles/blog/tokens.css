@@ -1,0 +1,299 @@
+/* ==========================================================================
+   WhatPing design tokens — operator console
+
+   Three tiers. Nothing outside this file states a colour.
+
+     1. Signal    — the eight exact brand values, as hex.
+     2. Surfaces  — dark-first, with a paper set scoped to .band--paper.
+     3. Semantic  — what components reference.
+
+   Dark-first is the point, not a preference. The product is an instrument that
+   watches things; the site is typeset as the readout it sells rather than as a
+   brochure about one. Docs invert to paper because long-form reference reading
+   is a different job from being sold to — same grid, same type, other material.
+
+   The previous palette was capacity.so's: a cream page with dark bands. It was
+   competent and it was someone else's. This one is ours.
+   ========================================================================== */
+
+:root {
+  /* --- 1. signal ------------------------------------------------------- */
+
+  /* Amber phosphor. Chosen over the usual terminal green because green is
+     already spoken for here — it means UP — and an accent that collides with a
+     status colour stops carrying information. */
+  --signal-amber: #ffb000;
+  --signal-amber-bright: #ffc94d;
+  /* The paper form. Amber on paper is ~1.7:1, so words on the manual surface
+     take this instead. See the note under --accent-text. */
+  --signal-amber-deep: #9a4a00;
+  --signal-green: #35d67f;
+  --signal-red: #ff5c4d;
+
+  /* Cold near-black with a faint cyan cast: a screen, not anodised metal. */
+  --console-void: #08090a;
+  --console-bay: #0e1113;
+  --paper-stock: #ffffff;
+
+  /* --- 2. surfaces, console -------------------------------------------- */
+
+  --surface-canvas: var(--console-void);
+  --surface-raised: var(--console-bay);
+  --surface-sunken: #0b0d0f;
+  --surface-overlay: #14181a;
+  --surface-hover: #171c1e;
+
+  --text-primary: #f4f6f6;
+  --text-secondary: #c8d0d1;
+  --text-tertiary: #9aa5a7;
+  /* 5.39:1 on canvas, 5.12:1 on a bay. The eyebrow tier is set in this and
+     eyebrows are 11px, so it has to clear AA as small text rather than large. */
+  --text-quaternary: #7c8789;
+
+  --hairline: #1b2124;
+  --hairline-strong: #2a3236;
+  --hairline-loud: #3c464b;
+
+  --status-up: var(--signal-green);
+  --status-down: var(--signal-red);
+  /* Amber is the accent *and* the warning, deliberately. On a monitoring
+     product the brand colour being the attention colour is correct rather than
+     confused. The mitigation is the rule in 01-BRAND.md: status is always a
+     labelled pill, never bare coloured text — DOWN does the work, the colour
+     reinforces it. */
+  --status-warn: var(--signal-amber);
+  --status-idle: var(--text-quaternary);
+
+  --status-up-bg: #06170e;
+  --status-down-bg: #1c0a08;
+  --status-warn-bg: #1d1200;
+
+  /* --- 3. semantic ------------------------------------------------------ */
+
+  /* The old palette needed two accent forms because orange on cream was 2.2:1
+     as text. Amber on #08090a is 10.87:1, so the fill and the text form are the
+     same value here and the split collapses. It does not disappear — it moves
+     to .band--paper, where it comes back for the same reason it existed. */
+  --accent: var(--signal-amber);
+  --accent-text: var(--signal-amber);
+  --accent-ink: #120b00;
+  --accent-hover: var(--signal-amber-bright);
+  --accent-active: color-mix(in oklch, var(--signal-amber), black 12%);
+  --accent-soft: var(--status-warn-bg);
+  --accent-line: color-mix(in oklch, var(--accent) 42%, var(--hairline));
+  /* Non-text UI is held to 3:1 by WCAG 1.4.11. Amber clears that on every
+     surface in this set, so unlike the previous palette the indicator does not
+     need a separate darker value. */
+  --accent-indicator: var(--accent);
+  --accent-glow: color-mix(in oklch, var(--signal-amber) 13%, transparent);
+
+  --focus-ring: color-mix(in oklch, var(--signal-amber) 75%, transparent);
+  --selection: color-mix(in oklch, var(--signal-amber) 30%, transparent);
+
+  /* Brand gradient: orange → yellow (matches the logo) */
+  --gradient-brand: linear-gradient(135deg, #FF6B00 0%, #FF8C00 35%, #FFB800 70%, #FFD700 100%);
+
+  /* --- typography ------------------------------------------------------- */
+
+  /* Display and UI are set in a *monospace*. That is the whole typographic
+     idea: headings, nav, buttons and section labels are instrument labelling,
+     so they are set in the face that labels instruments. Long-form prose is
+     not — mono at length is tiring — so body copy drops to Plex Sans, and
+     numbers and code stay in a tighter mono than the display face.
+
+     Martian Mono ships a width axis (75%–112.5%). --width-display uses the top
+     of it; if the axis is ever missing the type merely stops being wide. */
+  --font-display: "Martian Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
+
+  --width-display: 112.5%;
+  --width-ui: 100%;
+
+  /* A wide mono eats roughly 1.4x the horizontal space of the serif this
+     replaces, so the display ramp is scaled down to hold the same measure. */
+  --size-display-xl: clamp(1.85rem, 0.95rem + 3.5vw, 3rem);
+  --size-display-lg: clamp(1.5rem, 1.08rem + 1.8vw, 2.375rem);
+  --size-display-md: clamp(1.25rem, 1.05rem + 0.95vw, 1.75rem);
+  --size-headline: clamp(1.08rem, 0.98rem + 0.5vw, 1.3125rem);
+  --size-title: 1.125rem;
+  --size-body-lg: 1.0625rem;
+  --size-body: 1rem;
+  --size-small: 0.875rem;
+  --size-eyebrow: 0.6875rem;
+  --size-mono: 0.8125rem;
+
+  /* Mono needs far less negative tracking than a serif — the sidebearings are
+     already even. The eyebrow tier goes strongly *positive* instead, which is
+     what makes a label read as stencilled onto a panel. */
+  --track-display: -0.03em;
+  --track-heading: -0.02em;
+  --track-title: -0.01em;
+  --track-body: 0;
+  --track-eyebrow: 0.18em;
+  --leading-display: 1.06;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-strong: 600;
+  --weight-display: 600;
+
+  /* --- space and shape -------------------------------------------------- */
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-section: clamp(3.5rem, 7vw, 6rem);
+
+  /* Panels are machined, not rounded. The scale is kept so nothing breaks, but
+     it collapses to near-zero — a 10px radius reads as software, a 2px radius
+     reads as a milled edge. The pill survives for status only. */
+  --radius: 2px;
+  --radius-xs: 0;
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
+  --radius-pill: 999px;
+
+  /* Elevation on near-black is carried by the hairline, not by shadow — a drop
+     shadow under a black panel on a black page is invisible work. The tokens
+     stay defined so components that ask for one get nothing rather than break.
+     .band--paper turns them back on, because there they read. */
+  --shadow-2xs: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  --measure: 68ch;
+  --shell: 78rem;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+
+  /* The rail: a 1px instrument margin down the left of the shell. */
+  --rail: 1px;
+  --rail-gap: clamp(0.75rem, 2vw, 1.5rem);
+
+  /* The graticule: a faint square grid ruled onto the screen, one shade above
+     the scan line. Built like --texture-scan (text-primary at a low percent) so
+     it belongs to the surface rather than sitting on top of it. */
+  --grid-size: 40px;
+  --grid-line: color-mix(in oklch, var(--text-primary) 4.5%, transparent);
+
+  /* Texture. Flat #08090a is a void; grain and a scan line give it a surface to
+     be. Both are deliberately near the threshold of noticing — the moment you
+     can see the effect rather than the depth, it has gone too far. */
+  --texture-grain: 0.038;
+  --texture-scan: color-mix(in oklch, var(--text-primary) 3.5%, transparent);
+
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 120ms;
+  --duration: 200ms;
+}
+
+/* --------------------------------------------------------------------------
+   Paper. The docs are a printed manual slipped into the console — same grid,
+   same type, other material. This remaps the same semantic names, so every
+   component works inside it unchanged; it is a surface, not a second theme.
+   -------------------------------------------------------------------------- */
+
+.band--paper {
+  --surface-canvas: #ffffff;
+  --surface-raised: #f8f8f8;
+  --surface-sunken: #f0f0f0;
+  --surface-overlay: #ffffff;
+  --surface-hover: #f5f5f5;
+
+  /* Disable all texture/grain/scanline overlays on white background */
+  --texture-grain: 0;
+  --texture-scan: transparent;
+  --grid-line: transparent;
+
+  background: var(--surface-canvas);
+  color: var(--text-secondary);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --text-tertiary: #c3cccd;
+    --text-quaternary: #a7b1b2;
+    --hairline: #2a3236;
+    --hairline-strong: #465256;
+  }
+
+  .band--paper {
+    --text-tertiary: #35393b;
+    --text-quaternary: #43494b;
+    --hairline: #b3aa99;
+    --hairline-strong: #8d8371;
+  }
+}
+
+/* --- Homepage Theme Override --- */
+.theme-homepage {
+  --charcoal: #171717;
+  --charcoal-soft: #292929;
+  --butter: #F9B900;
+  --butter-bright: #FFBD00;
+  --butter-soft: #FFF6D8;
+  --cream: #FFFFFF;
+  --white: #FFFFFF;
+  --border: #EDE8DA;
+  --muted: #6F6C63;
+  --success: #3F8F55;
+  --green-soft: #EAF5EA;
+  --orange-soft: #FFF0D6;
+
+  --surface-canvas: #FFFFFF;
+  --surface-raised: var(--white);
+  --surface-sunken: #FFFFFF;
+  --surface-overlay: var(--white);
+  --surface-hover: var(--butter-soft);
+
+  --text-primary: var(--charcoal);
+  --text-secondary: var(--charcoal-soft);
+  --text-tertiary: var(--muted);
+  --text-quaternary: var(--muted);
+
+  --hairline: var(--border);
+  --hairline-strong: var(--border);
+  --hairline-loud: var(--muted);
+
+  --status-up: var(--success);
+  --status-down: #E05243;
+  --status-warn: var(--butter);
+
+  --status-up-bg: var(--green-soft);
+  --status-down-bg: #FBEBE9;
+  --status-warn-bg: var(--butter-soft);
+
+  --accent: var(--butter);
+  --accent-text: var(--charcoal);
+  --accent-ink: var(--charcoal);
+  --accent-hover: var(--butter-bright);
+  --accent-active: var(--butter);
+  --accent-soft: var(--butter-soft);
+  --accent-line: var(--border);
+  --accent-glow: rgba(249, 185, 0, 0.12);
+
+  --font-display: "Outfit", "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Outfit", sans-serif;
+
+  --radius: 8px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+
+  background: var(--surface-canvas);
+  color: var(--text-secondary);
+}
+

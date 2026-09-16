@@ -1,0 +1,110 @@
+---
+interface Props {
+  url: string;
+  title: string;
+  description?: string;
+  pubDate?: Date | string;
+  tags?: string[];
+  minutes?: number;
+}
+const { url, title, description, tags = [], minutes = 5 } = Astro.props;
+
+// Determine primary tag to display
+let displayTag = "SETUP GUIDE";
+if (tags.length > 0) {
+  const rawTag = tags.find(t => t === 'founder-special' || t === 'performance-special') || tags[0];
+  displayTag = rawTag === 'founder-special' ? "Founder's Playbook" : rawTag;
+}
+
+// Determine card theme
+const isPerformance = tags.includes('performance-special');
+---
+
+<a href={url} class:list={["grid-card", { "card-purple": isPerformance }]}>
+  <div>
+    <span class="cat-pill">{displayTag}</span>
+    <h3 class="grid-title">{title}</h3>
+    <p class="grid-desc">{description}</p>
+  </div>
+  <div class="grid-meta">
+    {minutes} min read
+  </div>
+</a>
+
+<style>
+  .grid-card {
+    background: #ffffff;
+    border: 2px solid #F9B900;
+    border-radius: 12px;
+    padding: 20px 22px;
+    min-height: 200px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  }
+  .grid-card.card-purple {
+    border-color: #DDD6FE;
+  }
+  
+  .grid-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 4px 4px 0px 0px #F9B900;
+    border-color: #F9B900;
+  }
+  .grid-card.card-purple:hover {
+    box-shadow: 4px 4px 0px 0px #8338EC;
+    border-color: #8338EC;
+  }
+
+  .cat-pill {
+    display: inline-block;
+    background: #F9B900;
+    color: #0F172A;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 12px;
+  }
+  .grid-card.card-purple .cat-pill {
+    background: #8338EC;
+    color: #FFFFFF;
+  }
+
+  .grid-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    line-height: 1.35;
+    color: #111827;
+    transition: color 0.2s ease;
+  }
+  .grid-card:hover .grid-title {
+    color: #F9B900;
+  }
+  .grid-card.card-purple:hover .grid-title {
+    color: #8338EC;
+  }
+
+  .grid-desc {
+    font-size: 13px;
+    color: #4B5563;
+    margin: 0 0 12px 0;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .grid-meta {
+    font-size: 12px;
+    color: #9CA3AF;
+    font-weight: 500;
+  }
+</style>

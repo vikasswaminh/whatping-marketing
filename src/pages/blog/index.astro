@@ -1,45 +1,35 @@
 ---
-import { getCollection, getEntry } from "astro:content";
-import Base from "../../layouts/Base.astro";
-import Navbar from "../../components/Navbar.astro";
-import Footer from "../../components/Footer.astro";
-import { normalize } from "../../lib/site";
+import BaseLayout from '../../layouts/blog/BaseLayout.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import { getPublishedPosts, readingTime } from '../../utils/posts';
 
-const pageEntry = await getEntry("pages", "blog");
-if (!pageEntry) {
-  throw new Error("Could not find blog page entry in pages collection");
-}
-
-const posts = await getCollection("blog");
-// Sort by pubDate descending (fallback to 0 if not set)
+const posts = await getPublishedPosts();
 const sortedPosts = posts.sort((a, b) => {
   const dateA = a.data.pubDate ? new Date(a.data.pubDate).getTime() : 0;
   const dateB = b.data.pubDate ? new Date(b.data.pubDate).getTime() : 0;
   return dateB - dateA;
 });
 
-// For the sake of filling the dense layout with only 6 posts, we will reuse them:
 const featuredPost = sortedPosts[0];
 const gridPosts = sortedPosts.slice(1);
-const leftSidebarPosts = sortedPosts.slice(0, 5);
-const rightSidebarPosts = sortedPosts.slice(1, 6);
+
+// Filter sidebars by their respective special tags
+const leftSidebarPosts = sortedPosts.filter(post => post.data.tags?.includes('founder-special'));
+const rightSidebarPosts = sortedPosts.filter(post => post.data.tags?.includes('performance-special'));
 ---
 
-<Base
-  title={pageEntry.data.title}
-  description={pageEntry.data.description}
->
-  <main class="blog-main-container">
+<BaseLayout title="Uptime Monitoring & Reliability Blog · WhatPing">
+  <div class="blog-main-container">
     
     <!-- LEFT SIDEBAR -->
     <aside class="blog-sidebar blog-sidebar--left">
-      <div class="sidebar-badge sidebar-badge--orange">FOUNDER SPECIAL</div>
+      <div class="sidebar-badge sidebar-badge--orange">FOUNDER'S PLAYBOOK</div>
       <ul class="sidebar-list">
         {leftSidebarPosts.map((post) => (
-          <li><a href={normalize(post.data.route)}>{post.data.title}</a></li>
+          <li><a href={`/blog/${post.slug}/`}>{post.data.title}</a></li>
         ))}
       </ul>
-      <a href="#" class="sidebar-view-all sidebar-view-all--orange">View All &rarr;</a>
+      <a href="/tags/founder-special/" class="sidebar-view-all sidebar-view-all--orange">View Playbook &rarr;</a>
     </aside>
 
     <!-- CENTER FEED -->
@@ -56,23 +46,19 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
 
       <!-- FEATURED POST -->
       {featuredPost && (
-        <a href={normalize(featuredPost.data.route)} class="featured-post-card">
+        <a href={`/blog/${featuredPost.slug}/`} class:list={["featured-post-card", { "featured-post-card--purple": featuredPost.data.tags?.includes('performance-special') }]}>
           <div class="featured-image">
-            {featuredPost.data.image ? (
-              <img src={featuredPost.data.image} alt={featuredPost.data.title} />
-            ) : (
-              <div style="width:100%; height:100%; min-height:250px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:#64748b; font-weight:600;">Featured Image</div>
-            )}
+            <img src={featuredPost.data.heroImage || "/images/featured-hero.png"} alt={featuredPost.data.title} width="600" height="315" decoding="async" loading="eager" />
           </div>
           <div class="featured-content">
             <div class="featured-meta-top">
-              <span class="cat-pill cat-pill--orange">Monitoring</span>
+              <span class="cat-pill">{featuredPost.data.tags?.[0] === 'founder-special' ? "Founder's Playbook" : featuredPost.data.tags?.[0] || 'Monitoring'}</span>
               <span class="new-pill">🔥 NEW</span>
             </div>
             <h2>{featuredPost.data.title}</h2>
             <p class="clamp-3">{featuredPost.data.description}</p>
             <div class="featured-meta-bottom">
-              10 min read &bull; <span class="read-article">Read article &rarr;</span>
+              {readingTime(featuredPost.body)} min read &bull; <span class="read-article">Read article &rarr;</span>
             </div>
           </div>
         </a>
@@ -81,14 +67,14 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
       <!-- GRID POSTS -->
       <div class="blog-grid">
         {gridPosts.map((post) => (
-          <a href={normalize(post.data.route)} class="grid-card">
-            <span class="cat-pill cat-pill--yellow">Setup Guide</span>
-            <h3>{post.data.title}</h3>
-            <p class="clamp-4">{post.data.description}</p>
-            <div class="grid-meta">
-              8 min read
-            </div>
-          </a>
+          <PostCard
+            url={`/blog/${post.slug}/`}
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            tags={post.data.tags}
+            minutes={readingTime(post.body)}
+          />
         ))}
       </div>
     </section>
@@ -98,14 +84,14 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
       <div class="sidebar-badge sidebar-badge--purple">PERFORMANCE SPECIAL</div>
       <ul class="sidebar-list">
         {rightSidebarPosts.map((post) => (
-          <li><a href={normalize(post.data.route)}>{post.data.title}</a></li>
+          <li><a href={`/blog/${post.slug}/`}>{post.data.title}</a></li>
         ))}
       </ul>
-      <a href="#" class="sidebar-view-all sidebar-view-all--purple">View All Specials &rarr;</a>
+      <a href="/tags/performance-special/" class="sidebar-view-all sidebar-view-all--purple">View All Specials &rarr;</a>
     </aside>
 
-  </main>
-</Base>
+  </div>
+</BaseLayout>
 
 <style>
   .blog-main-container {
@@ -134,7 +120,7 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
     margin-bottom: 24px;
     letter-spacing: 0.5px;
   }
-  .sidebar-badge--orange { background: #E85D04; }
+  .sidebar-badge--orange { background: #F9B900; color: #0F172A; }
   .sidebar-badge--purple { background: #8338EC; }
 
   .sidebar-list {
@@ -163,7 +149,7 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
     font-weight: 600;
     text-decoration: none;
   }
-  .sidebar-view-all--orange { color: #E85D04; }
+  .sidebar-view-all--orange { color: #D97706; }
   .sidebar-view-all--purple { color: #8338EC; }
 
   /* Center Feed */
@@ -189,18 +175,18 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
   .feed-section-title {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 24px;
   }
   .badge {
-    padding: 6px 16px;
-    border-radius: 20px;
+    padding: 4px 10px;
+    border-radius: 4px;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: uppercase;
-    color: #fff;
+    color: #0F172A;
   }
-  .badge--orange { background: #E85D04; }
+  .badge--orange { background: #F9B900; }
   .feed-section-subtitle {
     font-size: 14px;
     color: var(--text-secondary);
@@ -210,24 +196,25 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
   .featured-post-card {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    background: #FFF9EB; /* Soft yellow bg */
-    border: 1px solid #FDE68A;
+    background: #ffffff;
+    border: 2px solid #F9B900;
     border-radius: 12px;
     overflow: hidden;
     text-decoration: none;
     color: inherit;
     margin-bottom: 32px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.2s ease;
   }
   .featured-post-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+    box-shadow: 4px 4px 0px 0px #F9B900;
+    transform: translateY(-2px);
   }
   .featured-image {
     width: 100%;
     height: 100%;
     min-height: 250px;
     position: relative;
+    background: #f5f5f5;
   }
   .featured-image img {
     position: absolute;
@@ -236,9 +223,13 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .featured-post-card:hover .featured-image img {
+    transform: scale(1.03);
   }
   .featured-content {
-    padding: 32px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -247,104 +238,168 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   .cat-pill {
-    padding: 4px 12px;
-    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+    background: #F9B900;
+    color: #0F172A;
     font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .cat-pill--orange { background: #E85D04; color: #fff; }
-  .cat-pill--yellow { background: #FDE68A; color: #92400E; }
-  .new-pill {
-    background: #E85D04;
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 10px;
     font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .new-pill {
+    background: #F9B900;
+    color: #0F172A;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .featured-content h2 {
-    font-size: 24px;
-    margin: 0 0 12px 0;
-    line-height: 1.3;
-    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    line-height: 1.25;
+    color: #171717;
+    transition: color 0.2s ease;
+  }
+  .featured-post-card:hover .featured-content h2 {
+    color: #F9B900;
   }
   .featured-content p {
-    font-size: 15px;
-    color: var(--text-secondary);
-    margin: 0 0 24px 0;
-    line-height: 1.5;
+    font-size: 14px;
+    color: #525252;
+    margin: 0 0 16px 0;
+    line-height: 1.45;
   }
   .featured-meta-bottom {
-    font-size: 13px;
-    color: var(--text-tertiary);
+    font-size: 12px;
+    color: #737373;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .read-article {
-    color: #E85D04;
-    font-weight: 600;
+    color: #F9B900;
+    font-weight: 700;
+  }
+
+  /* Featured Post - Purple Theme Override */
+  .featured-post-card--purple {
+    border-color: #8338EC;
+  }
+  .featured-post-card--purple:hover {
+    box-shadow: 4px 4px 0px 0px #8338EC;
+  }
+  .featured-post-card--purple .cat-pill,
+  .featured-post-card--purple .new-pill {
+    background: #8338EC;
+    color: #ffffff;
+  }
+  .featured-post-card--purple:hover .featured-content h2,
+  .featured-post-card--purple .read-article {
+    color: #8338EC;
   }
 
   /* Grid Posts */
   .blog-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    gap: 20px;
   }
   .grid-card {
-    background: var(--white);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    border: 1.5px solid #FCD34D;
     border-radius: 12px;
-    padding: 24px;
+    padding: 18px 20px;
+    min-height: 205px;
     text-decoration: none;
     color: inherit;
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s, box-shadow 0.2s;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
   }
   .grid-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.05);
-    border-color: #FDE68A;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.12);
+    border-color: #F59E0B;
   }
   .grid-card .cat-pill {
     align-self: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
+  }
+  .cat-pill--orange {
+    background: #E85D04;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
   .grid-card h3 {
-    font-size: 18px;
-    margin: 0 0 12px 0;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
     line-height: 1.3;
-    color: var(--text-primary);
+    color: #111827;
+    transition: color 0.2s ease;
+  }
+  .grid-card:hover h3 {
+    color: #E85D04;
   }
   .grid-card p {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin: 0 0 24px 0;
-    line-height: 1.5;
-    flex-grow: 1;
+    font-size: 12.5px;
+    color: #4B5563;
+    margin: 0 0 10px 0;
+    line-height: 1.45;
   }
   .grid-meta {
-    font-size: 12px;
-    color: var(--text-tertiary);
+    font-size: 11.5px;
+    color: #9CA3AF;
+    font-weight: 500;
   }
 
   @media (max-width: 1100px) {
     .blog-main-container {
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-center-feed {
+      order: 1;
+    }
+    .blog-sidebar--left {
+      order: 2;
+    }
+    .blog-sidebar--right {
+      order: 3;
     }
     .blog-sidebar {
       position: static;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
     }
     .blog-grid {
       grid-template-columns: repeat(2, 1fr);
     }
     .featured-post-card {
       grid-template-columns: 1fr;
+    }
+    .featured-image {
+      min-height: 200px;
     }
   }
   @media (max-width: 768px) {
@@ -354,6 +409,12 @@ const rightSidebarPosts = sortedPosts.slice(1, 6);
   }
 
   /* Utility classes */
+  .clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   .clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;

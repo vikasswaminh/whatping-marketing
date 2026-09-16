@@ -19,6 +19,22 @@ const page = z.object({
   pubDate: z.coerce.date().optional(),
 });
 
+const blogSchema = z.object({
+  route: z.string().optional(),
+  title: z.string(),
+  description: z.string(),
+  h1: z.string().optional(),
+  pubDate: z.coerce.date().optional(),
+  updatedDate: z.coerce.date().optional(),
+  author: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+  keywords: z.array(z.string()).optional(),
+  cover: z.string().optional(),
+  image: z.string().optional(),
+  heroImage: z.string().optional(),
+  draft: z.boolean().default(false),
+});
+
 export const collections = {
   pages: defineCollection({
     loader: glob({ pattern: "**/*.mdx", base: "./src/content/pages" }),
@@ -29,7 +45,7 @@ export const collections = {
     schema: page,
   }),
   blog: defineCollection({
-    loader: glob({ pattern: "**/*.mdx", base: "./src/content/blog" }),
-    schema: page,
+    loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
+    schema: blogSchema,
   }),
 };

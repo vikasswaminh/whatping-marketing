@@ -1,0 +1,266 @@
+---
+import { SITE } from '../../config';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    
+    <!-- Top Section: Logo + Columns -->
+    <div class="footer-top">
+      
+      <!-- Brand Column -->
+      <div class="footer-brand">
+        <a href="https://whatping.com" class="footer-logo">
+          <img src="/logo.png" alt="WhatPing Logo" width="340" height="121" loading="lazy" decoding="async" />
+        </a>
+        <p class="brand-desc">
+          Uptime and performance monitoring, simplified. Built for reliability, humans, and autonomous systems.
+        </p>
+      </div>
+
+      <!-- Links Columns -->
+      <div class="footer-links-grid">
+        <div class="link-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#">Monitoring</a></li>
+            <li><a href="#">Alerts</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#">Integrations</a></li>
+            <li><a href="#">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="link-col">
+          <h4>Solutions</h4>
+          <ul>
+            <li><a href="#">Developers</a></li>
+            <li><a href="#">Businesses</a></li>
+            <li><a href="#">IT Teams</a></li>
+          </ul>
+        </div>
+        <div class="link-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API Reference</a></li>
+            <li><a href="#">Guides</a></li>
+            <li><a href="/">Blog</a></li>
+            <li><a href="/tags/performance-special/">Uptime Tools Guide</a></li>
+            <li><a href="#">Status Page</a></li>
+          </ul>
+        </div>
+        <div class="link-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Section: Trusted By -->
+    <div class="footer-trusted">
+      <span class="trusted-label">TRUSTED BY DEVELOPERS & BUSINESSES WORLDWIDE</span>
+      <div class="trusted-logos">
+        <span>Microsoft</span>
+        <span>Vercel</span>
+        <span>AWS</span>
+        <span>DigitalOcean</span>
+        <span>Cloudflare</span>
+        <span>Slack</span>
+      </div>
+    </div>
+
+    <!-- Bottom Section: Copyright + Badges -->
+    <div class="footer-bottom">
+      <p class="copyright">© {year} {SITE.brand}. All rights reserved.</p>
+      <div class="footer-badges">
+        <span>AI Assistant</span>
+        <span class="divider">|</span>
+        <span>API First</span>
+        <span class="divider">|</span>
+        <span>99.99% SLA</span>
+        <span class="divider">|</span>
+        <span>Secure & Compliant</span>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border, #ede8da);
+    background: linear-gradient(135deg, #fff8f0 0%, #fffbf0 100%);
+    padding: 60px 24px 30px 24px;
+    margin-top: 80px;
+    font-family: var(--font-sans);
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOP SECTION */
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 60px;
+    margin-bottom: 60px;
+  }
+
+  .footer-brand {
+    flex: 1;
+    max-width: 320px;
+  }
+  .footer-logo img {
+    height: 80px;
+    width: auto;
+    margin-bottom: 24px;
+    mix-blend-mode: multiply;
+  }
+  .brand-desc {
+    color: #64748B;
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .footer-links-grid {
+    flex: 2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+  .link-col h4 {
+    color: #0F172A;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+  }
+  .link-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .link-col a {
+    color: #64748B;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.15s ease;
+  }
+  .link-col a:hover {
+    color: #F9B900;
+  }
+
+  /* MIDDLE SECTION */
+  .footer-trusted {
+    border-top: 1px solid var(--border, #ede8da);
+    border-bottom: 1px solid var(--border, #ede8da);
+    padding: 32px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .trusted-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94A3B8;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .trusted-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+  .trusted-logos span {
+    font-size: 17px;
+    font-weight: 700;
+    color: #64748B;
+    letter-spacing: -0.02em;
+    /* Simulate a logo-like aesthetic for text */
+  }
+
+  /* BOTTOM SECTION */
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    font-size: 13.5px;
+    color: #64748B;
+  }
+  .copyright {
+    margin: 0;
+  }
+  .footer-badges {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+  }
+  .divider {
+    color: #CBD5E1;
+  }
+
+  /* RESPONSIVE DESIGN */
+  @media (max-width: 992px) {
+    .footer-top {
+      flex-direction: column;
+      gap: 40px;
+    }
+    .footer-links-grid {
+      width: 100%;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+    }
+    .footer-brand {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .footer-links-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      text-align: center;
+    }
+    .footer-brand {
+      text-align: center;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .footer-bottom {
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+    }
+    .footer-badges {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    .footer-badges .divider {
+      display: none;
+    }
+    .trusted-logos {
+      gap: 20px;
+    }
+  }
+</style>

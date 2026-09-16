@@ -1,0 +1,38 @@
+---
+import BaseHead from '../../components/blog/BaseHead.astro';
+import Header from '../../components/blog/Header.astro';
+import Footer from '../../components/blog/Footer.astro';
+import { SITE } from '../../config';
+import '../../styles/blog/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+    tags?: string[];
+    keywords?: string[];
+  };
+  noindex?: boolean;
+}
+const { title = SITE.title, description, image, article, noindex } = Astro.props;
+---
+
+<!doctype html>
+<html lang={SITE.locale}>
+  <head>
+    <BaseHead title={title} description={description} image={image} article={article} noindex={noindex} />
+    {Astro.url.pathname === '/' && <meta name="google-site-verification" content="googleb9d8d555f4a1a61b" />}
+  </head>
+  <body class="theme-homepage">
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

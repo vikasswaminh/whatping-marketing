@@ -1,0 +1,720 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import FormattedDate from '../../components/blog/FormattedDate.astro';
+import { SITE } from '../../config';
+import { readingTime } from '../../utils/posts';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  headings?: MarkdownHeading[];
+}
+const { post, headings = [] } = Astro.props;
+const { title, description, pubDate = new Date(), updatedDate, author = 'WhatPing Team', tags = [], keywords = [], cover } = post.data;
+const dateObj = pubDate ? new Date(pubDate) : new Date();
+const updatedObj = updatedDate ? new Date(updatedDate) : dateObj;
+const minutes = readingTime(post.body);
+const canonical = new URL(`/blog/${post.slug}/`, Astro.site).href;
+
+const firstTag = tags.length > 0 ? tags[0] : 'Monitoring';
+const mainTag = firstTag === 'founder-special' ? "Founder's Playbook" : firstTag;
+const isPerformance = tags.includes('performance-special');
+
+// Filter headings for TOC (only main H2 headings, excluding Table of Contents and Related Guides)
+const tocHeadings = headings.filter(h => h.depth === 2 && h.slug !== 'related-guides' && h.text.toLowerCase() !== 'related guides' && h.slug !== 'table-of-contents' && h.text.toLowerCase() !== 'table of contents');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: dateObj.toISOString(),
+  dateModified: updatedObj.toISOString(),
+  author: { '@type': 'Organization', name: author },
+  publisher: { '@type': 'Organization', name: SITE.brand },
+  mainEntityOfPage: canonical,
+  ...(cover ? { image: new URL(cover, Astro.site).href } : {}),
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={cover}
+  article={{
+    publishedTime: dateObj.toISOString(),
+    modifiedTime: updatedObj.toISOString(),
+    author,
+    tags,
+    keywords,
+  }}
+>
+  <main class:list={["blog-post-container", { "theme-purple": isPerformance }]}>
+    
+    <!-- HEADER SECTION -->
+    <header class="blog-post-header">
+      <div class="breadcrumbs">
+        <a href="https://whatping.com">Home</a> <span>/</span> <a href="/">Blog</a> <span>/</span> <span>{title}</span>
+      </div>
+      
+      <div class="post-category-tag">{mainTag}</div>
+      
+      <h1 class="post-title">{title}</h1>
+      {description && <p class="post-subtitle">{description}</p>}
+      
+      <div class="post-author-meta">
+        <div class="author-info">
+          <div class="author-avatar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div class="author-details">
+            <span class="author-name">{author}</span>
+            <span class="post-date"><FormattedDate date={dateObj} /> &bull; {minutes} min read</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- TWO-COLUMN LAYOUT: LEFT STICKY TOC SIDEBAR + RIGHT ARTICLE CONTENT -->
+    <div class="blog-post-layout-grid">
+      
+      <!-- LEFT STICKY SIDEBAR TOC -->
+      <aside class="toc-sidebar">
+        {tocHeadings.length > 0 && (
+          <nav class="toc-box">
+            <div class="toc-header">
+              <span class="toc-title">Table of Contents</span>
+            </div>
+            <ul class="toc-list">
+              {tocHeadings.map(h => (
+                <li class={`toc-item depth-${h.depth}`}>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </aside>
+
+      <!-- RIGHT ARTICLE BODY COLUMN -->
+      <div class="main-content-column">
+        <article class="post-body">
+          <slot />
+        </article>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const headings = Array.from(document.querySelectorAll('.post-body h2')) as HTMLElement[];
+      const tocLinks = Array.from(document.querySelectorAll('.toc-list a')) as HTMLAnchorElement[];
+
+      headings.forEach((heading) => {
+        if (!heading.id) {
+          heading.id = heading.textContent
+            ? heading.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+            : '';
+        }
+      });
+
+      
+      // Wrap all tables for responsiveness
+      const tables = document.querySelectorAll('.post-body table');
+      tables.forEach(table => {
+        if (!table.parentElement.classList.contains('table-responsive-wrapper')) {
+          const outer = document.createElement('div');
+          outer.className = 'table-container-outer';
+          const inner = document.createElement('div');
+          inner.className = 'table-responsive-wrapper';
+          table.parentNode.insertBefore(outer, table);
+          outer.appendChild(inner);
+          inner.appendChild(table);
+        }
+      });
+      if (headings.length === 0 || tocLinks.length === 0) return;
+
+      const tocList = document.querySelector('.toc-list') as HTMLElement;
+      let currentActiveId = '';
+
+      function setActiveLink(activeId: string) {
+        if (!activeId || activeId === currentActiveId) return;
+        currentActiveId = activeId;
+
+        let activeLink: HTMLAnchorElement | null = null;
+
+        tocLinks.forEach((link) => {
+          const href = link.getAttribute('href');
+          if (href === `#${activeId}`) {
+            link.classList.add('active');
+            activeLink = link;
+          } else {
+            link.classList.remove('active');
+          }
+        });
+
+        if (activeLink && tocList) {
+          const targetElement = (activeLink as HTMLElement).closest('li') || activeLink;
+          const linkTop = targetElement.offsetTop;
+          const linkHeight = targetElement.offsetHeight;
+          const containerHeight = tocList.clientHeight;
+          const targetScroll = linkTop - (containerHeight / 2) + (linkHeight / 2);
+
+          tocList.scrollTo({
+            top: Math.max(0, targetScroll),
+            behavior: 'smooth'
+          });
+        }
+      }
+
+      // IntersectionObserver for heading scroll tracking
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveLink(entry.target.id);
+            }
+          });
+        },
+        {
+          rootMargin: '-80px 0px -65% 0px',
+          threshold: 0.1,
+        }
+      );
+
+      headings.forEach((heading) => observer.observe(heading));
+
+      // Scroll listener backup
+      window.addEventListener(
+        'scroll',
+        () => {
+          let currentId = '';
+          const scrollPos = window.scrollY + 140;
+
+          headings.forEach((heading) => {
+            if (heading.offsetTop <= scrollPos) {
+              currentId = heading.id;
+            }
+          });
+
+          if (currentId) {
+            setActiveLink(currentId);
+          }
+        },
+        { passive: true }
+      );
+    });
+  </script>
+  
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</BaseLayout>
+
+<style>
+  .blog-post-container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 80px 24px;
+  }
+
+  /* Header Styles */
+  .blog-post-header {
+    max-width: 900px;
+    margin: 0 0 48px 0;
+    text-align: left;
+  }
+  .breadcrumbs {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary, #64748b);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .breadcrumbs a {
+    color: var(--text-secondary, #475569);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .breadcrumbs a:hover {
+    color: #F9B900;
+  }
+  .post-category-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #F9B900;
+    color: #0F172A;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+  }
+  .post-title {
+    font-size: 46px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text-primary, #0f172a);
+    margin: 0 0 20px 0;
+    letter-spacing: -0.02em;
+    transition: color 0.2s ease;
+  }
+  .post-title:hover {
+    color: #F9B900;
+  }
+  .post-subtitle {
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--text-secondary, #475569);
+    margin: 0 0 32px 0;
+  }
+  .post-author-meta {
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 0;
+    display: flex;
+    justify-content: flex-start;
+  }
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .author-avatar {
+    width: 44px;
+    height: 44px;
+    background: #FFF6D8;
+    border: 1px solid #FDE68A;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .author-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .author-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary, #0f172a);
+  }
+  .post-date {
+    font-size: 13px;
+    color: var(--text-secondary, #64748b);
+  }
+
+  /* TWO-COLUMN GRID LAYOUT */
+  .blog-post-layout-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* LEFT STICKY SIDEBAR TOC */
+  .toc-sidebar {
+    position: sticky;
+    top: 90px;
+  }
+  .toc-box {
+    background: #ffffff;
+    border: 2px solid #F9B900;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    max-height: calc(100vh - 110px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+  .toc-header {
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #FFF6D8;
+    flex-shrink: 0;
+  }
+  .toc-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0F172A;
+  }
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 4px;
+  }
+  .toc-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .toc-list::-webkit-scrollbar-track {
+    background: #F8FAFC;
+    border-radius: 4px;
+  }
+  .toc-list::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+  }
+  .toc-list::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+  .toc-item a {
+    text-decoration: none;
+    color: #475569;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: block;
+    line-height: 1.4;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border-left: 3px solid transparent;
+  }
+  .toc-item a:hover {
+    color: #0F172A;
+    background: #FFF6D8;
+    border-left: 3px solid #F9B900;
+    transform: translateX(3px);
+    font-weight: 600;
+  }
+  .toc-item a.active {
+    color: #0F172A;
+    font-weight: 700;
+    background: #FFF6D8;
+    border-left: 3px solid #F9B900;
+    transform: translateX(3px);
+  }
+  .toc-item.depth-2 {
+    font-weight: 600;
+  }
+  .toc-item.depth-3 {
+    padding-left: 14px;
+    font-size: 12.5px;
+    color: #64748b;
+  }
+
+  /* MAIN CONTENT COLUMN */
+  .main-content-column {
+    min-width: 0;
+  }
+
+  /* Article Body */
+  .post-body {
+    font-size: 17.5px;
+    line-height: 1.8;
+    color: #1e293b;
+  }
+  
+  .post-body :global(h2) {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 44px 0 20px 0;
+    line-height: 1.3;
+    color: #0f172a;
+    scroll-margin-top: 90px;
+    transition: color 0.2s ease;
+  }
+  .post-body :global(h2:hover) {
+    color: #F9B900;
+  }
+  .post-body :global(h3) {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 32px 0 16px 0;
+    color: #1e293b;
+    scroll-margin-top: 90px;
+    transition: color 0.2s ease;
+  }
+  .post-body :global(h3:hover) {
+    color: #F9B900;
+  }
+  .post-body :global(p) {
+    margin: 0 0 24px 0;
+  }
+  .post-body :global(ul), .post-body :global(ol) {
+    margin: 0 0 24px 0;
+    padding-left: 24px;
+  }
+  .post-body :global(li) {
+    margin-bottom: 10px;
+  }
+  .post-body :global(a.theme-backlink) {
+    background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 35%, #FFB800 70%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: #FF8C00;
+    text-underline-offset: 3px;
+    transition: all 0.2s ease;
+  }
+  .post-body :global(a.theme-backlink:hover) {
+    background: linear-gradient(135deg, #e05e00 0%, #e07800 35%, #f5a800 70%, #ffc800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration-color: #e07800;
+  }
+  .post-body :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 32px 0;
+    border: 1px solid #e2e8f0;
+  }
+  .post-body :global(pre) {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 20px 24px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 32px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    border: 1.5px solid #1e293b;
+  }
+  .post-body :global(blockquote) {
+    border-left: 4px solid #F9B900;
+    background: #FFF6D8;
+    padding: 16px 20px;
+    margin: 28px 0;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #0F172A;
+  }
+  
+  .post-body :global(.callout) {
+    background: #FFF6D8;
+    border: 1px solid #FDE68A;
+    border-left: 4px solid #F9B900;
+    color: #0F172A;
+    margin: 32px 0;
+  }
+  .post-body :global(.callout__label) {
+    color: #B45309;
+  }
+
+  /* BRAND TABLE FORMATTING & OUTSIDE BORDER */
+  .post-body :global(.table-container-outer) {
+    margin: 36px 0;
+    border: 2px solid #F9B900;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+  .post-body :global(.table-responsive-wrapper) {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .post-body :global(table) {
+    width: 100%;
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    border: none;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .post-body :global(thead) {
+    background: #FFF6D8;
+  }
+  .post-body :global(th) {
+    background: #FFF6D8;
+    color: #0F172A;
+    font-size: 13.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 2px solid #F9B900;
+    border-right: 1px solid #E2E8F0;
+    white-space: nowrap;
+  }
+  .post-body :global(th:last-child) {
+    border-right: none;
+  }
+  .post-body :global(td) {
+    padding: 13px 18px;
+    color: #334155;
+    border-bottom: 1px solid #E2E8F0;
+    border-right: 1px solid #E2E8F0;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .post-body :global(td:last-child) {
+    border-right: none;
+  }
+  .post-body :global(tr:last-child td) {
+    border-bottom: none;
+  }
+  .post-body :global(tbody tr:nth-child(even)) {
+    background-color: #F8FAFC;
+  }
+  .post-body :global(tbody tr:hover) {
+    background-color: #FFFDF0;
+  }
+
+  /* HIGHLIGHTED RELATED GUIDES BOX */
+  .post-body :global(.related-guides-box) {
+    margin-top: 48px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, #FFFDF0 0%, #FFFFFF 100%);
+    border: 2px solid #F9B900;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(249, 185, 0, 0.08);
+  }
+  .post-body :global(.related-guides-header) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .post-body :global(.related-guides-header h3) {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0;
+  }
+  .post-body :global(.related-guides-box p) {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #334155;
+    margin: 0 0 20px 0;
+  }
+  .post-body :global(.related-guides-box p a) {
+    color: #0F172A;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: #F9B900;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+  }
+  .post-body :global(.related-guides-box p a:hover) {
+    color: #F9B900;
+  }
+  .post-body :global(.related-cta-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #F9B900;
+    color: #0F172A;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(249, 185, 0, 0.25);
+    transition: all 0.2s ease;
+  }
+  .post-body :global(.related-cta-btn:hover) {
+    background: #e5a900;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(249, 185, 0, 0.35);
+    color: #0F172A;
+  }
+
+  @media (max-width: 960px) {
+    .blog-post-layout-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .toc-sidebar {
+      position: static;
+      max-height: none;
+    }
+    .post-title {
+      font-size: 28px;
+    }
+  }
+
+  /* PURPLE THEME OVERRIDES FOR PERFORMANCE SPECIAL */
+  .theme-purple .breadcrumbs a:hover { color: #8338EC; }
+  .theme-purple .post-category-tag { background: #8338EC; color: #FFFFFF; }
+  .theme-purple .post-title:hover { color: #8338EC; }
+  .theme-purple .author-avatar { background: #F3E8FF; border-color: #DDD6FE; }
+  
+  .theme-purple .toc-box { border-color: #8338EC; }
+  .theme-purple .toc-header { border-bottom-color: #F3E8FF; }
+  .theme-purple .toc-item a:hover,
+  .theme-purple .toc-item a.active {
+    background: #F3E8FF;
+    border-left-color: #8338EC;
+  }
+  
+  .theme-purple .post-body :global(h2:hover) { color: #8338EC; }
+  .theme-purple .post-body :global(h3:hover) { color: #8338EC; }
+  
+  .theme-purple .post-body :global(a.theme-backlink) {
+    background: none;
+    -webkit-text-fill-color: #7E22CE;
+    background-clip: unset;
+    color: #7E22CE;
+    text-decoration-color: #8338EC;
+  }
+  .theme-purple .post-body :global(a.theme-backlink:hover) {
+    background: none;
+    -webkit-text-fill-color: #8338EC;
+    background-clip: unset;
+    color: #8338EC;
+    text-decoration-color: #8338EC;
+  }
+
+  .theme-purple .post-body :global(blockquote) {
+    border-left-color: #8338EC;
+    background: #F3E8FF;
+  }
+  
+  .theme-purple .post-body :global(.callout) {
+    background: #F3E8FF;
+    border-color: #DDD6FE;
+    border-left-color: #8338EC;
+  }
+  .theme-purple .post-body :global(.callout__label) {
+    color: #7E22CE;
+  }
+  
+  .theme-purple .post-body :global(.table-container-outer) { border-color: #8338EC; }
+  .theme-purple .post-body :global(table) { border-color: transparent; }
+  .theme-purple .post-body :global(thead),
+  .theme-purple .post-body :global(th) { background: #F3E8FF; }
+  .theme-purple .post-body :global(th) { border-bottom-color: #8338EC; }
+  .theme-purple .post-body :global(tbody tr:hover) { background-color: #FAF5FF; }
+  
+  .theme-purple .post-body :global(.related-guides-box) {
+    background: linear-gradient(135deg, #F3E8FF 0%, #FFFFFF 100%);
+    border-color: #8338EC;
+    box-shadow: 0 6px 20px rgba(131, 56, 236, 0.08);
+  }
+  .theme-purple .post-body :global(.related-guides-box p a) { text-decoration-color: #8338EC; }
+  .theme-purple .post-body :global(.related-guides-box p a:hover) { color: #8338EC; }
+  
+  .theme-purple .post-body :global(.related-cta-btn) {
+    background: #8338EC;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(131, 56, 236, 0.25);
+  }
+  .theme-purple .post-body :global(.related-cta-btn:hover) {
+    background: #7E22CE;
+    box-shadow: 0 6px 16px rgba(131, 56, 236, 0.35);
+  }
+</style>

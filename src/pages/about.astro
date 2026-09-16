@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/blog/BaseLayout.astro';
+import { SITE } from '../config';
+---
+
+<BaseLayout title="About" description={`About the ${SITE.brand} blog.`}>
+  <div class="about-container">
+    <article class="post">
+      <h1 class="post-title">About</h1>
+      <div class="prose">
+        <h2>Why it exists</h2>
+        <p>Every monitoring tool answers the same question — is the server responding? — and most of them answer it well. But the outages that actually surprise people usually don’t start with a server that stopped responding.</p>
+        <p>They start with a date passing. A certificate expires. A registration lapses. Or with an edit: a DNS record changed during a migration, an SPF record broken by adding one more include:. In every case, the health check returns 200 right up until everything is down at once.</p>
+        <p>WhatPing was built to watch those alongside ordinary uptime, in the same dashboard, through the same alert channels — so the thing that takes you down is being watched by the same tool you already check.</p>
+
+        <h2>Who builds it</h2>
+        <div class="callout">
+          <p><strong>One developer.</strong> That is worth knowing before you depend on it.</p>
+        </div>
+        <p>What it means in practice: no support team, no SLA, no roadmap commitments with dates on them, and no guarantee about how long it will be around. It also means no growth targets pushing features you didn’t ask for, no seat pricing, and no upsell path — because there is nothing to upsell you to.</p>
+
+        <h2>How it’s built</h2>
+        <p>Deliberately boring where it matters. A stateless Rust prober that can be restarted mid-outage without losing anything. A backend that owns every state decision in one place. Idempotent check results, so a retry cannot page you twice. A dead man’s switch on the prober itself, so the system reports its own death instead of going quiet.</p>
+        <p>That last one is not decoration. It has already caught a real regression where a parsing bug froze the prober on a stale configuration — everything looked normal, and the heartbeat was the only signal anything was wrong.</p>
+        <p>The architecture page describes it properly.</p>
+
+        <h2>What it deliberately is not</h2>
+        <ul class="styled-list">
+          <li><strong>Not a platform.</strong> No logs, no metrics, no APM, no tracing. Those are different products and doing them badly alongside monitoring helps nobody.</li>
+          <li><strong>Not an incident management tool.</strong> No on-call rotations, no escalation policies, no postmortems. If being paged reliably is someone’s job at your company, buy a tool built for that.</li>
+          <li><strong>Not multi-region.</strong> Checks run from one network location. The second opinion adds one independent vantage point per incident, which is genuinely useful and is not a global probe fleet.</li>
+          <li><strong>Not self-hostable today.</strong> Hosted only.</li>
+        </ul>
+
+        <h2>The standard it holds itself to</h2>
+        <p>Everything on this website is checkable against the source. When a number appears — 20 seconds, 30 days, 7 days, 20 monitors — it came from reading the code, not from memory. When something isn’t built, it says so on the roadmap rather than appearing as a feature with an asterisk.</p>
+        <p>For a young product from an unknown developer, that is the only real asset. Being caught overstating once would cost more than any feature is worth.</p>
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-container {
+    max-width: 1200px;
+    margin: 64px auto;
+    padding: 0 24px;
+  }
+  .post-title {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+  }
+  .prose {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #475569;
+  }
+  .prose h2 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 56px;
+    margin-bottom: 24px;
+    padding-left: 16px;
+    border-left: 4px solid #F9B900;
+    line-height: 1.3;
+  }
+  .prose p {
+    margin-bottom: 24px;
+  }
+  .prose a {
+    color: #0f172a;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: #F9B900;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+  }
+  .prose a:hover {
+    color: #F9B900;
+  }
+  .callout {
+    background: #FFFBEC;
+    border: 1px solid #FDE68A;
+    border-left: 4px solid #F9B900;
+    padding: 24px;
+    border-radius: 8px;
+    margin: 32px 0;
+  }
+  .callout p {
+    margin-bottom: 0 !important;
+    font-size: 20px;
+    color: #0f172a;
+    line-height: 1.5;
+  }
+  .styled-list {
+    list-style: none;
+    padding: 0;
+    margin: 32px 0;
+  }
+  .styled-list li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 20px;
+  }
+  .styled-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #F9B900;
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 1;
+    top: -4px;
+  }
+  .styled-list strong {
+    color: #0f172a;
+    font-weight: 700;
+  }
+  @media (max-width: 640px) {
+    .about-container {
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+    .post-title {
+      font-size: 36px;
+    }
+    .prose h2 {
+      font-size: 22px;
+      margin-top: 40px;
+    }
+    .callout {
+      padding: 20px;
+    }
+  }
+</style>

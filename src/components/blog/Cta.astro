@@ -1,0 +1,32 @@
+---
+interface Props {
+  label: string;
+  href: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}
+
+const { label, href, secondaryLabel, secondaryHref } = Astro.props;
+---
+
+<p class="cta-row">
+  <a class="btn btn--primary" href={href}>{label}</a>
+  {
+    secondaryLabel && secondaryHref && (
+      <a class="btn btn--secondary" href={secondaryHref}>
+        {secondaryLabel}
+      </a>
+    )
+  }
+</p>
+
+<style>
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs, 0.5rem);
+    margin-top: var(--space-xl, 3rem) !important;
+    padding-top: var(--space-md, 1.5rem);
+    border-top: 1px solid var(--border, #ede8da);
+  }
+</style>

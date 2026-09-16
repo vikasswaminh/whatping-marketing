@@ -1,0 +1,428 @@
+---
+import BaseLayout from '../../layouts/blog/BaseLayout.astro';
+import { getPublishedPosts, readingTime } from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const tagsMap = new Map<string, typeof posts>();
+  for (const p of posts) {
+    if (p.data.tags && Array.isArray(p.data.tags)) {
+      for (const t of p.data.tags) {
+        const existing = tagsMap.get(t) || [];
+        existing.push(p);
+        tagsMap.set(t, existing);
+      }
+    }
+  }
+
+  const allTagsList = [...tagsMap.keys()];
+
+  const founderTags = new Set<string>();
+  const performanceTags = new Set<string>();
+
+  for (const p of posts) {
+    if (p.data.tags?.includes('founder-special')) {
+      p.data.tags.forEach(t => founderTags.add(t));
+    }
+    if (p.data.tags?.includes('performance-special')) {
+      p.data.tags.forEach(t => performanceTags.add(t));
+    }
+  }
+
+  const founderTagsList = Array.from(founderTags);
+  const performanceTagsList = Array.from(performanceTags);
+
+  return allTagsList.map((tag) => ({
+    params: { tag },
+    props: {
+      posts: posts.filter((p) => p.data.tags?.includes(tag)),
+      tag,
+      allTags: allTagsList,
+      founderTags: founderTagsList,
+      performanceTags: performanceTagsList
+    },
+  }));
+}
+
+const { posts, tag, allTags = [], founderTags = [], performanceTags = [] } = Astro.props;
+
+// Formatting helper for tag display
+const isFounderSpecial = tag === 'founder-special';
+const isPerformanceSpecial = tag === 'performance-special';
+
+let displayTitle = `# ${tag}`;
+if (isFounderSpecial) displayTitle = "Founder's Playbook";
+if (isPerformanceSpecial) displayTitle = 'Performance Special Guides';
+
+// Filter tags to display in the nav bar based on the current collection
+let displayTags = allTags;
+if (founderTags.includes(tag)) {
+  displayTags = founderTags;
+} else if (performanceTags.includes(tag)) {
+  displayTags = performanceTags;
+}
+---
+
+<BaseLayout title={`${displayTitle} | WhatPing Blog`} description={`Explore technical guides and articles tagged under ${tag}.`}>
+  <div class="tag-detail-container">
+    
+    <!-- HEADER -->
+    <header class="tag-detail-header">
+      <a href="/tags/" class="back-link">&larr; All Topics & Specials</a>
+
+      <div class="tag-title-row">
+        {isFounderSpecial && <span class="special-badge special-badge--orange">FOUNDER'S PLAYBOOK</span>}
+        {isPerformanceSpecial && <span class="special-badge special-badge--purple">PERFORMANCE SPECIAL</span>}
+        {!isFounderSpecial && !isPerformanceSpecial && <span class="tag-badge"># TOPIC</span>}
+        
+        <span class="count-badge">{posts.length} {posts.length === 1 ? 'Article' : 'Articles'}</span>
+      </div>
+
+      <h1>{displayTitle}</h1>
+      <p class="tag-desc">
+        {isFounderSpecial && 'Curated technical guides on uptime check frequency, monitoring tool evaluations, and SLA protection for startup founders.'}
+        {isPerformanceSpecial && 'Deep dives into distributed schedulers, verdict engines, probe fleets, Linux systemd checks, and cloud VM setup.'}
+        {!isFounderSpecial && !isPerformanceSpecial && `Browse all published technical guides and articles tagged under ${tag}.`}
+      </p>
+    </header>
+
+    <!-- OTHER TOPICS PILLS -->
+    {displayTags.length > 0 && (
+      <div class="tag-nav-bar">
+        <span class="nav-label">Filter by Topic:</span>
+        <div class="tag-pills-row" id="tagPillsContainer">
+          {displayTags.map((t) => {
+            const isActive = t === tag;
+            const isOrange = t === 'founder-special';
+            const isPurple = t === 'performance-special';
+            return (
+              <a
+                href={`/tags/${encodeURIComponent(t)}/`}
+                class:list={[
+                  'nav-tag-pill',
+                  { active: isActive },
+                  { 'pill-orange': isOrange },
+                  { 'pill-purple': isPurple },
+                ]}
+              >
+                {t === 'founder-special' ? "Founder's Playbook" : t === 'performance-special' ? 'Performance Special' : `#${t}`}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    )}
+
+    <script is:inline>
+      function scrollActiveTag() {
+        const activePill = document.querySelector('#tagPillsContainer .nav-tag-pill.active');
+        if (activePill) {
+          activePill.scrollIntoView({ behavior: 'instant', inline: 'center', block: 'nearest' });
+        }
+      }
+      scrollActiveTag();
+      // Run again on load just in case web fonts shifted the layout
+      window.addEventListener('load', scrollActiveTag);
+    </script>
+
+    <!-- POSTS GRID (NO IMAGES, NO ANIMATIONS) -->
+    <div class="posts-grid">
+      {posts.map((post) => {
+        const postTags = post.data.tags || [];
+        const primaryTag = postTags.find((t) => t !== 'founder-special' && t !== 'performance-special') || postTags[0] || 'guide';
+        const formattedDate = post.data.pubDate ? new Date(post.data.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+        const isPostFounder = postTags.includes('founder-special');
+        const isPostPerformance = postTags.includes('performance-special');
+
+        return (
+          <article class:list={['post-card', { 'card-orange': isPostFounder, 'card-purple': isPostPerformance }]}>
+            <div class="card-body">
+              <div class="card-meta-top">
+                <span class="category-pill">{primaryTag}</span>
+                <span class="read-time-pill">{readingTime(post.body)} min read</span>
+              </div>
+
+              <h2>
+                <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+              </h2>
+
+              <p class="card-description">{post.data.description}</p>
+            </div>
+
+            <div class="card-footer">
+              {formattedDate && <span class="pub-date">{formattedDate}</span>}
+              <a href={`/blog/${post.slug}/`} class="read-more-link">
+                Read guide &rarr;
+              </a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .tag-detail-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .tag-detail-header {
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .back-link {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #D97706;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .tag-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .special-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .special-badge--orange {
+    background: #F9B900;
+    color: #0F172A;
+  }
+  .special-badge--purple {
+    background: #8338EC;
+    color: #ffffff;
+  }
+  .tag-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    background: #F1F5F9;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .count-badge {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 600;
+  }
+
+  .tag-detail-header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+  }
+  .tag-desc {
+    font-size: 16px;
+    color: #475569;
+    margin: 0;
+    max-width: 720px;
+    line-height: 1.5;
+  }
+
+  /* Tag Navigation Bar */
+  .tag-nav-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 14px 20px;
+    overflow-x: auto;
+  }
+  .nav-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .tag-pills-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+  .nav-tag-pill {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    background: #ffffff;
+    border: 1px solid #CBD5E1;
+    padding: 5px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .nav-tag-pill:hover {
+    color: #0F172A;
+    border-color: #94A3B8;
+  }
+  .nav-tag-pill.active {
+    background: #0F172A;
+    color: #ffffff;
+    border-color: #0F172A;
+  }
+  .nav-tag-pill.pill-orange.active {
+    background: #F9B900;
+    color: #0F172A;
+    border-color: #F9B900;
+  }
+  .nav-tag-pill.pill-purple.active {
+    background: #8338EC;
+    color: #ffffff;
+    border-color: #8338EC;
+  }
+
+  /* Posts Grid (NO Images, NO Animations) */
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+
+  .post-card {
+    background: #ffffff;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .post-card.card-orange {
+    border-color: #FCD34D;
+  }
+  .post-card.card-purple {
+    border-color: #DDD6FE;
+  }
+
+  .post-card:hover {
+    border-color: #F9B900;
+  }
+  .post-card.card-purple:hover {
+    border-color: #8338EC;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .category-pill {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: #F8FAFC;
+    color: #0F172A;
+    border: 1px solid #E2E8F0;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .read-time-pill {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #64748B;
+    font-weight: 500;
+  }
+
+  .post-card h2 {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0 0 10px 0;
+  }
+  .post-card h2 a {
+    color: #0F172A;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .post-card h2 a:hover {
+    color: #D97706;
+  }
+  .post-card.card-purple h2 a:hover {
+    color: #8338EC;
+  }
+
+  .card-description {
+    font-size: 13.5px;
+    color: #475569;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #F1F5F9;
+    font-size: 12px;
+  }
+  .pub-date {
+    color: #94A3B8;
+    font-weight: 500;
+  }
+  .read-more-link {
+    font-weight: 700;
+    color: #D97706;
+    text-decoration: none;
+  }
+  .post-card.card-purple .read-more-link {
+    color: #8338EC;
+  }
+  .read-more-link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 992px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
